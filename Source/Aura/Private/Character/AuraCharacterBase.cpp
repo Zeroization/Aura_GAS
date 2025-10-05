@@ -8,6 +8,11 @@ AAuraCharacterBase::AAuraCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	/// Begin Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
+	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
+	Weapon->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+	/// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 }
 
 void AAuraCharacterBase::BeginPlay()
