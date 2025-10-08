@@ -6,6 +6,8 @@
 #include "Character/AuraCharacterBase.h"
 #include "AuraCharacter.generated.h"
 
+class UCameraComponent;
+class USpringArmComponent;
 /**
  * 
  */
@@ -13,8 +15,16 @@ UCLASS()
 class AURA_API AAuraCharacter : public AAuraCharacterBase
 {
 	GENERATED_BODY()
+
+public:
+	AAuraCharacter();
 	
-	
-	
-	
+private:
+	/// Begin Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	TObjectPtr<USpringArmComponent> SpringArmComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	TObjectPtr<UCameraComponent> CameraComponent;
+	/// End Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 };

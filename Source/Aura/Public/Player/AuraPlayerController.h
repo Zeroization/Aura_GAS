@@ -26,6 +26,7 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
+	/// Begin Category: Input <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC_AuraContext;
 
@@ -33,4 +34,6 @@ private:
 	TObjectPtr<UInputAction> IA_MoveAction;
 
 	void Move(const FInputActionValue& InputActionValue);
+	/// End Category: Input <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	
 };
