@@ -6,8 +6,10 @@
 
 void AAuraEnemy::HighlightActor()
 {
+	UE_LOG(LogTemp, Warning, TEXT("[ %s ]: I am highlighted!"), *GetActorNameOrLabel());
 }
 
 void AAuraEnemy::UnHighlightActor()
 {
+	UE_LOG(LogTemp, Warning, TEXT("[ %s ]: I am unhighlighted!"), *GetActorNameOrLabel())
 }

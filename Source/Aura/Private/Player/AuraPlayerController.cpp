@@ -5,10 +5,18 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Interaction/Interactable.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
 	bReplicates = true;
+}
+
+void AAuraPlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+
+	CursorTrace();
 }
 
 void AAuraPlayerController::BeginPlay()
@@ -59,5 +67,33 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 	{
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
+	}
+}
+
+void AAuraPlayerController::CursorTrace()
+{
+	// 只有 Visibility Channel 为 Blocked 的才能被指针发现
+	FHitResult CursorHit;
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	if (!CursorHit.bBlockingHit)
+	{
+		return;
+	}
+
+	LastTracedActor = CurrTracedActor;
+	CurrTracedActor = CursorHit.GetActor();
+	
+	// 处理Actor高亮逻辑
+	if (LastTracedActor != CurrTracedActor)
+	{
+		if (LastTracedActor != nullptr)
+		{
+			LastTracedActor->UnHighlightActor();
+		}
+
+		if (CurrTracedActor != nullptr)
+		{
+			CurrTracedActor->HighlightActor();
+		}
 	}
 }
