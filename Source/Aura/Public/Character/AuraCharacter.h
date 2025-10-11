@@ -18,6 +18,9 @@ class AURA_API AAuraCharacter : public AAuraCharacterBase
 
 public:
 	AAuraCharacter();
+
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
 	
 private:
 	/// Begin Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -27,4 +30,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	TObjectPtr<UCameraComponent> CameraComponent;
 	/// End Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+	/// Begin: Ability System <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	void InitAbilitySystem();
+	/// End: Ability System   <<<<<<<<<<<<<<<<<<<<<<<<<<<<
 };

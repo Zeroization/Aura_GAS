@@ -3,20 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "AuraCharacterBase.generated.h"
 
+class UAttributeSet;
+class UAbilitySystemComponent;
+
 UCLASS(Abstract)
-class AURA_API AAuraCharacterBase : public ACharacter
+class AURA_API AAuraCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
 	AAuraCharacterBase();
 
-protected:
-	virtual void BeginPlay() override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	FORCEINLINE UAttributeSet* GetAttributeSet() const { return AttributeSet;}
 
+protected:
 	/// Begin Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	
 	/// TObjectPtr<>是UE5新引入的指针类型, 用于替代传统UObject*, 更安全高效
@@ -30,4 +35,15 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
 	/// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+	/// Begin: Ability System <<<<<<<<<<<<<<<
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	TObjectPtr<UAttributeSet> AttributeSet;
+	/// End: Ability System   <<<<<<<<<<<<<<<
+
+protected:
+	virtual void BeginPlay() override;
 };
