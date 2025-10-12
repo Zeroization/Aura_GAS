@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/AuraCharacterBase.h"
-#include "Interaction/Interactable.h"
+#include "Interaction/Interface/Interactable.h"
 #include "AuraEnemy.generated.h"
 
 /**

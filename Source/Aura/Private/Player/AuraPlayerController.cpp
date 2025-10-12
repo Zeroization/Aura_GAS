@@ -5,7 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "Interaction/Interactable.h"
+#include "Interaction/Interface/Interactable.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
