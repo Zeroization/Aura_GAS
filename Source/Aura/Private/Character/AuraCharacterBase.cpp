@@ -3,6 +3,8 @@
 
 #include "Character/AuraCharacterBase.h"
 
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
+
 
 AAuraCharacterBase::AAuraCharacterBase()
 {
@@ -17,12 +19,10 @@ AAuraCharacterBase::AAuraCharacterBase()
 
 UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent;
+	return AuraAbilitySystemComponent;
 }
 
 void AAuraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
-

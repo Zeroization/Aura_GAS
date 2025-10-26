@@ -18,10 +18,10 @@ UCLASS()
 class AURA_API AAuraPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+
 public:
 	AAuraPlayerController();
-	
+
 	virtual void PlayerTick(float DeltaTime) override;
 
 protected:
@@ -36,11 +36,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> IA_MoveAction;
 	/// End Category: Input <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	
+
 	void Move(const FInputActionValue& InputActionValue);
 
 
-	/// 指针追踪相关
+	/// 鼠标指针追踪相关
 	/// Ps: 要声明实现某接口的Actor变量, 类型是TScriptInterface<I接口名>
 	TScriptInterface<IInteractable> LastTracedActor;
 	TScriptInterface<IInteractable> CurrTracedActor;

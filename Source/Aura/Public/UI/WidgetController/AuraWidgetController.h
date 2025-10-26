@@ -3,11 +3,43 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
 #include "UObject/NoExportTypes.h"
 #include "AuraWidgetController.generated.h"
 
-class UAttributeSet;
-class UAbilitySystemComponent;
+class AAuraPlayerController;
+class AAuraPlayerState;
+class UAuraAbilitySystemComponent;
+class UAuraAttributeSet;
+
+USTRUCT(BlueprintType)
+struct FAuraWidgetControllerParams
+{
+	GENERATED_BODY()
+
+	FAuraWidgetControllerParams() = default;
+
+	FAuraWidgetControllerParams(AAuraPlayerController* InPlayerController, AAuraPlayerState* InPlayerState,
+	                            UAuraAbilitySystemComponent* InAbilitySystemComponent,
+	                            UAuraAttributeSet* InAttributeSet)
+		: PlayerController(InPlayerController), PlayerState(InPlayerState),
+		  AbilitySystemComponent(InAbilitySystemComponent), AttributeSet(InAttributeSet)
+	{
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<AAuraPlayerController> PlayerController = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<AAuraPlayerState> PlayerState = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAuraAbilitySystemComponent> AbilitySystemComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAuraAttributeSet> AttributeSet = nullptr;
+};
+
 /**
  * MVC UI 架构
  * Controller: 获取Model数据，提供给View UI
@@ -16,21 +48,23 @@ UCLASS()
 class AURA_API UAuraWidgetController : public UObject
 {
 	GENERATED_BODY()
-	
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void SetWidgetControllerParams(const FAuraWidgetControllerParams& InParams);
+
 protected:
 	/// Begin Category: Widget Controller >>>>>>>>>>>>>>>>>>>>>>>
 	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
-	TObjectPtr<APlayerController> PlayerController;
+	TObjectPtr<AAuraPlayerController> PlayerController;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
-	TObjectPtr<APlayerState> PlayerState;
+	TObjectPtr<AAuraPlayerState> PlayerState;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UAuraAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
-	TObjectPtr<UAttributeSet> AttributeSet;
+	TObjectPtr<UAuraAttributeSet> AttributeSet;
 	/// End Category: Widget Controller   >>>>>>>>>>>>>>>>>>>>>>>
-	
-	
 };
