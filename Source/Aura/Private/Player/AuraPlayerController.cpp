@@ -25,8 +25,8 @@ void AAuraPlayerController::BeginPlay()
 
 	// 设置InputMappingContext
 	checkf(IMC_AuraContext, TEXT("IMC_AuraContext is not set !"));
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	if (ensureMsgf(Subsystem, TEXT("Can't get UEnhancedInputLocalPlayerSubsystem !")))
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(IMC_AuraContext, 0);
 	}
@@ -39,7 +39,6 @@ void AAuraPlayerController::BeginPlay()
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	InputModeData.SetHideCursorDuringCapture(false);
 	SetInputMode(InputModeData);
-	
 }
 
 void AAuraPlayerController::SetupInputComponent()
@@ -82,7 +81,7 @@ void AAuraPlayerController::CursorTrace()
 
 	LastTracedActor = CurrTracedActor;
 	CurrTracedActor = CursorHit.GetActor();
-	
+
 	// 处理Actor高亮逻辑
 	if (LastTracedActor != CurrTracedActor)
 	{

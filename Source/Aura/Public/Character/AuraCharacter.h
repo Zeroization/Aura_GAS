@@ -21,7 +21,7 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
-	
+
 private:
 	/// Begin Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	UPROPERTY(EditAnywhere, Category = "Camera")
@@ -31,7 +31,8 @@ private:
 	TObjectPtr<UCameraComponent> CameraComponent;
 	/// End Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-	/// Begin: Ability System <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	/// Begin: Init <<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	void InitAbilitySystem();
-	/// End: Ability System   <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	void InitPlayerHUD();
+	/// End: Init  <<<<<<<<<<<<<<<<<<<<<<<<<<<<
 };

@@ -14,25 +14,25 @@ AAuraEnemy::AAuraEnemy()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 
 	// 对于敌人, 将 AbilitySystem 和 AttributeSet 放到这里即可
-	AbilitySystemComponent = CreateDefaultSubobject<UAuraAbilitySystemComponent>("AbilitySystemComponent");
-	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
-	
-	AttributeSet = CreateDefaultSubobject<UAuraAttributeSet>("AttributeSet");
+	AuraAbilitySystemComponent = CreateDefaultSubobject<UAuraAbilitySystemComponent>("AbilitySystemComponent");
+	AuraAbilitySystemComponent->SetIsReplicated(true);
+	AuraAbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+
+	AuraAttributeSet = CreateDefaultSubobject<UAuraAttributeSet>("AttributeSet");
 }
 
 void AAuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	AuraAbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
 void AAuraEnemy::HighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->SetCustomDepthStencilValue(OUTLINE_COLOR_RED);
-	
+
 	Weapon->SetRenderCustomDepth(true);
 	Weapon->SetCustomDepthStencilValue(OUTLINE_COLOR_RED);
 }

@@ -4,10 +4,14 @@
 #include "Character/AuraCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/AuraAttributeSet.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
+#include "UI/HUD/AuraHUD.h"
 
 
 AAuraCharacter::AAuraCharacter()
@@ -37,24 +41,39 @@ void AAuraCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	// 服务端初始化Ability System
+	// 服务端初始化
 	InitAbilitySystem();
+	InitPlayerHUD();
 }
 
 void AAuraCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
-	// 客户端初始化Ability System
+	// 客户端初始化
 	InitAbilitySystem();
+	InitPlayerHUD();
 }
 
 void AAuraCharacter::InitAbilitySystem()
 {
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	checkf(AuraPlayerState, TEXT("Can't get PlayerState !!!"));
+	checkf(AuraPlayerState, TEXT("Can't get AuraPlayerState !!!"));
 	AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState, this);
-	
-	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
-	AttributeSet = AuraPlayerState->GetAttributeSet();
+
+	AuraAbilitySystemComponent = CastChecked<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent());
+	AuraAttributeSet = CastChecked<UAuraAttributeSet>(AuraPlayerState->GetAttributeSet());
+}
+
+void AAuraCharacter::InitPlayerHUD()
+{
+	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
+	{
+		AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD());
+		checkf(AuraHUD, TEXT("Can't get AuraHUD !!!"));
+		AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+		checkf(AuraPlayerState, TEXT("Can't get AuraPlayerState !!!"));
+
+		AuraHUD->InitOverlayWidget(AuraPlayerController, AuraPlayerState, AuraAbilitySystemComponent, AuraAttributeSet);
+	}
 }
