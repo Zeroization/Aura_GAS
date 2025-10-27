@@ -6,8 +6,12 @@
 
 void UAuraWidgetController::SetWidgetControllerParams(const FAuraWidgetControllerParams& InParams)
 {
-	PlayerController = InParams.PlayerController;
-	PlayerState = InParams.PlayerState;
-	AbilitySystemComponent = InParams.AbilitySystemComponent;
-	AttributeSet = InParams.AttributeSet;
+	AuraPlayerController = InParams.PlayerController;
+	AuraPlayerState = InParams.PlayerState;
+	AuraAbilitySystemComponent = InParams.AbilitySystemComponent;
+	AuraAttributeSet = InParams.AttributeSet;
+}
+
+void UAuraWidgetController::BroadcastInitialValues()
+{
 }

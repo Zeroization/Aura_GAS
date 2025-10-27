@@ -43,7 +43,10 @@ void AAuraHUD::InitOverlayWidget(AAuraPlayerController* InPlayerController, AAur
 	UAuraOverlayWidgetController* WidgetController = SetAuraOverlayWidgetController(InParams);
 	OverlayWidget->SetWidgetController(WidgetController);
 
-	// 3. 添加到角色视口中
+	// 3. 通过WidgetController初始化UI数据
+	WidgetController->BroadcastInitialValues();
+	
+	// 4. 添加到角色视口中
 	OverlayWidget->AddToViewport();
 }
 

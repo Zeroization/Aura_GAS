@@ -53,18 +53,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FAuraWidgetControllerParams& InParams);
 
+	virtual void BroadcastInitialValues();
+	
 protected:
 	/// Begin Category: Widget Controller >>>>>>>>>>>>>>>>>>>>>>>
 	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
-	TObjectPtr<AAuraPlayerController> PlayerController;
+	TObjectPtr<AAuraPlayerController> AuraPlayerController;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
-	TObjectPtr<AAuraPlayerState> PlayerState;
+	TObjectPtr<AAuraPlayerState> AuraPlayerState;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
-	TObjectPtr<UAuraAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
-	TObjectPtr<UAuraAttributeSet> AttributeSet;
+	TObjectPtr<UAuraAttributeSet> AuraAttributeSet;
 	/// End Category: Widget Controller   >>>>>>>>>>>>>>>>>>>>>>>
 };
