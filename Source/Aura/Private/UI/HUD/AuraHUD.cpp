@@ -11,7 +11,7 @@
 
 UAuraOverlayWidgetController* AAuraHUD::GetAuraOverlayWidgetController()
 {
-	checkf(OverlayWidgetController != nullptr, TEXT("AuraOverlayWidgetController is nullptr !!!"));
+	checkf(OverlayWidgetController != nullptr, TEXT("[%hs] AuraOverlayWidgetController is nullptr !!!"), __FUNCTION__);
 	return OverlayWidgetController;
 }
 
@@ -20,9 +20,14 @@ UAuraOverlayWidgetController* AAuraHUD::SetAuraOverlayWidgetController(const FAu
 	if (OverlayWidgetController == nullptr)
 	{
 		OverlayWidgetController = NewObject<UAuraOverlayWidgetController>(this, OverlayWidgetControllerClass);
+		OverlayWidgetController->SetWidgetControllerParams(InParams);
+		OverlayWidgetController->BindDelegateCallbackFunctions();
+	}
+	else
+	{
+		OverlayWidgetController->SetWidgetControllerParams(InParams);
 	}
 
-	OverlayWidgetController->SetWidgetControllerParams(InParams);
 	return OverlayWidgetController;
 }
 
@@ -45,7 +50,7 @@ void AAuraHUD::InitOverlayWidget(AAuraPlayerController* InPlayerController, AAur
 
 	// 3. 通过WidgetController初始化UI数据
 	WidgetController->BroadcastInitialValues();
-	
+
 	// 4. 添加到角色视口中
 	OverlayWidget->AddToViewport();
 }

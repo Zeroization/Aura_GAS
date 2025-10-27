@@ -54,7 +54,8 @@ public:
 	void SetWidgetControllerParams(const FAuraWidgetControllerParams& InParams);
 
 	virtual void BroadcastInitialValues();
-	
+	virtual void BindDelegateCallbackFunctions();
+
 protected:
 	/// Begin Category: Widget Controller >>>>>>>>>>>>>>>>>>>>>>>
 	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
