@@ -23,10 +23,18 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
 	FOnAttributeChangedSignature OnMaxHealthChanged;
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
+	FOnAttributeChangedSignature OnManaChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
+	FOnAttributeChangedSignature OnMaxManaChanged;
+
 	virtual void BroadcastInitialValues() override;
 	virtual void BindDelegateCallbackFunctions() override;
 
 protected:
 	void OnHealthChangedCallback(const FOnAttributeChangeData& Data) const;
 	void OnMaxHealthChangedCallback(const FOnAttributeChangeData& Data) const;
+	void OnManaChangedCallback(const FOnAttributeChangeData& Data) const;
+	void OnMaxManaChangedCallback(const FOnAttributeChangeData& Data) const;
 };
