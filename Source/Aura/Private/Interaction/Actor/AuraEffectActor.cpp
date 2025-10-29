@@ -5,46 +5,39 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "AbilitySystem/AuraAttributeSet.h"
-#include "Components/SphereComponent.h"
 
 
 AAuraEffectActor::AAuraEffectActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	SetRootComponent(Mesh);
-	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
-	Sphere->SetupAttachment(GetRootComponent());
-}
-
-void AAuraEffectActor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                      UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-                                      const FHitResult& HitResult)
-{
-	// TODO: 更改成用 GameplayEffects 修改 AttributeSet 的值 
-	if (OtherActor->Implements<UAbilitySystemInterface>())
-	{
-		TScriptInterface<IAbilitySystemInterface> ASCInterface = TScriptInterface<IAbilitySystemInterface>(OtherActor);
-		const UAuraAttributeSet* ConstAuraAttributeSet = CastChecked<UAuraAttributeSet>(
-			ASCInterface->GetAbilitySystemComponent()->GetAttributeSet(UAuraAttributeSet::StaticClass()));
-		UAuraAttributeSet* AuraAttributeSet = const_cast<UAuraAttributeSet*>(ConstAuraAttributeSet);
-		
-		AuraAttributeSet->SetHealth(AuraAttributeSet->GetHealth() + 25.f);
-		AuraAttributeSet->SetMana(AuraAttributeSet->GetMana() - 25.f);
-	}
-}
-
-void AAuraEffectActor::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
+	USceneComponent* SceneComponent = CreateDefaultSubobject<USceneComponent>("SceneRoot");
+	SetRootComponent(SceneComponent);
 }
 
 void AAuraEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
-	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AAuraEffectActor::OnBeginOverlap);
-	Sphere->OnComponentEndOverlap.AddDynamic(this, &AAuraEffectActor::OnEndOverlap);
+void AAuraEffectActor::ApplyEffectToTarget(AActor* InTargetActor, TSubclassOf<UGameplayEffect> InGEClass)
+{
+	if (InTargetActor->Implements<UAbilitySystemInterface>())
+	{
+		checkf(InGEClass, TEXT("[%hs] Instant GEClass is empty, please fill out in editor!"), __FUNCTION__);
+		
+		// 1. 获取ASC
+		TScriptInterface<IAbilitySystemInterface> ASCInterface = TScriptInterface<IAbilitySystemInterface>(InTargetActor);
+		UAbilitySystemComponent* TargetActorASC = ASCInterface->GetAbilitySystemComponent();
+		// 2. 创建GEContextHandle(封装GEContext + 工具函数)
+		FGameplayEffectContextHandle GEContextHandle = TargetActorASC->MakeEffectContext();
+		GEContextHandle.AddSourceObject(this);
+		// 3. 创建GESpecHandle(封装GESpec + 工具函数)
+		FGameplayEffectSpecHandle GESpecHandle = TargetActorASC->MakeOutgoingSpec(InGEClass, 1.f, GEContextHandle);
+		// 4. 施加GE
+		TargetActorASC->ApplyGameplayEffectSpecToSelf(*GESpecHandle.Data);
+	}
+
+	// 获取ASC的另一个方法:
+	// UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
 }
