@@ -17,7 +17,7 @@ public:
 	AAuraEffectActor();
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "GAS|Effects")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS|Effects")
 	TSubclassOf<UGameplayEffect> InstantGEClass;
 
 	virtual void BeginPlay() override;
