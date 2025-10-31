@@ -41,3 +41,11 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* InTargetActor, TSubclassOf<UG
 	// 获取ASC的另一个方法:
 	// UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
 }
+
+void AAuraEffectActor::OnBeginOverlap(AActor* TargetActor)
+{
+}
+
+void AAuraEffectActor::OnEndOverlap(AActor* TargetActor)
+{
+}
