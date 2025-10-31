@@ -17,8 +17,13 @@ public:
 	AAuraEffectActor();
 
 protected:
+	// Instant GE: 一般会永久改变BaseValue
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS|Effects")
 	TSubclassOf<UGameplayEffect> InstantGEClass;
+
+	// Has Duration/Infinite GE: 一般会改变CurrentValue, 并在时间到后撤回修改
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS|Effects")
+	TSubclassOf<UGameplayEffect> HasDurationGEClass;
 
 	virtual void BeginPlay() override;
 

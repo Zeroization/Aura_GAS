@@ -26,7 +26,7 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* InTargetActor, TSubclassOf<UG
 	{
 		checkf(InGEClass, TEXT("[%hs] Instant GEClass is empty, please fill out in editor!"), __FUNCTION__);
 		
-		// 1. 获取ASC
+		// 1. 获取Target自己的ASC
 		TScriptInterface<IAbilitySystemInterface> ASCInterface = TScriptInterface<IAbilitySystemInterface>(InTargetActor);
 		UAbilitySystemComponent* TargetActorASC = ASCInterface->GetAbilitySystemComponent();
 		// 2. 创建GEContextHandle(封装GEContext + 工具函数)
@@ -34,7 +34,7 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* InTargetActor, TSubclassOf<UG
 		GEContextHandle.AddSourceObject(this);
 		// 3. 创建GESpecHandle(封装GESpec + 工具函数)
 		FGameplayEffectSpecHandle GESpecHandle = TargetActorASC->MakeOutgoingSpec(InGEClass, 1.f, GEContextHandle);
-		// 4. 施加GE
+		// 4. 对Target自己的ASC施加GE
 		TargetActorASC->ApplyGameplayEffectSpecToSelf(*GESpecHandle.Data);
 	}
 
