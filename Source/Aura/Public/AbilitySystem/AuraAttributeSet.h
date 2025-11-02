@@ -20,13 +20,13 @@ UCLASS()
 class AURA_API UAuraAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
-	
+
 public:
 	UAuraAttributeSet();
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 
-public:
 	/// Begin Category: Vital Attributes >>>>>>>>>>>>>
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Vital Attributes")
 	FGameplayAttributeData Health;
@@ -44,18 +44,18 @@ public:
 	FGameplayAttributeData MaxMana;
 	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, MaxMana)
 	/// End Category: Vital Attributes   >>>>>>>>>>>>>
-	
+
 
 	/// Begin: OnRep_ Functions >>>>>>>>>>>>>>>>>>>>>>
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
-	
+
 	UFUNCTION()
 	void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const;
 
 	UFUNCTION()
 	void OnRep_Mana(const FGameplayAttributeData& OldMana) const;
-	
+
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
 	/// End: OnRep_ Functions   >>>>>>>>>>>>>>>>>>>>>>
