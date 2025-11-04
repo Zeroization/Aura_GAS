@@ -3,6 +3,8 @@
 
 #include "AbilitySystem/AuraAttributeSet.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -33,16 +35,24 @@ void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 
-	// 在Attribute的Current Value改变时进行Clamp操作
+	// 在Attribute的Current Value改变前进行Clamp操作
 	if (Attribute == GetHealthAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
 	}
 	if (Attribute == GetManaAttribute())
-
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
 	}
+}
+
+void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+
+	// 获取Source和Target的相关信息
+	FEffectProperties EffectProperties;
+	SetEffectProperties(Data, EffectProperties);
 }
 
 void UAuraAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
@@ -63,4 +73,36 @@ void UAuraAttributeSet::OnRep_Mana(const FGameplayAttributeData& OldMana) const
 void UAuraAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, MaxMana, OldMaxMana);
+}
+
+void UAuraAttributeSet::SetEffectProperties(const struct FGameplayEffectModCallbackData& Data, FEffectProperties& Props)
+{
+	Props.EffectContextHandle = Data.EffectSpec.GetContext();
+
+	// Source: 引发GE的Actor
+	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+	if (IsValid(Props.SourceASC) &&
+		Props.SourceASC->AbilityActorInfo.IsValid() &&
+		Props.SourceASC->AbilityActorInfo->AvatarActor.IsValid())
+	{
+		Props.SourceAvatarActor = Props.SourceASC->GetAvatarActor();
+		Props.SourceController = Props.SourceASC->AbilityActorInfo->PlayerController.Get();
+		if (Props.SourceController == nullptr && Props.SourceAvatarActor != nullptr)
+		{
+			if (const APawn* SourcePawn = Cast<APawn>(Props.SourceAvatarActor))
+			{
+				Props.SourceController = SourcePawn->GetController();
+			}
+		}
+		Props.SourceCharacter = Props.SourceController->GetCharacter();
+	}
+
+	// Target: 被GE施加效果的Actor
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	{
+		Props.TargetAvatarActor = Data.Target.GetAvatarActor();
+		Props.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		Props.TargetCharacter = Props.TargetController->GetCharacter();
+		Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
+	}
 }
