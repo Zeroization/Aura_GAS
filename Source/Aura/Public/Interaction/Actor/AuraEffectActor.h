@@ -44,6 +44,9 @@ struct FEffectActorGE
 	EEffectRemovalPolicy GERemovalPolicy = EEffectRemovalPolicy::EERP_DoNotRemove;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float GELevel = 1.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bDestroyOnEndOverlap = false;
 };
 

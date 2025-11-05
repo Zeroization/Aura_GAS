@@ -36,7 +36,7 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* InTargetActor, const FEffectA
 		GEContextHandle.AddSourceObject(this);
 		// 3. 创建GESpecHandle(封装GESpec + 工具函数)
 		const FGameplayEffectSpecHandle GESpecHandle = TargetActorAsc->MakeOutgoingSpec(
-			InEffectActorGE.GEClass, 1.f, GEContextHandle);
+			InEffectActorGE.GEClass, InEffectActorGE.GELevel, GEContextHandle);
 		// 4. 对Target自己的ASC施加GE
 		const FActiveGameplayEffectHandle ActiveGEHandle = TargetActorAsc->ApplyGameplayEffectSpecToSelf(
 			*GESpecHandle.Data);
