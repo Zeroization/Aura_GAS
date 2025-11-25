@@ -42,6 +42,8 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UAuraAttributeSet> AuraAttributeSet;
+
+	virtual void InitAbilitySystem();
 	/// End: Ability System   <<<<<<<<<<<<<<<
 
 	virtual void BeginPlay() override;

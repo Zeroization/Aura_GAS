@@ -32,7 +32,7 @@ private:
 	/// End Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	/// Begin: Init <<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	void InitAbilitySystem();
+	virtual void InitAbilitySystem() override;
 	void InitPlayerHUD();
 	/// End: Init  <<<<<<<<<<<<<<<<<<<<<<<<<<<<
 };

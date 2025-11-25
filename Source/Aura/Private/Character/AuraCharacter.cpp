@@ -57,11 +57,14 @@ void AAuraCharacter::OnRep_PlayerState()
 
 void AAuraCharacter::InitAbilitySystem()
 {
+	Super::InitAbilitySystem();
+
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
 	checkf(AuraPlayerState, TEXT("Can't get AuraPlayerState !!!"));
-	AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState, this);
-
 	AuraAbilitySystemComponent = CastChecked<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent());
+	AuraAbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
+	AuraAbilitySystemComponent->OnAbilityActorInfoSet();
+
 	AuraAttributeSet = CastChecked<UAuraAttributeSet>(AuraPlayerState->GetAttributeSet());
 }
 
