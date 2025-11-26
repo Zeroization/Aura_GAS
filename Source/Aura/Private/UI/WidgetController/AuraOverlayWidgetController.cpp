@@ -17,14 +17,25 @@ void UAuraOverlayWidgetController::BroadcastInitialValues()
 
 void UAuraOverlayWidgetController::BindDelegateCallbackFunctions()
 {
+	// UAuraOverlayWidgetController::FOnAttributeChangedSignature
 	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetHealthAttribute()).
 	                            AddUObject(this, &UAuraOverlayWidgetController::OnHealthChangedCallback);
 	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetMaxHealthAttribute()).
 	                            AddUObject(this, &UAuraOverlayWidgetController::OnMaxHealthChangedCallback);
 	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetManaAttribute()).
-								AddUObject(this, &UAuraOverlayWidgetController::OnManaChangedCallback);
+	                            AddUObject(this, &UAuraOverlayWidgetController::OnManaChangedCallback);
 	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetMaxManaAttribute()).
-								AddUObject(this, &UAuraOverlayWidgetController::OnMaxManaChangedCallback);
+	                            AddUObject(this, &UAuraOverlayWidgetController::OnMaxManaChangedCallback);
+
+	// UAuraAbilitySystemComponent::FOnGetGEAssetTagDelegate
+	AuraAbilitySystemComponent->OnGetGEAssetTag.AddLambda([](const FGameplayTagContainer& AssetTags)
+	{
+		for (const auto& Tag : AssetTags)
+		{
+			const FString DebugMsg = FString::Printf(TEXT("[Overlay UI] GE Tag: %s"), *Tag.ToString());
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, DebugMsg);
+		}
+	});
 }
 
 void UAuraOverlayWidgetController::OnHealthChangedCallback(const FOnAttributeChangeData& Data) const

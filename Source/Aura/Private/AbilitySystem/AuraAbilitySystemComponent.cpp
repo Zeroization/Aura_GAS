@@ -12,6 +12,9 @@ void UAuraAbilitySystemComponent::OnAbilityActorInfoSet()
 void UAuraAbilitySystemComponent::OnGEApplied(UAbilitySystemComponent* InASC, const FGameplayEffectSpec& InGESpec,
                                               FActiveGameplayEffectHandle ActiveGEHandle)
 {
-	FString DebugMsg = FString::Printf(TEXT("GE %s has been applied."), *InGESpec.Def->GetName());
-	GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Cyan, DebugMsg);
+	FGameplayTagContainer TagContainer;
+	InGESpec.GetAllAssetTags(TagContainer);
+
+	// 广播获取的Tag到UIWidgetController
+	OnGetGEAssetTag.Broadcast(TagContainer);
 }

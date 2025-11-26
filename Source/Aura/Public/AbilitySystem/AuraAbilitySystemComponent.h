@@ -6,6 +6,8 @@
 #include "AbilitySystemComponent.h"
 #include "AuraAbilitySystemComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGetGEAssetTagDelegate, const FGameplayTagContainer&);
+
 /**
  * 
  */
@@ -15,6 +17,8 @@ class AURA_API UAuraAbilitySystemComponent : public UAbilitySystemComponent
 	GENERATED_BODY()
 
 public:
+	FOnGetGEAssetTagDelegate OnGetGEAssetTag;
+
 	/**
 	 *  在 `ASC->InitAbilityActorInfo()` 被调用后执行
 	 */
