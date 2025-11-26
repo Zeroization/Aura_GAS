@@ -8,6 +8,26 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 
+class UAuraUserWidget;
+
+USTRUCT(BlueprintType)
+struct FDisplayWidgetRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText DisplayMessage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UTexture2D> DisplayImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag Tag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UAuraUserWidget> DisplayWidget;
+};
+
 /**
  * 
  */
@@ -33,6 +53,9 @@ public:
 	virtual void BindDelegateCallbackFunctions() override;
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
+	TObjectPtr<UDataTable> MessageWidgetDataTable;
+	
 	void OnHealthChangedCallback(const FOnAttributeChangeData& Data) const;
 	void OnMaxHealthChangedCallback(const FOnAttributeChangeData& Data) const;
 	void OnManaChangedCallback(const FOnAttributeChangeData& Data) const;
