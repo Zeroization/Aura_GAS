@@ -25,7 +25,15 @@ void AAuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	InitAbilitySystem();
+}
+
+void AAuraEnemy::InitAbilitySystem()
+{
+	Super::InitAbilitySystem();
+
 	AuraAbilitySystemComponent->InitAbilityActorInfo(this, this);
+	AuraAbilitySystemComponent->OnAbilityActorInfoSet();
 }
 
 void AAuraEnemy::HighlightActor()

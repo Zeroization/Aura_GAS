@@ -19,7 +19,9 @@ public:
 	AAuraEnemy();
 
 	virtual void BeginPlay() override;
- 
+
+	virtual void InitAbilitySystem() override;
+
 	/// >>>> Begin: Interface IInteractable
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
