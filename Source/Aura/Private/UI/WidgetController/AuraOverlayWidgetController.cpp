@@ -28,12 +28,20 @@ void UAuraOverlayWidgetController::BindDelegateCallbackFunctions()
 	                            AddUObject(this, &UAuraOverlayWidgetController::OnMaxManaChangedCallback);
 
 	// UAuraAbilitySystemComponent::FOnGetGEAssetTagDelegate
-	AuraAbilitySystemComponent->OnGetGEAssetTag.AddLambda([](const FGameplayTagContainer& AssetTags)
+	AuraAbilitySystemComponent->OnGetGEAssetTag.AddLambda([this](const FGameplayTagContainer& AssetTags)
 	{
 		for (const auto& Tag : AssetTags)
 		{
+#ifdef WITH_EDITOR
 			const FString DebugMsg = FString::Printf(TEXT("[Overlay UI] GE Tag: %s"), *Tag.ToString());
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, DebugMsg);
+#endif
+
+			// 尝试获取带有 DisplayMessage.* Tag 的数据表格, 并将其广播至显示对应消息的UI
+			if (FDisplayWidgetRow* Row = GetDataTableRowByGameplayTag<FDisplayWidgetRow>(MessageWidgetDataTable, Tag))
+			{
+				
+			}
 		}
 	});
 }

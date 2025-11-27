@@ -55,9 +55,25 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
-	
+
+	/**
+	 * 根据 GameplayTag 进行查表的工具函数, TODO: 创建一个工具函数库
+	 * @tparam DTRowType 任意数据表格的行类型
+	 * @param DataTable 数据表格指针
+	 * @param Tag Gameplay Tag
+	 * @return 指向表行数据的指针
+	 */
+	template <typename DTRowType>
+	static DTRowType* GetDataTableRowByGameplayTag(UDataTable* DataTable, const FGameplayTag& Tag);
+
 	void OnHealthChangedCallback(const FOnAttributeChangeData& Data) const;
 	void OnMaxHealthChangedCallback(const FOnAttributeChangeData& Data) const;
 	void OnManaChangedCallback(const FOnAttributeChangeData& Data) const;
 	void OnMaxManaChangedCallback(const FOnAttributeChangeData& Data) const;
 };
+
+template <typename DTRowType>
+DTRowType* UAuraOverlayWidgetController::GetDataTableRowByGameplayTag(UDataTable* DataTable, const FGameplayTag& Tag)
+{
+	return DataTable->FindRow<DTRowType>(Tag.GetTagName(), TEXT(""));
+}
