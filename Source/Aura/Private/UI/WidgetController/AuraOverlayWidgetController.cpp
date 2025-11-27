@@ -18,14 +18,26 @@ void UAuraOverlayWidgetController::BroadcastInitialValues()
 void UAuraOverlayWidgetController::BindDelegateCallbackFunctions()
 {
 	// UAuraOverlayWidgetController::FOnAttributeChangedSignature
-	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetHealthAttribute()).
-	                            AddUObject(this, &UAuraOverlayWidgetController::OnHealthChangedCallback);
-	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetMaxHealthAttribute()).
-	                            AddUObject(this, &UAuraOverlayWidgetController::OnMaxHealthChangedCallback);
-	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetManaAttribute()).
-	                            AddUObject(this, &UAuraOverlayWidgetController::OnManaChangedCallback);
-	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetMaxManaAttribute()).
-	                            AddUObject(this, &UAuraOverlayWidgetController::OnMaxManaChangedCallback);
+	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetHealthAttribute())
+	                          .AddLambda([this](const FOnAttributeChangeData& Data)
+	                          {
+		                          OnHealthChanged.Broadcast(Data.NewValue);
+	                          });
+	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetMaxHealthAttribute())
+	                          .AddLambda([this](const FOnAttributeChangeData& Data)
+	                          {
+		                          OnMaxHealthChanged.Broadcast(Data.NewValue);
+	                          });
+	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetManaAttribute())
+	                          .AddLambda([this](const FOnAttributeChangeData& Data)
+	                          {
+		                          OnManaChanged.Broadcast(Data.NewValue);
+	                          });
+	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetMaxManaAttribute())
+	                          .AddLambda([this](const FOnAttributeChangeData& Data)
+	                          {
+		                          OnMaxManaChanged.Broadcast(Data.NewValue);
+	                          });
 
 	// UAuraAbilitySystemComponent::FOnGetGEAssetTagDelegate
 	AuraAbilitySystemComponent->OnGetGEAssetTag.AddLambda([this](const FGameplayTagContainer& AssetTags)
@@ -47,24 +59,4 @@ void UAuraOverlayWidgetController::BindDelegateCallbackFunctions()
 			}
 		}
 	});
-}
-
-void UAuraOverlayWidgetController::OnHealthChangedCallback(const FOnAttributeChangeData& Data) const
-{
-	OnHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UAuraOverlayWidgetController::OnMaxHealthChangedCallback(const FOnAttributeChangeData& Data) const
-{
-	OnMaxHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UAuraOverlayWidgetController::OnManaChangedCallback(const FOnAttributeChangeData& Data) const
-{
-	OnManaChanged.Broadcast(Data.NewValue);
-}
-
-void UAuraOverlayWidgetController::OnMaxManaChangedCallback(const FOnAttributeChangeData& Data) const
-{
-	OnMaxManaChanged.Broadcast(Data.NewValue);
 }

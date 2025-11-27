@@ -70,11 +70,6 @@ protected:
 	 */
 	template <typename DTRowType>
 	static DTRowType* GetDataTableRowByGameplayTag(UDataTable* DataTable, const FGameplayTag& Tag);
-
-	void OnHealthChangedCallback(const FOnAttributeChangeData& Data) const;
-	void OnMaxHealthChangedCallback(const FOnAttributeChangeData& Data) const;
-	void OnManaChangedCallback(const FOnAttributeChangeData& Data) const;
-	void OnMaxManaChangedCallback(const FOnAttributeChangeData& Data) const;
 };
 
 template <typename DTRowType>
