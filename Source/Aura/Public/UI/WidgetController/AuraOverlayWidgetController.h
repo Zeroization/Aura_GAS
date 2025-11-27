@@ -6,8 +6,6 @@
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "AuraOverlayWidgetController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
-
 class UAuraUserWidget;
 
 USTRUCT(BlueprintType)
@@ -27,6 +25,10 @@ struct FDisplayWidgetRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UAuraUserWidget> DisplayWidget;
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FDisplayWidgetRow, Row);
 
 /**
  * 
@@ -49,6 +51,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
 	FOnAttributeChangedSignature OnMaxManaChanged;
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Messages")
+	FMessageWidgetRowSignature OnDisplayMessageRowReceived;
+
 	virtual void BroadcastInitialValues() override;
 	virtual void BindDelegateCallbackFunctions() override;
 
@@ -57,7 +62,7 @@ protected:
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
 
 	/**
-	 * 根据 GameplayTag 进行查表的工具函数, TODO: 创建一个工具函数库
+	 * 根据 GameplayTag 进行查表的工具函数, 行名必须是 GameplayTag 名, TODO: 创建一个工具函数库
 	 * @tparam DTRowType 任意数据表格的行类型
 	 * @param DataTable 数据表格指针
 	 * @param Tag Gameplay Tag
