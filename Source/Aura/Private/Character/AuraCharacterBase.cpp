@@ -26,6 +26,18 @@ void AAuraCharacterBase::InitAbilitySystem()
 {
 }
 
+void AAuraCharacterBase::InitPrimaryAttributes() const
+{
+	checkf(IsValid(GetAbilitySystemComponent()), TEXT("[%hs] ASC is null!"), __FUNCTION__);
+	checkf(IsValid(InitPrimaryAttrGEClass), TEXT("[%hs] InitPrimaryAttrGEClass is null, plz fill it in editor"),
+	       __FUNCTION__);
+
+	const FGameplayEffectContextHandle GEContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	const FGameplayEffectSpecHandle GESpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(
+		InitPrimaryAttrGEClass, 1.f, GEContextHandle);
+	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data, GetAbilitySystemComponent());
+}
+
 void AAuraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();

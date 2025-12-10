@@ -29,7 +29,7 @@ void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimePropert
 	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
 	/// End Category: Vital Attributes   >>>>>>>>>>
-	
+
 	/// Begin Category: Primary Attributes >>>>>>>>>
 	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, Strength, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, Intelligence, COND_None, REPNOTIFY_Always);
@@ -139,6 +139,13 @@ void UAuraAttributeSet::SetEffectProperties(const struct FGameplayEffectModCallb
 	{
 		Props.TargetAvatarActor = Data.Target.GetAvatarActor();
 		Props.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		if (Props.TargetController == nullptr && Props.TargetAvatarActor != nullptr)
+		{
+			if (const APawn* TargetPawn = Cast<APawn>(Props.TargetAvatarActor))
+			{
+				Props.TargetController = TargetPawn->GetController();
+			}
+		}
 		Props.TargetCharacter = Props.TargetController->GetCharacter();
 		Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
 	}

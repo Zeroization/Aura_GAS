@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "AuraCharacterBase.generated.h"
 
+class UGameplayEffect;
 class UAuraAbilitySystemComponent;
 class UAuraAttributeSet;
 
@@ -23,7 +24,6 @@ public:
 
 protected:
 	/// Begin Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 	/// TObjectPtr<>是UE5新引入的指针类型, 用于替代传统UObject*, 更安全高效
 	/// 有两个关键特性:
 	///		1. 访问追踪 Access Tracking:	记录和检测TObjectPtr<>的访问情况,
@@ -33,7 +33,6 @@ protected:
 	///								的句柄，在访问时才真正加载对象。
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
-
 	/// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	/// Begin: Ability System <<<<<<<<<<<<<<<
@@ -43,7 +42,12 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAuraAttributeSet> AuraAttributeSet;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> InitPrimaryAttrGEClass;
+
 	virtual void InitAbilitySystem();
+
+	void InitPrimaryAttributes() const;
 	/// End: Ability System   <<<<<<<<<<<<<<<
 
 	virtual void BeginPlay() override;

@@ -34,6 +34,8 @@ void AAuraEnemy::InitAbilitySystem()
 
 	AuraAbilitySystemComponent->InitAbilityActorInfo(this, this);
 	AuraAbilitySystemComponent->OnAbilityActorInfoSet();
+
+	InitPrimaryAttributes();
 }
 
 void AAuraEnemy::HighlightActor()
