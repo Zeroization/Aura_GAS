@@ -25,7 +25,7 @@ public:
 
 protected:
 	/// Begin: Ability System <<<<<<<<<<<<<<<
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()

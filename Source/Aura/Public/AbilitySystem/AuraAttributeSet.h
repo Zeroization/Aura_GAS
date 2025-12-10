@@ -59,23 +59,41 @@ class AURA_API UAuraAttributeSet : public UAttributeSet
 	GENERATED_BODY()
 
 public:
-	/// Begin Category: Vital Attributes >>>>>>>>>>>>>
+	/// Begin Category: Vital Attributes 必备属性 >>>>>>>>>>>>>
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Vital Attributes")
 	FGameplayAttributeData Health;
-	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Health)
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Health);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth, Category = "Vital Attributes")
 	FGameplayAttributeData MaxHealth;
-	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, MaxHealth)
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, MaxHealth);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category = "Vital Attributes")
 	FGameplayAttributeData Mana;
-	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Mana)
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Mana);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxMana, Category = "Vital Attributes")
 	FGameplayAttributeData MaxMana;
-	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, MaxMana)
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, MaxMana);
 	/// End Category: Vital Attributes   >>>>>>>>>>>>>
+
+	/// Begin Category: Primary Attributes >>>>>>>>>>>>>>>>>
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Strength, Category = "Primary Attributes")
+	FGameplayAttributeData Strength;
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Strength);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Intelligence, Category = "Primary Attributes")
+	FGameplayAttributeData Intelligence;
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Intelligence);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Resilience, Category = "Primary Attributes")
+	FGameplayAttributeData Resilience;
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Resilience);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Vigor, Category = "Primary Attributes")
+	FGameplayAttributeData Vigor;
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Vigor);
+	/// End Category: Primary Attributes >>>>>>>>>>>>>>>>>>>
 	
 	UAuraAttributeSet();
 
@@ -95,6 +113,18 @@ public:
 
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
+
+	UFUNCTION()
+	void OnRep_Strength(const FGameplayAttributeData& OldStrength) const;
+
+	UFUNCTION()
+	void OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence) const;
+
+	UFUNCTION()
+	void OnRep_Resilience(const FGameplayAttributeData& OldResilience) const;
+
+	UFUNCTION()
+	void OnRep_Vigor(const FGameplayAttributeData& OldVigor) const; 
 	/// End: OnRep_ Functions   >>>>>>>>>>>>>>>>>>>>>>
 
 private:
