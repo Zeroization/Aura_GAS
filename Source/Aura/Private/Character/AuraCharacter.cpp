@@ -67,7 +67,7 @@ void AAuraCharacter::InitAbilitySystem()
 
 	AuraAttributeSet = CastChecked<UAuraAttributeSet>(AuraPlayerState->GetAttributeSet());
 
-	InitPrimaryAttributes();
+	InitDefaultAttributes();
 }
 
 void AAuraCharacter::InitPlayerHUD()

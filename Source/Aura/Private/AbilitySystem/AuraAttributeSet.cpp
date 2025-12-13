@@ -12,9 +12,7 @@ UAuraAttributeSet::UAuraAttributeSet()
 {
 	/// Begin Category: Vital Attributes >>>>>>>>>>
 	InitHealth(50.f);
-	InitMaxHealth(100.f);
 	InitMana(25.f);
-	InitMaxMana(50.f);
 	/// End Category: Vital Attributes   >>>>>>>>>>
 }
 
