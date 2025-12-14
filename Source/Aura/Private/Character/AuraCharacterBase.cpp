@@ -31,7 +31,8 @@ void AAuraCharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& G
 	checkf(IsValid(GetAbilitySystemComponent()), TEXT("[%hs] Self ASC is null!"), __FUNCTION__);
 	checkf(IsValid(GEClass), TEXT("[%hs] GEClass is null, plz check fillings"), __FUNCTION__);
 
-	const FGameplayEffectContextHandle GEContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	FGameplayEffectContextHandle GEContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	GEContextHandle.AddSourceObject(this);
 	const FGameplayEffectSpecHandle GESpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GEClass, Level, GEContextHandle);
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data, GetAbilitySystemComponent());
 }
