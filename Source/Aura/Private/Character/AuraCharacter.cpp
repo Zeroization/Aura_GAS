@@ -55,6 +55,13 @@ void AAuraCharacter::OnRep_PlayerState()
 	InitPlayerHUD();
 }
 
+int32 AAuraCharacter::GetActorLevel()
+{
+	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	checkf(AuraPlayerState, TEXT("[%hs] AuraPlayerState is nullptr!"), __FUNCTION__);
+	return AuraPlayerState->GetPlayerLevel();
+}
+
 void AAuraCharacter::InitAbilitySystem()
 {
 	Super::InitAbilitySystem();
