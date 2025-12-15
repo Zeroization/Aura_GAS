@@ -26,6 +26,24 @@ void AAuraCharacterBase::InitAbilitySystem()
 {
 }
 
+void AAuraCharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GEClass, float Level) const
+{
+	checkf(IsValid(GetAbilitySystemComponent()), TEXT("[%hs] Self ASC is null!"), __FUNCTION__);
+	checkf(IsValid(GEClass), TEXT("[%hs] GEClass is null, plz check fillings"), __FUNCTION__);
+
+	FGameplayEffectContextHandle GEContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	GEContextHandle.AddSourceObject(this);
+	const FGameplayEffectSpecHandle GESpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GEClass, Level, GEContextHandle);
+	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*GESpecHandle.Data, GetAbilitySystemComponent());
+}
+
+void AAuraCharacterBase::InitDefaultAttributes() const
+{
+	ApplyEffectToSelf(InitPrimaryAttrGEClass);
+	ApplyEffectToSelf(InitSecondaryAttrGEClass);
+	ApplyEffectToSelf(InitVitalAttrGEClass);
+}
+
 void AAuraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();

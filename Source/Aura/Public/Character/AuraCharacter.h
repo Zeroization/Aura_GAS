@@ -22,6 +22,10 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 
+	/// Begin: Combat Interface <<<<
+	virtual int32 GetActorLevel() override;
+	/// End: Combat Interface <<<<<<
+
 private:
 	/// Begin Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	UPROPERTY(EditAnywhere, Category = "Camera")

@@ -34,6 +34,8 @@ void AAuraEnemy::InitAbilitySystem()
 
 	AuraAbilitySystemComponent->InitAbilityActorInfo(this, this);
 	AuraAbilitySystemComponent->OnAbilityActorInfoSet();
+
+	InitDefaultAttributes();
 }
 
 void AAuraEnemy::HighlightActor()
@@ -49,4 +51,9 @@ void AAuraEnemy::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
+}
+
+int32 AAuraEnemy::GetActorLevel()
+{
+	return Level;
 }
