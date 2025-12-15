@@ -41,6 +41,7 @@ void AAuraCharacterBase::InitDefaultAttributes() const
 {
 	ApplyEffectToSelf(InitPrimaryAttrGEClass);
 	ApplyEffectToSelf(InitSecondaryAttrGEClass);
+	ApplyEffectToSelf(InitVitalAttrGEClass);
 }
 
 void AAuraCharacterBase::BeginPlay()
