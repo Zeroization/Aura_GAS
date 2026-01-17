@@ -23,7 +23,26 @@ UAuraOverlayWidgetController* UAuraAbilitySystemLibrary::GetAuraOverlayWidgetCon
 			UAuraAbilitySystemComponent* ASC = Cast<UAuraAbilitySystemComponent>(PlayerState->GetAbilitySystemComponent());
 			UAuraAttributeSet* AttributeSet = Cast<UAuraAttributeSet>(PlayerState->GetAttributeSet());
 			const FAuraWidgetControllerParams Params(PlayerController, PlayerState, ASC, AttributeSet);
-			return AuraHUD->SetAuraOverlayWidgetController(Params);
+			return AuraHUD->GetAuraOverlayWidgetController(Params);
+		}
+	}
+
+	return nullptr;
+}
+
+UAuraAttributeMenuWidgetController* UAuraAbilitySystemLibrary::GetAuraAttributeMenuWidgetController(const UObject* WorldContextObject)
+{
+	// 从本地玩家获取UI Controller
+	if (AAuraPlayerController* PlayerController =
+		Cast<AAuraPlayerController>(WorldContextObject->GetWorld()->GetFirstPlayerController()))
+	{
+		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(PlayerController->GetHUD()))
+		{
+			AAuraPlayerState* PlayerState = PlayerController->GetPlayerState<AAuraPlayerState>();
+			UAuraAbilitySystemComponent* ASC = Cast<UAuraAbilitySystemComponent>(PlayerState->GetAbilitySystemComponent());
+			UAuraAttributeSet* AttributeSet = Cast<UAuraAttributeSet>(PlayerState->GetAttributeSet());
+			const FAuraWidgetControllerParams Params(PlayerController, PlayerState, ASC, AttributeSet);
+			return AuraHUD->GetAuraAttributeMenuWidgetController(Params);
 		}
 	}
 

@@ -4,10 +4,10 @@
 #include "UI/WidgetController/AttributeMenuWidgetController.h"
 
 
-void UAttributeMenuWidgetController::BindDelegateCallbackFunctions()
+void UAuraAttributeMenuWidgetController::BindDelegateCallbackFunctions()
 {
 }
 
-void UAttributeMenuWidgetController::BroadcastInitialValues()
+void UAuraAttributeMenuWidgetController::BroadcastInitialValues()
 {
 }

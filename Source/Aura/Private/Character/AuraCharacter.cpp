@@ -86,6 +86,6 @@ void AAuraCharacter::InitPlayerHUD()
 		AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
 		checkf(AuraPlayerState, TEXT("Can't get AuraPlayerState !!!"));
 
-		AuraHUD->InitOverlayWidget(AuraPlayerController, AuraPlayerState, AuraAbilitySystemComponent, AuraAttributeSet);
+		AuraHUD->InitHUD(AuraPlayerController, AuraPlayerState, AuraAbilitySystemComponent, AuraAttributeSet);
 	}
 }
