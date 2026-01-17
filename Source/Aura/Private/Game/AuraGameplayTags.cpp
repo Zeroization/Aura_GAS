@@ -10,6 +10,9 @@ namespace AuraGameplayTags
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
 		                               "Attribute",
 		                               "GAS中用到的属性; 此Tag仅用于Tag相关操作(如Matches)");
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Point,
+		                               "Attribute.Point",
+		                               "用于给首要属性加点的属性点");
 
 		namespace Vital
 		{

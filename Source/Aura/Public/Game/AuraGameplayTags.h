@@ -9,7 +9,8 @@ namespace AuraGameplayTags
 {
 	namespace Attribute
 	{
-		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "Attribute"
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);  // "Attribute"
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Point); // "Attribute.Point"
 
 		namespace Vital
 		{
