@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AttributeSet.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "AuraAttributeInfo.generated.h"
 
+struct FGameplayAttribute;
 /**
 * \brief 单个 GAS Primary/Secondary Attribute 的相关信息
 */
@@ -24,6 +26,9 @@ struct FAuraAttributeData
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Attribute 展示给 UI 的相关描述"))
 	FText AttributeDescription;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Attribute 本体, 用于和该Data作映射关系"))
+	FGameplayAttribute Attribute;
+
 	UPROPERTY(BlueprintReadOnly)
 	float AttributeValue = 0.f;
 };
@@ -38,7 +43,7 @@ class AURA_API UAuraAttributeInfo : public UDataAsset
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<FAuraAttributeData> AttributeInfoList;
+	TArray<FAuraAttributeData> AttributeDataList;
 
-	FAuraAttributeData FindAttributeDataByTag(const FGameplayTag& AttributeTag, bool bLogNotFound = false) const;
+	FAuraAttributeData FindAttributeDataByTag(const FGameplayTag& AttributeTag, bool bLogNotFound = true) const;
 };
