@@ -5,17 +5,12 @@
 
 #include "Blueprint/UserWidget.h"
 #include "UI/Widget/AuraUserWidget.h"
+#include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "UI/WidgetController/AuraOverlayWidgetController.h"
 #include "UI/WidgetController/AuraWidgetController.h"
 
 
-UAuraOverlayWidgetController* AAuraHUD::GetAuraOverlayWidgetController()
-{
-	checkf(OverlayWidgetController != nullptr, TEXT("[%hs] AuraOverlayWidgetController is nullptr !!!"), __FUNCTION__);
-	return OverlayWidgetController;
-}
-
-UAuraOverlayWidgetController* AAuraHUD::SetAuraOverlayWidgetController(const FAuraWidgetControllerParams& InParams)
+UAuraOverlayWidgetController* AAuraHUD::GetAuraOverlayWidgetController(const FAuraWidgetControllerParams& InParams)
 {
 	if (OverlayWidgetController == nullptr)
 	{
@@ -23,15 +18,15 @@ UAuraOverlayWidgetController* AAuraHUD::SetAuraOverlayWidgetController(const FAu
 		OverlayWidgetController->SetWidgetControllerParams(InParams);
 		OverlayWidgetController->BindDelegateCallbackFunctions();
 	}
-	else
-	{
-		OverlayWidgetController->SetWidgetControllerParams(InParams);
-	}
+	// else
+	// {
+	// 	OverlayWidgetController->SetWidgetControllerParams(InParams);
+	// }
 
 	return OverlayWidgetController;
 }
 
-void AAuraHUD::InitOverlayWidget(AAuraPlayerController* InPlayerController, AAuraPlayerState* InPlayerState,
+void AAuraHUD::InitHUD(AAuraPlayerController* InPlayerController, AAuraPlayerState* InPlayerState,
                                  UAuraAbilitySystemComponent* InAbilitySystemComponent,
                                  UAuraAttributeSet* InAttributeSet)
 {
@@ -45,7 +40,7 @@ void AAuraHUD::InitOverlayWidget(AAuraPlayerController* InPlayerController, AAur
 	// 2. 初始化WidgetController, 并和Widget绑定
 	const FAuraWidgetControllerParams InParams(InPlayerController, InPlayerState, InAbilitySystemComponent,
 	                                           InAttributeSet);
-	UAuraOverlayWidgetController* WidgetController = SetAuraOverlayWidgetController(InParams);
+	UAuraOverlayWidgetController* WidgetController = GetAuraOverlayWidgetController(InParams);
 	OverlayWidget->SetWidgetController(WidgetController);
 
 	// 3. 通过WidgetController初始化UI数据
@@ -53,6 +48,22 @@ void AAuraHUD::InitOverlayWidget(AAuraPlayerController* InPlayerController, AAur
 
 	// 4. 添加到角色视口中
 	OverlayWidget->AddToViewport();
+}
+
+UAuraAttributeMenuWidgetController* AAuraHUD::GetAuraAttributeMenuWidgetController(const FAuraWidgetControllerParams& InParams)
+{
+	if (AttributeMenuWidgetController == nullptr)
+	{
+		AttributeMenuWidgetController = NewObject<UAuraAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
+		AttributeMenuWidgetController->SetWidgetControllerParams(InParams);
+		AttributeMenuWidgetController->BindDelegateCallbackFunctions();
+	}
+	// else
+	// {
+	// 	AttributeMenuWidgetController->SetWidgetControllerParams(InParams);
+	// }
+
+	return AttributeMenuWidgetController;
 }
 
 void AAuraHUD::BeginPlay()

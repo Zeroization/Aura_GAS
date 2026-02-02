@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "Game/AuraGameplayTags.h"
 
 
 void UAuraOverlayWidgetController::BroadcastInitialValues()
@@ -49,8 +50,9 @@ void UAuraOverlayWidgetController::BindDelegateCallbackFunctions()
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, DebugMsg);
 #endif
 
-			// 只有Tag是 DisplayMessage.* 的才会查表, 并将其广播至显示对应消息的UI
-			if (FGameplayTag DisplayMessageTag = FGameplayTag::RequestGameplayTag("DisplayMessage");
+			// 只有Tag是 UI.DisplayMessage.* 的才会查表, 并将其广播至显示对应消息的UI
+			if (FGameplayTag DisplayMessageTag = FGameplayTag::RequestGameplayTag(
+					AuraGameplayTags::UI::DisplayMessage::Root.GetTag().GetTagName());
 				Tag.MatchesTag(DisplayMessageTag))
 			{
 				const FDisplayWidgetRow* Row = GetDataTableRowByGameplayTag<FDisplayWidgetRow>(

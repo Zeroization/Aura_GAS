@@ -53,6 +53,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FAuraWidgetControllerParams& InParams);
 
+	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues();
 	virtual void BindDelegateCallbackFunctions();
 
