@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "AuraAbilitySystemComponent.generated.h"
 
+class UAuraGameplayAbility;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGetGEAssetTagDelegate, const FGameplayTagContainer&);
 
 /**
@@ -19,10 +20,11 @@ class AURA_API UAuraAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	FOnGetGEAssetTagDelegate OnGetGEAssetTag;
 
-	/**
-	 *  在 `ASC->InitAbilityActorInfo()` 被调用后执行
-	 */
+	/// 在 `ASC->InitAbilityActorInfo()` 被调用后执行
 	void OnAbilityActorInfoSet();
+
+	/// 赋予Actor GA
+	void GrantActorGA(const TArray<TSubclassOf<UAuraGameplayAbility>>& AbilityClasses);
 
 protected:
 	void OnGEApplied(UAbilitySystemComponent* InASC, const FGameplayEffectSpec& InGESpec,

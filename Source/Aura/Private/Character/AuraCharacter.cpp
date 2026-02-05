@@ -66,15 +66,19 @@ void AAuraCharacter::InitAbilitySystem()
 {
 	Super::InitAbilitySystem();
 
+	// 1. 初始化ASC
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
 	checkf(AuraPlayerState, TEXT("Can't get AuraPlayerState !!!"));
 	AuraAbilitySystemComponent = CastChecked<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent());
 	AuraAbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
 	AuraAbilitySystemComponent->OnAbilityActorInfoSet();
 
+	// 2. 初始化AttributeSet和Attributes
 	AuraAttributeSet = CastChecked<UAuraAttributeSet>(AuraPlayerState->GetAttributeSet());
-
 	InitDefaultAttributes();
+
+	// 3. 初始化GA
+	GrantCharacterStartupAbilities();
 }
 
 void AAuraCharacter::InitPlayerHUD()

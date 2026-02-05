@@ -44,6 +44,14 @@ void AAuraCharacterBase::InitDefaultAttributes() const
 	ApplyEffectToSelf(InitVitalAttrGEClass);
 }
 
+void AAuraCharacterBase::GrantCharacterStartupAbilities()
+{
+	// 只有在服务端才能对GA进行赋予/撤销操作
+	if (!HasAuthority())	return;
+
+	AuraAbilitySystemComponent->GrantActorGA(StartupAbilities);
+}
+
 void AAuraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
