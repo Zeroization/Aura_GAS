@@ -3,8 +3,8 @@
 
 #include "Player/AuraPlayerController.h"
 
-#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Input/AuraInputComponent.h"
 #include "Interaction/Interface/Interactable.h"
 
 AAuraPlayerController::AAuraPlayerController()
@@ -46,8 +46,14 @@ void AAuraPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	// 绑定Input Action
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-	EnhancedInputComponent->BindAction(IA_MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+	UAuraInputComponent* AuraInputComponent = CastChecked<UAuraInputComponent>(InputComponent);
+	AuraInputComponent->BindAction(IA_MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+	AuraInputComponent->BindAbilityInputAction(InputConfig, this,
+	                                           {
+		                                           &ThisClass::AbilityInputTagOnPressed,
+		                                           &ThisClass::AbilityInputTagOnReleased,
+		                                           &ThisClass::AbilityInputTagOnHeld
+	                                           });
 }
 
 void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -95,4 +101,22 @@ void AAuraPlayerController::CursorTrace()
 			CurrTracedActor->HighlightActor();
 		}
 	}
+}
+
+void AAuraPlayerController::AbilityInputTagOnPressed(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Cyan,
+	                                 FString::Printf(TEXT("[%hs]: Gameplay Input Tag: %s"), __FUNCTION__, *InputTag.ToString()));
+}
+
+void AAuraPlayerController::AbilityInputTagOnReleased(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Cyan,
+	                                 FString::Printf(TEXT("[%hs]: Gameplay Input Tag: %s"), __FUNCTION__, *InputTag.ToString()));
+}
+
+void AAuraPlayerController::AbilityInputTagOnHeld(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Cyan,
+	                                 FString::Printf(TEXT("[%hs]: Gameplay Input Tag: %s"), __FUNCTION__, *InputTag.ToString()));
 }

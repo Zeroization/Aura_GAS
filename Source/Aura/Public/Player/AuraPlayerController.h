@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+struct FGameplayTag;
+class UAuraInputConfig;
 class IInteractable;
 struct FInputActionValue;
 class UInputAction;
@@ -29,20 +31,26 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
-	/// Begin Category: Input <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC_AuraContext;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> IA_MoveAction;
-	/// End Category: Input <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	void Move(const FInputActionValue& InputActionValue);
-
 
 	/// 鼠标指针追踪相关
 	/// Ps: 要声明实现某接口的Actor变量, 类型是TScriptInterface<I接口名>
 	TScriptInterface<IInteractable> LastTracedActor;
 	TScriptInterface<IInteractable> CurrTracedActor;
 	void CursorTrace();
+
+	/// Ability System
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UAuraInputConfig> InputConfig;
+
+	void AbilityInputTagOnPressed(FGameplayTag InputTag);
+	void AbilityInputTagOnReleased(FGameplayTag InputTag);
+	void AbilityInputTagOnHeld(FGameplayTag InputTag);
+	/// Ability System
 };
