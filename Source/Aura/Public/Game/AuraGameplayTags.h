@@ -57,4 +57,25 @@ namespace AuraGameplayTags
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(ManaPotion);    // "UI.DisplayMessage.ManaPotion"
 		}
 	}
+
+	namespace Input
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "Input"
+
+		namespace Mouse
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "Input.Mouse"			
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(LMB);  // "Input.Mouse.LMB"
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(RMB);  // "Input.Mouse.RMB"
+		}
+
+		namespace Keyboard
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);  // "Input.Keyboard"
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_1); // "Input.Keyboard.1"
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_2); // "Input.Keyboard.2"
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_3); // "Input.Keyboard.3"
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_4); // "Input.Keyboard.4"
+		}
+	}
 }
