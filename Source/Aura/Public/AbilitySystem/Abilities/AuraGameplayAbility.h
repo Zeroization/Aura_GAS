@@ -13,8 +13,9 @@ UCLASS()
 class AURA_API UAuraGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
-	
-	
-	
-	
+
+public:
+	/// 触发GA的默认输入Tag
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag StartupInputTag;
 };

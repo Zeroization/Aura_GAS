@@ -3,7 +3,9 @@
 
 #include "Player/AuraPlayerController.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Input/AuraInputComponent.h"
 #include "Interaction/Interface/Interactable.h"
 
@@ -39,6 +41,10 @@ void AAuraPlayerController::BeginPlay()
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	InputModeData.SetHideCursorDuringCapture(false);
 	SetInputMode(InputModeData);
+
+	// GAS 初始化部分
+	AuraASC = Cast<UAuraAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn()));
+	check(IsValid(AuraASC));
 }
 
 void AAuraPlayerController::SetupInputComponent()
@@ -105,18 +111,22 @@ void AAuraPlayerController::CursorTrace()
 
 void AAuraPlayerController::AbilityInputTagOnPressed(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Cyan,
-	                                 FString::Printf(TEXT("[%hs]: Gameplay Input Tag: %s"), __FUNCTION__, *InputTag.ToString()));
+	// GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Cyan,
+	//                                  FString::Printf(TEXT("[%hs]: Gameplay Input Tag: %s"), __FUNCTION__, *InputTag.ToString()));
 }
 
 void AAuraPlayerController::AbilityInputTagOnReleased(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Cyan,
-	                                 FString::Printf(TEXT("[%hs]: Gameplay Input Tag: %s"), __FUNCTION__, *InputTag.ToString()));
+	// GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Cyan,
+	//                                  FString::Printf(TEXT("[%hs]: Gameplay Input Tag: %s"), __FUNCTION__, *InputTag.ToString()));
+
+	AuraASC->AbilityInputTagOnReleased(InputTag);
 }
 
 void AAuraPlayerController::AbilityInputTagOnHeld(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Cyan,
-	                                 FString::Printf(TEXT("[%hs]: Gameplay Input Tag: %s"), __FUNCTION__, *InputTag.ToString()));
+	// GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Cyan,
+	//                                  FString::Printf(TEXT("[%hs]: Gameplay Input Tag: %s"), __FUNCTION__, *InputTag.ToString()));
+
+	AuraASC->AbilityInputTagOnHeld(InputTag);
 }
