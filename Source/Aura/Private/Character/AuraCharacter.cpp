@@ -68,7 +68,7 @@ void AAuraCharacter::InitAbilitySystem()
 
 	// 1. 初始化ASC
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	checkf(AuraPlayerState, TEXT("Can't get AuraPlayerState !!!"));
+	checkf(IsValid(AuraPlayerState), TEXT("Can't get AuraPlayerState !!!"));
 	AuraAbilitySystemComponent = CastChecked<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent());
 	AuraAbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
 	AuraAbilitySystemComponent->OnAbilityActorInfoSet();
@@ -85,11 +85,12 @@ void AAuraCharacter::InitPlayerHUD()
 {
 	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
 	{
-		AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD());
-		checkf(AuraHUD, TEXT("Can't get AuraHUD !!!"));
-		AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-		checkf(AuraPlayerState, TEXT("Can't get AuraPlayerState !!!"));
+		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
+		{
+			AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+			checkf(AuraPlayerState, TEXT("Can't get AuraPlayerState !!!"));
 
-		AuraHUD->InitHUD(AuraPlayerController, AuraPlayerState, AuraAbilitySystemComponent, AuraAttributeSet);
+			AuraHUD->InitHUD(AuraPlayerController, AuraPlayerState, AuraAbilitySystemComponent, AuraAttributeSet);
+		}
 	}
 }

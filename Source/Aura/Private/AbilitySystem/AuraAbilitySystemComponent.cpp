@@ -63,8 +63,8 @@ void UAuraAbilitySystemComponent::AbilityInputTagOnReleased(const FGameplayTag& 
 	}
 }
 
-void UAuraAbilitySystemComponent::OnGEApplied(UAbilitySystemComponent* InASC, const FGameplayEffectSpec& InGESpec,
-                                              FActiveGameplayEffectHandle ActiveGEHandle)
+void UAuraAbilitySystemComponent::OnGEApplied_Implementation(UAbilitySystemComponent* InASC, const FGameplayEffectSpec& InGESpec,
+	FActiveGameplayEffectHandle ActiveGEHandle)
 {
 	FGameplayTagContainer TagContainer;
 	InGESpec.GetAllAssetTags(TagContainer);

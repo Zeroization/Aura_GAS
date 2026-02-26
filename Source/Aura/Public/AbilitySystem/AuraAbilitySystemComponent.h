@@ -31,6 +31,7 @@ public:
 	void AbilityInputTagOnReleased(const FGameplayTag& InputTag);
 
 protected:
+	UFUNCTION(Client, Reliable)
 	void OnGEApplied(UAbilitySystemComponent* InASC, const FGameplayEffectSpec& InGESpec,
 	                 FActiveGameplayEffectHandle ActiveGEHandle);
 };
