@@ -22,6 +22,12 @@ UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
 	return AuraAbilitySystemComponent;
 }
 
+FVector AAuraCharacterBase::GetProjectileSpawnLocation()
+{
+	checkf(IsValid(Weapon), TEXT("[%hs]: Character [%s] 's weapon is null!!!"), __FUNCTION__, *GetNameSafe(this));
+	return Weapon->GetSocketLocation(WeaponTipSocketName);
+}
+
 void AAuraCharacterBase::InitAbilitySystem()
 {
 }
@@ -42,6 +48,17 @@ void AAuraCharacterBase::InitDefaultAttributes() const
 	ApplyEffectToSelf(InitPrimaryAttrGEClass);
 	ApplyEffectToSelf(InitSecondaryAttrGEClass);
 	ApplyEffectToSelf(InitVitalAttrGEClass);
+}
+
+void AAuraCharacterBase::GrantCharacterStartupAbilities()
+{
+	// 只有在服务端才能对GA进行赋予/撤销操作
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	AuraAbilitySystemComponent->GrantActorGA(StartupAbilities);
 }
 
 void AAuraCharacterBase::BeginPlay()

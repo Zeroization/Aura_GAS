@@ -109,4 +109,43 @@ namespace AuraGameplayTags
 			                               "魔法药水的相关提示信息");
 		}
 	}
+
+	namespace Input
+	{
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+		                               "Input",
+		                               "玩家输入用到的Tag; 此Tag仅用于Tag相关操作(如Matches)");
+
+		namespace Mouse
+		{
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+			                               "Input.Mouse",
+			                               "鼠标输入用到的Tag; 此Tag仅用于Tag相关操作(如Matches)");
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(LMB,
+			                               "Input.Mouse.LMB",
+			                               "鼠标左键");
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(RMB,
+			                               "Input.Mouse.RMB",
+			                               "鼠标右键");
+		}
+
+		namespace Keyboard
+		{
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+			                               "Input.Keyboard",
+			                               "键盘输入用到的Tag; 此Tag仅用于Tag相关操作(如Matches)");
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(Num_1,
+			                               "Input.Keyboard.1",
+			                               "1");
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(Num_2,
+			                               "Input.Keyboard.2",
+			                               "2");
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(Num_3,
+			                               "Input.Keyboard.3",
+			                               "3");
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(Num_4,
+			                               "Input.Keyboard.4",
+			                               "4");
+		}
+	}
 }

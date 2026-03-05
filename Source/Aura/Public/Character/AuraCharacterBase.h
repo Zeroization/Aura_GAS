@@ -8,6 +8,7 @@
 #include "Interaction/Interface/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UAuraGameplayAbility;
 class UGameplayEffect;
 class UAuraAbilitySystemComponent;
 class UAuraAttributeSet;
@@ -34,6 +35,11 @@ protected:
 	///								的句柄，在访问时才真正加载对象。
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	FName WeaponTipSocketName;
+
+	virtual FVector GetProjectileSpawnLocation() override;
 	/// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	/// Begin: Ability System <<<<<<<<<<<<<<<
@@ -56,7 +62,12 @@ protected:
 
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GEClass, float Level = 1.f) const;
 	void InitDefaultAttributes() const;
+	void GrantCharacterStartupAbilities();
 	/// End: Ability System   <<<<<<<<<<<<<<<
 
 	virtual void BeginPlay() override;
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UAuraGameplayAbility>> StartupAbilities;
 };
