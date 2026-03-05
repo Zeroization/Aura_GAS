@@ -35,6 +35,11 @@ protected:
 	///								的句柄，在访问时才真正加载对象。
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	FName WeaponTipSocketName;
+
+	virtual FVector GetProjectileSpawnLocation() override;
 	/// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	/// Begin: Ability System <<<<<<<<<<<<<<<
