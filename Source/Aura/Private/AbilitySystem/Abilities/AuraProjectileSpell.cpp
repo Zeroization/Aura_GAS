@@ -7,20 +7,16 @@
 #include "Interaction/Interface/CombatInterface.h"
 
 
-void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-                                           const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UAuraProjectileSpell::SpawnProjectile()
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
 	// 只有服务器才能生成投射物
-	const bool bIsServer = HasAuthority(&ActivationInfo);
-	if (!bIsServer)
+	AActor* Owner = GetAvatarActorFromActorInfo();
+	if (!Owner->HasAuthority())
 	{
 		return;
 	}
 
 	// 生成投射物, 撞到物体后对它应用GE
-	AActor* Owner = GetAvatarActorFromActorInfo();
 	if (Owner->Implements<UCombatInterface>())
 	{
 		FTransform SpawnTransform;
@@ -36,4 +32,10 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 		
 		Projectile->FinishSpawning(SpawnTransform);
 	}
+}
+
+void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+                                           const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
