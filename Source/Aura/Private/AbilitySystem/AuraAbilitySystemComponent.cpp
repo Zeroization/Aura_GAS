@@ -30,7 +30,7 @@ void UAuraAbilitySystemComponent::AbilityInputTagOnHeld(const FGameplayTag& Inpu
 	}
 
 	for (TArray<FGameplayAbilitySpec> ActivatableGASpecs = GetActivatableAbilities();
-		 FGameplayAbilitySpec& GASpec : ActivatableGASpecs)
+	     FGameplayAbilitySpec& GASpec : ActivatableGASpecs)
 	{
 		// 寻找该按键输入能触发的GA
 		if (GASpec.DynamicAbilityTags.HasTagExact(InputTag))
@@ -54,7 +54,7 @@ void UAuraAbilitySystemComponent::AbilityInputTagOnReleased(const FGameplayTag& 
 	}
 
 	for (TArray<FGameplayAbilitySpec> ActivatableGASpecs = GetActivatableAbilities();
-		 FGameplayAbilitySpec& GASpec : ActivatableGASpecs)
+	     FGameplayAbilitySpec& GASpec : ActivatableGASpecs)
 	{
 		if (GASpec.DynamicAbilityTags.HasTagExact(InputTag))
 		{
@@ -64,7 +64,7 @@ void UAuraAbilitySystemComponent::AbilityInputTagOnReleased(const FGameplayTag& 
 }
 
 void UAuraAbilitySystemComponent::OnGEApplied_Implementation(UAbilitySystemComponent* InASC, const FGameplayEffectSpec& InGESpec,
-	FActiveGameplayEffectHandle ActiveGEHandle)
+                                                             FActiveGameplayEffectHandle ActiveGEHandle)
 {
 	FGameplayTagContainer TagContainer;
 	InGESpec.GetAllAssetTags(TagContainer);
