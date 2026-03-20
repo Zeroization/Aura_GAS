@@ -8,6 +8,7 @@
 #include "Interaction/Interface/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UMotionWarpingComponent;
 class UAuraGameplayAbility;
 class UGameplayEffect;
 class UAuraAbilitySystemComponent;
@@ -64,6 +65,14 @@ protected:
 	void InitDefaultAttributes() const;
 	void GrantCharacterStartupAbilities();
 	/// End: Ability System   <<<<<<<<<<<<<<<
+
+	/// Begin: Animation <<<<<<<<<<<<<<<<<<<<
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	TObjectPtr<UMotionWarpingComponent> MotionWarping;
+	
+	UFUNCTION(BlueprintCallable)
+	bool CheckMotionWarpTargetExists(const FName& WarpTargetName);
+	/// End:   Animation <<<<<<<<<<<<<<<<<<<<
 
 	virtual void BeginPlay() override;
 

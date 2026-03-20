@@ -3,6 +3,7 @@
 
 #include "Character/AuraCharacterBase.h"
 
+#include "MotionWarpingComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 
@@ -18,7 +19,11 @@ AAuraCharacterBase::AAuraCharacterBase()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
 	Weapon->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
-	/// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	/// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+	/// Begin: Animation
+	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>("Motion Warping");
+	/// End: Animation 
 }
 
 UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
@@ -63,6 +68,11 @@ void AAuraCharacterBase::GrantCharacterStartupAbilities()
 	}
 
 	AuraAbilitySystemComponent->GrantActorGA(StartupAbilities);
+}
+
+bool AAuraCharacterBase::CheckMotionWarpTargetExists(const FName& WarpTargetName)
+{
+	return MotionWarping->FindWarpTarget(WarpTargetName) != nullptr;
 }
 
 void AAuraCharacterBase::BeginPlay()
