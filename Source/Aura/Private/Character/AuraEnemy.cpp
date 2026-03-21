@@ -12,6 +12,8 @@ AAuraEnemy::AAuraEnemy()
 {
 	// 初始化Character Mesh的Visibility碰撞通道为Block, 方便鼠标追踪
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
 
 	// 对于敌人, 将 AbilitySystem 和 AttributeSet 放到这里即可
 	AuraAbilitySystemComponent = CreateDefaultSubobject<UAuraAbilitySystemComponent>("AbilitySystemComponent");

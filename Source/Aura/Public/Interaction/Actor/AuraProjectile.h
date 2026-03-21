@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "AuraProjectile.generated.h"
 
+class UNiagaraSystem;
 class UProjectileMovementComponent;
 class USphereComponent;
 
@@ -21,13 +22,33 @@ public:
 	AAuraProjectile();
 
 protected:
-	virtual void BeginPlay() override;
-
 	UFUNCTION()
 	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	                          bool bFromSweep, const FHitResult& SweepResult);
 
+	virtual void BeginPlay() override;
+	virtual void Destroyed() override;
+
 private:
+	UPROPERTY(EditAnywhere, Category = "Projectile")
+	float ProjectileLifeSpan = 10.f;
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> Sphere;
+
+	/* Begin: SFX */
+	UPROPERTY(EditAnywhere, Category = "Projectile|SFX")
+	TObjectPtr<UAudioComponent> LoopSoundComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Projectile|SFX")
+	TObjectPtr<UNiagaraSystem> ImpactEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Projectile|SFX")
+	TObjectPtr<USoundBase> ImpactSound;
+
+	// 客户端Destroyed()和OnSphereBeginOverlap()的调用顺序未知, 需要用该变量区分ImpactSFX到底播放了没有
+	bool bIsImpactSFXPlayed = false;
+
+	void PlayImpactSFX();
+	/* End: SFX */
 };

@@ -7,3 +7,5 @@
 #define OUTLINE_COLOR_RED	250
 #define OUTLINE_COLOR_BLUE	251
 #define OUTLINE_COLOR_WHITE 252
+
+#define ECC_Projectile ECollisionChannel::ECC_GameTraceChannel1
