@@ -3,6 +3,8 @@
 
 #include "Interaction/Actor/AuraProjectile.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Aura/Aura.h"
 #include "Character/AuraCharacter.h"
@@ -75,6 +77,11 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, 
 	if (HasAuthority())
 	{
 		// 服务器逻辑
+		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
+		{
+			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data);
+		}
+
 		Destroy();
 	}
 	else
