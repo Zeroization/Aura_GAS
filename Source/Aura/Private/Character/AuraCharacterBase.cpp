@@ -3,18 +3,30 @@
 
 #include "Character/AuraCharacterBase.h"
 
+#include "MotionWarpingComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "Aura/Aura.h"
+#include "Components/CapsuleComponent.h"
 
 
 AAuraCharacterBase::AAuraCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
+
 	/// Begin Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
 	Weapon->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
-	/// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	/// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+	/// Begin: Animation
+	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>("Motion Warping");
+	/// End: Animation 
 }
 
 UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
@@ -59,6 +71,11 @@ void AAuraCharacterBase::GrantCharacterStartupAbilities()
 	}
 
 	AuraAbilitySystemComponent->GrantActorGA(StartupAbilities);
+}
+
+bool AAuraCharacterBase::CheckMotionWarpTargetExists(const FName& WarpTargetName)
+{
+	return MotionWarping->FindWarpTarget(WarpTargetName) != nullptr;
 }
 
 void AAuraCharacterBase::BeginPlay()

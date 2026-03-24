@@ -3,37 +3,48 @@
 
 #include "AbilitySystem/Abilities/AuraProjectileSpell.h"
 
-#include "Actor/AuraProjectile.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "Interaction/Actor/AuraProjectile.h"
 #include "Interaction/Interface/CombatInterface.h"
 
 
-void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-                                           const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
 	// 只有服务器才能生成投射物
-	const bool bIsServer = HasAuthority(&ActivationInfo);
-	if (!bIsServer)
+	AActor* Owner = GetAvatarActorFromActorInfo();
+	if (!Owner->HasAuthority())
 	{
 		return;
 	}
 
 	// 生成投射物, 撞到物体后对它应用GE
-	AActor* Owner = GetAvatarActorFromActorInfo();
 	if (Owner->Implements<UCombatInterface>())
 	{
-		FTransform SpawnTransform;
 		const TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(Owner);
+		FRotator Rotation = (TargetLocation - Owner->GetActorLocation()).Rotation();
+		Rotation.Pitch = 0.f;
+
+		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(CombatInterface->GetProjectileSpawnLocation());
-		// TODO: SpawnTransform.SetRotation()
+		SpawnTransform.SetRotation(Rotation.Quaternion());
 
 		AAuraProjectile* Projectile = GetWorld()->SpawnActorDeferred<AAuraProjectile>(
 			ProjectileClass, SpawnTransform, Owner, Cast<APawn>(Owner),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-		
-		// TODO: 赋予投射物相关GE
-		
+
+		// 赋予投射物相关GE
+		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Owner);
+		const FGameplayEffectSpecHandle GESpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(),
+		                                                                           SourceASC->MakeEffectContext());
+		Projectile->DamageEffectSpecHandle = GESpecHandle;
+
 		Projectile->FinishSpawning(SpawnTransform);
 	}
+}
+
+void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+                                           const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
