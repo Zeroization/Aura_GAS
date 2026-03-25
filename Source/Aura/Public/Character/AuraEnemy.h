@@ -3,11 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Character/AuraCharacterBase.h"
 #include "Interaction/Interface/Interactable.h"
 #include "UI/WidgetController/AuraOverlayWidgetController.h"
 #include "AuraEnemy.generated.h"
 
+enum class ECharacterClass : uint8;
 class UWidgetComponent;
 /**
  * 
@@ -28,6 +30,7 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void InitAbilitySystem() override;
+	virtual void InitDefaultAttributes() const override;
 
 	/// >>>> Begin: Interactable Interface
 	virtual void HighlightActor() override;
@@ -39,8 +42,11 @@ public:
 	/// >>>> End: Combat Interface
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Defaults")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
 	int32 Level = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
+	ECharacterClass CharacterClass = ECharacterClass::ECC_Warrior;
 
 	/* Begin: UI */
 	/// 血条

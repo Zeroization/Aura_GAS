@@ -4,6 +4,7 @@
 #include "Character/AuraEnemy.h"
 
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "Aura/Aura.h"
 #include "Components/WidgetComponent.h"
@@ -71,6 +72,11 @@ void AAuraEnemy::InitAbilitySystem()
 	InitDefaultAttributes();
 }
 
+void AAuraEnemy::InitDefaultAttributes() const
+{
+	UAuraAbilitySystemLibrary::InitEnemyDefaultAttributesByClass(this, CharacterClass, Level, AuraAbilitySystemComponent);
+}
+
 void AAuraEnemy::HighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(true);
@@ -78,7 +84,7 @@ void AAuraEnemy::HighlightActor()
 
 	Weapon->SetRenderCustomDepth(true);
 	Weapon->SetCustomDepthStencilValue(OUTLINE_COLOR_RED);
-} 
+}
 
 void AAuraEnemy::UnHighlightActor()
 {

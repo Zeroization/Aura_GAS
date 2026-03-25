@@ -60,16 +60,16 @@ protected:
 	TSubclassOf<UGameplayEffect> InitVitalAttrGEClass;
 
 	virtual void InitAbilitySystem();
+	virtual void InitDefaultAttributes() const;
 
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GEClass, float Level = 1.f) const;
-	void InitDefaultAttributes() const;
 	void GrantCharacterStartupAbilities();
 	/// End: Ability System   <<<<<<<<<<<<<<<
 
 	/// Begin: Animation <<<<<<<<<<<<<<<<<<<<
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	TObjectPtr<UMotionWarpingComponent> MotionWarping;
-	
+
 	UFUNCTION(BlueprintCallable)
 	bool CheckMotionWarpTargetExists(const FName& WarpTargetName);
 	/// End:   Animation <<<<<<<<<<<<<<<<<<<<

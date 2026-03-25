@@ -35,6 +35,9 @@
 !/Config/**
 !/Plugins/**
 
+# 也不忽略数据表文件夹
+!/TableData/**
+
 # Only allow .uasset and .umap files from /Content dir.
 # They're tracked by git-lfs, don't forget to track other
 # files if adding them here.
