@@ -4,6 +4,8 @@
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
+#include "Game/AuraGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
@@ -47,4 +49,37 @@ UAuraAttributeMenuWidgetController* UAuraAbilitySystemLibrary::GetAuraAttributeM
 	}
 
 	return nullptr;
+}
+
+void UAuraAbilitySystemLibrary::InitEnemyDefaultAttributesByClass(const UObject* WorldContextObject,
+                                                                  ECharacterClass EnemyClass, float Level,
+                                                                  UAuraAbilitySystemComponent* ASC)
+{
+	if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject)))
+	{
+		UCharacterClassInfo* EnemyClassInfo = AuraGameMode->EnemyCharacterClassInfo;
+		FCharacterClassDefaultInfo EnemyClassDefaultInfo = EnemyClassInfo->GetClassDefaultInfo(EnemyClass);
+
+		AActor* AvatarActor = ASC->GetAvatarActor();
+		// Primary Attributes
+		FGameplayEffectContextHandle PrimaryAttrGEContextHandle = ASC->MakeEffectContext();
+		PrimaryAttrGEContextHandle.AddSourceObject(AvatarActor);
+		const FGameplayEffectSpecHandle PrimaryAttrGESpecHandle = ASC->MakeOutgoingSpec(EnemyClassDefaultInfo.PrimaryAttributes, Level,
+		                                                                                PrimaryAttrGEContextHandle);
+		ASC->ApplyGameplayEffectSpecToSelf(*PrimaryAttrGESpecHandle.Data);
+
+		// Secondary Attributes
+		FGameplayEffectContextHandle SecondaryAttrGEContextHandle = ASC->MakeEffectContext();
+		SecondaryAttrGEContextHandle.AddSourceObject(AvatarActor);
+		const FGameplayEffectSpecHandle SecondaryAttrGESpecHandle = ASC->MakeOutgoingSpec(
+			EnemyClassInfo->SecondaryAttributes, Level, SecondaryAttrGEContextHandle);
+		ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttrGESpecHandle.Data);
+
+		// Vital Attributes
+		FGameplayEffectContextHandle VitalAttrGEContextHandle = ASC->MakeEffectContext();
+		VitalAttrGEContextHandle.AddSourceObject(AvatarActor);
+		const FGameplayEffectSpecHandle VitalAttrGESpecHandle = ASC->MakeOutgoingSpec(
+			EnemyClassInfo->VitalAttributes, Level, VitalAttrGEContextHandle);
+		ASC->ApplyGameplayEffectSpecToSelf(*VitalAttrGESpecHandle.Data);
+	}
 }
