@@ -49,13 +49,20 @@ void AAuraEnemy::BeginPlay()
 	                          .AddLambda([this](const FOnAttributeChangeData& Data)
 	                          {
 		                          OnHealthChanged.Broadcast(Data.NewValue);
-		                          // TODO: 多人模式下, 客户端敌人血条显示有问题, 目前仅能这样勉强解决
-		                          OnMaxHealthChanged.Broadcast(AuraAttributeSet->GetMaxHealth());
 	                          });
 	AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetMaxHealthAttribute())
 	                          .AddLambda([this](const FOnAttributeChangeData& Data)
 	                          {
-		                          OnMaxHealthChanged.Broadcast(Data.NewValue);
+		                          // UE5.4 问题（UE5.5 已修复）
+		                          // 原教程使用 Data.NewValue（BaseValue）作为 MaxHealth。
+		                          // 但本项目中 MaxHealth 由 Infinite GE 修改，该类型 GE 只影响 CurrentValue，不修改 BaseValue。
+		                          // 因此：
+		                          // - BaseValue 始终为初始值（通常为 0）
+		                          // - CurrentValue 才是实际生效的 MaxHealth
+		                          // 而 GAMEPLAYATTRIBUTE_REPNOTIFY 在 OnRep 中传递的是 BaseValue，
+		                          // 导致客户端读取到的 MaxHealth 为 0，从而血条计算错误。
+		                          // 正确做法：使用 GetMaxHealth() 获取 CurrentValue。
+		                          OnMaxHealthChanged.Broadcast(AuraAttributeSet->GetMaxHealth());
 	                          });
 	OnHealthChanged.Broadcast(AuraAttributeSet->GetHealth());
 	OnMaxHealthChanged.Broadcast(AuraAttributeSet->GetMaxHealth());

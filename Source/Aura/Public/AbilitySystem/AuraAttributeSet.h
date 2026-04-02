@@ -59,7 +59,7 @@ class AURA_API UAuraAttributeSet : public UAttributeSet
 	GENERATED_BODY()
 
 public:
-	// Begin Category: Vital Attributes 必备属性 >>>>>>>>>>>>>
+#pragma region Vital Attributes: 必备属性
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Attributes|Vital Attributes")
 	FGameplayAttributeData Health;
 	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Health);
@@ -67,9 +67,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category = "Attributes|Vital Attributes")
 	FGameplayAttributeData Mana;
 	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Mana);
-	// End Category: Vital Attributes   >>>>>>>>>>>>>
+#pragma endregion
 
-	// Begin Category: Primary Attributes 首要属性: 值独立设置, 不依赖其他属性 >>>>>>>>>>>>>>>>>
+#pragma region Primary Attributes: 首要属性
+	// Primary Attributes 首要属性: 值独立设置, 不依赖其他属性
+
 	/// STR: 增加物理攻击伤害
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Strength, Category = "Attributes|Primary Attributes")
 	FGameplayAttributeData Strength;
@@ -89,9 +91,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Vigor, Category = "Attributes|Primary Attributes")
 	FGameplayAttributeData Vigor;
 	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Vigor);
-	// End Category: Primary Attributes >>>>>>>>>>>>>>>>>>>
+#pragma endregion
 
-	// Begin Category: Secondary Attributes 次级属性: 值有依赖一级属性或部分次级属性 >>>>>>>>>>>>>>>>>>>>>>>>>>
+#pragma region Secondary Attributes: 次级属性
+	// Secondary Attributes 次级属性: 值有依赖一级属性或部分次级属性
+
 	/// Mana Regeneration: 依赖属性INT, 每秒持续回复特定蓝值
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_ManaRegeneration, Category = "Attributes|Secondary Attributes")
 	FGameplayAttributeData ManaRegeneration;
@@ -141,7 +145,17 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth, Category = "Attributes|Secondary Attributes")
 	FGameplayAttributeData MaxHealth;
 	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, MaxHealth);
-	// End Category: Secondary Attributes
+#pragma endregion
+
+#pragma region Meta Attributes: 元属性
+	// Meta Attributes 元属性: 用于传递过程数据的临时属性. 
+	// 核心作用: 在GE与AttributeSet间传递中间数据, 并由AttributeSet统一处理最终结果.
+
+	/// IncomingDamage: 角色受到的伤害
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes|Meta Attributes")
+	FGameplayAttributeData IncomingDamage;
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, IncomingDamage);
+#pragma endregion
 
 	UAuraAttributeSet();
 

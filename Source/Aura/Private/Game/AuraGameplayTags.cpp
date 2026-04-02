@@ -82,6 +82,16 @@ namespace AuraGameplayTags
 			                               "Attribute.Secondary.MaxHealth",
 			                               "Max Health: 依赖属性VIG, Health的最大值");
 		}
+
+		namespace Meta
+		{
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+			                               "Attribute.Meta",
+			                               "Meta Attributes 元属性: 用于传递过程数据的临时属性; 此Tag仅用于Tag相关操作(如Matches)");
+			UE_DEFINE_GAMEPLAY_TAG_COMMENT(InComingDamage,
+			                               "Attribute.Meta.IncomingDamage",
+			                               "当前角色在本次受到的总伤害, 在AttributeSet中统一处理");
+		}
 	}
 
 	namespace UI
