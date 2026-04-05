@@ -50,6 +50,12 @@ namespace AuraGameplayTags
 		}
 	}
 
+	namespace GE
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "GE"
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(HitReact); // "GE.HitReact"
+	}
+
 	namespace UI
 	{
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "UI"

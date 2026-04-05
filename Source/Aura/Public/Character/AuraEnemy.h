@@ -25,8 +25,16 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnMaxHealthChanged;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	float DefaultWalkSpeed = 250.f;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	bool bDoHitReacting = false;
 
 	AAuraEnemy();
+
+	void OnGEHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
 	virtual void BeginPlay() override;
 	virtual void InitAbilitySystem() override;
@@ -43,10 +51,10 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
-	int32 Level = 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
 	ECharacterClass CharacterClass = ECharacterClass::ECC_Warrior;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
+	int32 Level = 1;
 
 	/* Begin: UI */
 	/// 血条

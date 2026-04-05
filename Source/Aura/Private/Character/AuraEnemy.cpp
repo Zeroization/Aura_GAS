@@ -8,6 +8,8 @@
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "Aura/Aura.h"
 #include "Components/WidgetComponent.h"
+#include "Game/AuraGameplayTags.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "UI/Widget/AuraUserWidget.h"
 
 
@@ -33,10 +35,18 @@ AAuraEnemy::AAuraEnemy()
 	/* End: UI */
 }
 
+void AAuraEnemy::OnGEHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bDoHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bDoHitReacting ? 0.f : DefaultWalkSpeed;
+}
+
 void AAuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
+	
 	InitAbilitySystem();
 
 	/* Begin: UI */
@@ -67,6 +77,10 @@ void AAuraEnemy::BeginPlay()
 	OnHealthChanged.Broadcast(AuraAttributeSet->GetHealth());
 	OnMaxHealthChanged.Broadcast(AuraAttributeSet->GetMaxHealth());
 	/* End: UI */
+
+	// 绑定特定GameplayTag被添加/移除的回调
+	AuraAbilitySystemComponent->RegisterGameplayTagEvent(AuraGameplayTags::GE::HitReact.GetTag(), EGameplayTagEventType::NewOrRemoved)
+	                          .AddUObject(this, &AAuraEnemy::OnGEHitReactTagChanged);
 }
 
 void AAuraEnemy::InitAbilitySystem()

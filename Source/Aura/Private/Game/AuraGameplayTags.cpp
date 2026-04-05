@@ -94,6 +94,16 @@ namespace AuraGameplayTags
 		}
 	}
 
+	namespace GE
+	{
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+		                               "GE",
+		                               "实现的Gameplay Effect; 此Tag仅用于Tag相关操作(如Matches)");
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(HitReact,
+		                               "GE.HitReact",
+		                               "当GE HitReact被施加时, 赋予目标Target");
+	}
+
 	namespace UI
 	{
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,

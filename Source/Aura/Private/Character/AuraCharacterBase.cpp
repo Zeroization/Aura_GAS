@@ -40,6 +40,11 @@ FVector AAuraCharacterBase::GetProjectileSpawnLocation()
 	return Weapon->GetSocketLocation(WeaponTipSocketName);
 }
 
+UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation()
+{
+	return HitReactMontage;
+}
+
 void AAuraCharacterBase::InitAbilitySystem()
 {
 }

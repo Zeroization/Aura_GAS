@@ -41,6 +41,7 @@ protected:
 	FName WeaponTipSocketName;
 
 	virtual FVector GetProjectileSpawnLocation() override;
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	/// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	/// Begin: Ability System <<<<<<<<<<<<<<<
@@ -79,4 +80,7 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UAuraGameplayAbility>> StartupAbilities;
+	
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 };
