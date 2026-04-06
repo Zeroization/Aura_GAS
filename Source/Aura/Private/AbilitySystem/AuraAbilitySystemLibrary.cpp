@@ -83,3 +83,16 @@ void UAuraAbilitySystemLibrary::InitEnemyDefaultAttributesByClass(const UObject*
 		ASC->ApplyGameplayEffectSpecToSelf(*VitalAttrGESpecHandle.Data);
 	}
 }
+
+void UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC)
+{
+	if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject)))
+	{
+		UCharacterClassInfo* EnemyClassInfo = AuraGameMode->EnemyCharacterClassInfo;
+		for (const auto& AbilityClass : EnemyClassInfo->CommonAbilities)
+		{
+			FGameplayAbilitySpec GASpec = FGameplayAbilitySpec(AbilityClass, 1);
+			ASC->GiveAbility(GASpec);
+		}
+	}
+}

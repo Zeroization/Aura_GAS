@@ -47,7 +47,13 @@ void AAuraEnemy::BeginPlay()
 
 	GetCharacterMovement()->MaxWalkSpeed = DefaultWalkSpeed;
 	
+	/* Begin: Ability System */
 	InitAbilitySystem();
+	UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(this, AuraAbilitySystemComponent);
+	// 绑定特定GameplayTag被添加/移除的回调
+	AuraAbilitySystemComponent->RegisterGameplayTagEvent(AuraGameplayTags::GE::HitReact.GetTag(), EGameplayTagEventType::NewOrRemoved)
+							  .AddUObject(this, &AAuraEnemy::OnGEHitReactTagChanged);
+	/* End: Ability System */
 
 	/* Begin: UI */
 	if (UAuraUserWidget* AuraUserWidget = Cast<UAuraUserWidget>(HealthBar->GetUserWidgetObject()))
@@ -77,10 +83,6 @@ void AAuraEnemy::BeginPlay()
 	OnHealthChanged.Broadcast(AuraAttributeSet->GetHealth());
 	OnMaxHealthChanged.Broadcast(AuraAttributeSet->GetMaxHealth());
 	/* End: UI */
-
-	// 绑定特定GameplayTag被添加/移除的回调
-	AuraAbilitySystemComponent->RegisterGameplayTagEvent(AuraGameplayTags::GE::HitReact.GetTag(), EGameplayTagEventType::NewOrRemoved)
-	                          .AddUObject(this, &AAuraEnemy::OnGEHitReactTagChanged);
 }
 
 void AAuraEnemy::InitAbilitySystem()

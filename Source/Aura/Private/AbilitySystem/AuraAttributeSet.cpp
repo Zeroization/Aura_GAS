@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayEffectExtension.h"
+#include "Game/AuraGameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -92,6 +93,12 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 			
 			const bool bIsDead = NewHealth <= 0.f; 
+			if (!bIsDead)
+			{
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(AuraGameplayTags::GE::HitReact.GetTag());
+				EffectProperties.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
 		}
 	}
 }
