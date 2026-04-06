@@ -40,6 +40,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName WeaponTipSocketName;
 
+	/// 所有客户端: 该角色死亡的逻辑(例如播放动画等)
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MulticastOnCharacterDeath();
+	/// 服务器: 该角色死亡的逻辑
+	virtual void Die() override;
 	virtual FVector GetProjectileSpawnLocation() override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	/// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

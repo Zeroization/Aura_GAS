@@ -6,6 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayEffectExtension.h"
 #include "Game/AuraGameplayTags.h"
+#include "Interaction/Interface/CombatInterface.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -93,7 +94,16 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 			
 			const bool bIsDead = NewHealth <= 0.f; 
-			if (!bIsDead)
+			if (bIsDead)
+			{
+				AActor* TargetAvatarActor = EffectProperties.TargetAvatarActor;
+				if (TargetAvatarActor->Implements<UCombatInterface>())
+				{
+					const TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(TargetAvatarActor);
+					CombatInterface->Die();
+				}
+			}
+			else
 			{
 				FGameplayTagContainer TagContainer;
 				TagContainer.AddTag(AuraGameplayTags::GE::HitReact.GetTag());

@@ -29,6 +29,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	float DefaultWalkSpeed = 250.f;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	float DyingLifeSpan = 5.f;
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	bool bDoHitReacting = false;
 
@@ -46,6 +49,7 @@ public:
 	/// >>>> End: Interactable Interface
 
 	/// >>>> Begin: Combat Interface
+	virtual void Die() override;
 	virtual int32 GetActorLevel() override;
 	/// >>>> End: Combat Interface
 

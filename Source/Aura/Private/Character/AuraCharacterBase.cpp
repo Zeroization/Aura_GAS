@@ -34,6 +34,30 @@ UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
 	return AuraAbilitySystemComponent;
 }
 
+void AAuraCharacterBase::MulticastOnCharacterDeath_Implementation()
+{
+	// 设定武器掉落相关参数
+	Weapon->SetSimulatePhysics(true);
+	Weapon->SetEnableGravity(true);
+	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	
+	// 设定角色网格体Ragdoll效果
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AAuraCharacterBase::Die()
+{
+	// 角色死亡时武器会掉落
+	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+	
+	MulticastOnCharacterDeath();
+}
+
 FVector AAuraCharacterBase::GetProjectileSpawnLocation()
 {
 	checkf(IsValid(Weapon), TEXT("[%hs]: Character [%s] 's weapon is null!!!"), __FUNCTION__, *GetNameSafe(this));
