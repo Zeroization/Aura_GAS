@@ -34,10 +34,10 @@ protected:
 	///									额外检查.
 	///		2. 延迟加载 Lazy Loading:	当对象来自外部包时，它可以保存一个轻量级
 	///								的句柄，在访问时才真正加载对象。
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "AuraCharacter|Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "AuraCharacter|Combat")
 	FName WeaponTipSocketName;
 
 	/// 所有客户端: 该角色死亡的逻辑(例如播放动画等)
@@ -56,13 +56,13 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAuraAttributeSet> AuraAttributeSet;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "AuraCharacter|Attributes")
 	TSubclassOf<UGameplayEffect> InitPrimaryAttrGEClass;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "AuraCharacter|Attributes")
 	TSubclassOf<UGameplayEffect> InitSecondaryAttrGEClass;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "AuraCharacter|Attributes")
 	TSubclassOf<UGameplayEffect> InitVitalAttrGEClass;
 
 	virtual void InitAbilitySystem();
@@ -73,19 +73,34 @@ protected:
 	/// End: Ability System   <<<<<<<<<<<<<<<
 
 	/// Begin: Animation <<<<<<<<<<<<<<<<<<<<
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "AuraCharacter|Animation")
 	TObjectPtr<UMotionWarpingComponent> MotionWarping;
 
 	UFUNCTION(BlueprintCallable)
 	bool CheckMotionWarpTargetExists(const FName& WarpTargetName);
 	/// End:   Animation <<<<<<<<<<<<<<<<<<<<
 
+	/* Begin: SFX */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|SFX")
+	TObjectPtr<UMaterialInstance> CharacterDissolveMaterialInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|SFX")
+	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+
+	/// 在角色死亡时替换溶解材质
+	void Dissolve();
+
+	/// 在蓝图中实现角色慢慢溶解的效果
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartDissolveTimeline(const TArray<UMaterialInstanceDynamic*>& DynamicMIs);
+	/* End: SFX */
+
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Abilities")
+	UPROPERTY(EditAnywhere, Category = "AuraCharacter|Abilities")
 	TArray<TSubclassOf<UAuraGameplayAbility>> StartupAbilities;
-	
-	UPROPERTY(EditAnywhere, Category = "Combat")
+
+	UPROPERTY(EditAnywhere, Category = "AuraCharacter|Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
 };

@@ -40,21 +40,23 @@ void AAuraCharacterBase::MulticastOnCharacterDeath_Implementation()
 	Weapon->SetSimulatePhysics(true);
 	Weapon->SetEnableGravity(true);
 	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	
+
 	// 设定角色网格体Ragdoll效果
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->SetEnableGravity(true);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	// 角色和武器溶解
+	Dissolve();
 }
 
 void AAuraCharacterBase::Die()
 {
 	// 角色死亡时武器会掉落
 	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
-	
+
 	MulticastOnCharacterDeath();
 }
 
@@ -105,6 +107,25 @@ void AAuraCharacterBase::GrantCharacterStartupAbilities()
 bool AAuraCharacterBase::CheckMotionWarpTargetExists(const FName& WarpTargetName)
 {
 	return MotionWarping->FindWarpTarget(WarpTargetName) != nullptr;
+}
+
+void AAuraCharacterBase::Dissolve()
+{
+	TArray<UMaterialInstanceDynamic*> DynamicDissolveMIs;
+	if (IsValid(CharacterDissolveMaterialInstance))
+	{
+		// MaterialInstanceDynamic: 可以在运行时计算（和编辑）。
+		UMaterialInstanceDynamic* MeshDynamicMI = UMaterialInstanceDynamic::Create(CharacterDissolveMaterialInstance, this);
+		GetMesh()->SetMaterial(0, MeshDynamicMI);
+		DynamicDissolveMIs.Add(MeshDynamicMI);
+	}
+	if (IsValid(WeaponDissolveMaterialInstance))
+	{
+		UMaterialInstanceDynamic* WeaponDynamicMI = UMaterialInstanceDynamic::Create(WeaponDissolveMaterialInstance, this);
+		Weapon->SetMaterial(0, WeaponDynamicMI);
+		DynamicDissolveMIs.Add(WeaponDynamicMI);
+	}
+	StartDissolveTimeline(DynamicDissolveMIs);
 }
 
 void AAuraCharacterBase::BeginPlay()
