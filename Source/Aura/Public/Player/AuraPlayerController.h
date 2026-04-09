@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+class UDamageFloatingTextComponent;
 class USplineComponent;
 class UAuraAbilitySystemComponent;
 struct FGameplayTag;
@@ -26,6 +27,9 @@ class AURA_API AAuraPlayerController : public APlayerController
 public:
 	AAuraPlayerController();
 
+	UFUNCTION(Client, Reliable)
+	void ShowDamageFloatingText(float DamageAmount, ACharacter* TargetCharacter);
+
 	virtual void PlayerTick(float DeltaTime) override;
 
 protected:
@@ -33,17 +37,22 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Input")
+	UPROPERTY(EditAnywhere, Category = "Aura Player Controller|Input")
 	TObjectPtr<UInputMappingContext> IMC_AuraContext;
 
-	UPROPERTY(EditAnywhere, Category = "Input")
+	UPROPERTY(EditAnywhere, Category = "Aura Player Controller|Input")
 	TObjectPtr<UInputAction> IA_MoveAction;
 
 	void Move(const FInputActionValue& InputActionValue);
 
+#pragma region UI
+	UPROPERTY(EditDefaultsOnly, Category = "Aura Player Controller|UI")
+	TSubclassOf<UDamageFloatingTextComponent> DamageFloatingTextComponentClass;
+#pragma endregion
+
 #pragma region 鼠标: 指针追踪 Cursor Trace
 	FHitResult CursorHit;
-	
+
 	// Ps: 要声明实现某接口的Actor变量, 类型是TScriptInterface<I接口名>
 	TScriptInterface<IInteractable> LastTracedActor;
 	TScriptInterface<IInteractable> CurrTracedActor;
@@ -61,13 +70,13 @@ private:
 	// 鼠标点按的持续时间, 用于识别长/短按
 	float MousePressTime = 0.f;
 	// 鼠标短按的最长持续时间
-	UPROPERTY(EditDefaultsOnly, Category = "Click To Move")
+	UPROPERTY(EditDefaultsOnly, Category = "Aura Player Controller|Click To Move")
 	float ShortPressThreshold = 0.5f;
 	// 自动行走实际终点与理论终点的距离精度值
-	UPROPERTY(EditDefaultsOnly, Category = "Click To Move")
+	UPROPERTY(EditDefaultsOnly, Category = "Aura Player Controller|Click To Move")
 	float AutoRunAcceptanceRadius = 50.f;
 	// 自动行走的导航路线
-	UPROPERTY(VisibleAnywhere, Category = "Click To Move")
+	UPROPERTY(VisibleAnywhere, Category = "Aura Player Controller|Click To Move")
 	TObjectPtr<USplineComponent> Spline;
 	// 判断当前是否是鼠标短按的自动行走状态
 	bool bIsAutoRun = false;
@@ -81,7 +90,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<UAuraAbilitySystemComponent> AuraASC;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Aura Player Controller|Input")
 	TObjectPtr<UAuraInputConfig> InputConfig;
 
 	TObjectPtr<UAuraAbilitySystemComponent> InitAndGetAuraASC();

@@ -7,7 +7,10 @@
 #include "GameplayEffectExtension.h"
 #include "Game/AuraGameplayTags.h"
 #include "Interaction/Interface/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/AuraPlayerController.h"
+#include "GameFramework/Character.h"
 
 
 UAuraAttributeSet::UAuraAttributeSet()
@@ -81,19 +84,19 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
 	}
-	
+
 	// 处理IncomingDamage
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
 		const float LocalIncomingDamage = GetIncomingDamage();
 		SetIncomingDamage(0.f);
-		
+
 		if (LocalIncomingDamage > 0.f)
 		{
 			const float NewHealth = GetHealth() - LocalIncomingDamage;
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
-			
-			const bool bIsDead = NewHealth <= 0.f; 
+
+			const bool bIsDead = NewHealth <= 0.f;
 			if (bIsDead)
 			{
 				AActor* TargetAvatarActor = EffectProperties.TargetAvatarActor;
@@ -108,6 +111,18 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 				FGameplayTagContainer TagContainer;
 				TagContainer.AddTag(AuraGameplayTags::GE::HitReact.GetTag());
 				EffectProperties.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
+
+			// 在敌人身上显示伤害数字
+			if (EffectProperties.SourceCharacter != EffectProperties.TargetCharacter)
+			{
+				for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+				{
+					if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(It->Get()))
+					{
+						PC->ShowDamageFloatingText(LocalIncomingDamage, EffectProperties.TargetCharacter);
+					}
+				}
 			}
 		}
 	}

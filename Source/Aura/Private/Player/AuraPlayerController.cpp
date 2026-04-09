@@ -3,15 +3,17 @@
 
 #include "Player/AuraPlayerController.h"
 
+#include "Game/AuraGameplayTags.h"
+#include "Interaction/Interface/Interactable.h"
+#include "GameFramework/Character.h"
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "UI/Widget/DamageFloatingTextComponent.h"
+#include "Components/SplineComponent.h"
+#include "Input/AuraInputComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
-#include "AbilitySystem/AuraAbilitySystemComponent.h"
-#include "Components/SplineComponent.h"
-#include "Game/AuraGameplayTags.h"
-#include "Input/AuraInputComponent.h"
-#include "Interaction/Interface/Interactable.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
@@ -19,6 +21,21 @@ AAuraPlayerController::AAuraPlayerController()
 
 	// 鼠标-按键行走: 初始化
 	Spline = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
+}
+
+void AAuraPlayerController::ShowDamageFloatingText_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+{
+	if (IsValid(TargetCharacter) && IsValid(DamageFloatingTextComponentClass))
+	{
+		// 对于动态创建的组件, 需要手动注册
+		UDamageFloatingTextComponent* DamageTextComp = NewObject<UDamageFloatingTextComponent>(
+			TargetCharacter, DamageFloatingTextComponentClass);
+		DamageTextComp->RegisterComponent();
+		// 为了只在敌人受击时的位置处显示伤害数字, 需要附加并脱离敌人的根组件
+		DamageTextComp->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		DamageTextComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		DamageTextComp->SetDamageValue(DamageAmount);
+	}
 }
 
 void AAuraPlayerController::PlayerTick(float DeltaTime)
@@ -83,7 +100,7 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
 	}
-	
+
 	// 通过WASD移动时强行打断鼠标移动
 	bIsAutoRun = false;
 }
