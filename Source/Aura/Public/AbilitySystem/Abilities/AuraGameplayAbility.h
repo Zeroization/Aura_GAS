@@ -16,6 +16,11 @@ class AURA_API UAuraGameplayAbility : public UGameplayAbility
 
 public:
 	/// 触发GA的默认输入Tag
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "AuraGA|Input")
 	FGameplayTag StartupInputTag;
+	
+	/* GA可能用到的数值属性 */
+	/// Damage: 造成的伤害
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AuraGA|Properties")
+	FScalableFloat Damage;
 };

@@ -25,7 +25,11 @@ class AURA_API ICombatInterface
 public:
 	virtual int32 GetActorLevel();
 	virtual FVector GetProjectileSpawnLocation();
+	virtual void Die() = 0;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetFacingWarpTarget(const FVector& TargetLocation);
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UAnimMontage* GetHitReactMontage();
 };

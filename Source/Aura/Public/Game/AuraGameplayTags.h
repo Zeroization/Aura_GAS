@@ -42,6 +42,18 @@ namespace AuraGameplayTags
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(HealthRegeneration);     // "Attribute.Secondary.HealthRegeneration"
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(MaxHealth);              // "Attribute.Secondary.MaxHealth"
 		}
+
+		namespace Meta
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);           // "Attribute.Meta"
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(IncomingDamage); // "Attribute.Meta.IncomingDamage"
+		}
+	}
+
+	namespace GE
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "GE"
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(HitReact); // "GE.HitReact"
 	}
 
 	namespace UI

@@ -26,7 +26,18 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnMaxHealthChanged;
 
+	UPROPERTY(BlueprintReadOnly, Category = "AuraCharacter|Combat")
+	float DefaultWalkSpeed = 250.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|Combat")
+	float DyingLifeSpan = 5.f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "AuraCharacter|Combat")
+	bool bDoHitReacting = false;
+
 	AAuraEnemy();
+
+	void OnGEHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
 	virtual void BeginPlay() override;
 	virtual void InitAbilitySystem() override;
@@ -38,15 +49,16 @@ public:
 	/// >>>> End: Interactable Interface
 
 	/// >>>> Begin: Combat Interface
+	virtual void Die() override;
 	virtual int32 GetActorLevel() override;
 	/// >>>> End: Combat Interface
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
-	int32 Level = 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|Character Class Defaults")
 	ECharacterClass CharacterClass = ECharacterClass::ECC_Warrior;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|Character Class Defaults")
+	int32 Level = 1;
 
 	/* Begin: UI */
 	/// 血条
