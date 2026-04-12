@@ -15,84 +15,92 @@
 
 UAuraOverlayWidgetController* UAuraAbilitySystemLibrary::GetAuraOverlayWidgetController(const UObject* WorldContextObject)
 {
-	// 从本地玩家获取UI Controller
-	if (AAuraPlayerController* PlayerController =
-		Cast<AAuraPlayerController>(WorldContextObject->GetWorld()->GetFirstPlayerController()))
-	{
-		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(PlayerController->GetHUD()))
-		{
-			AAuraPlayerState* PlayerState = PlayerController->GetPlayerState<AAuraPlayerState>();
-			UAuraAbilitySystemComponent* ASC = Cast<UAuraAbilitySystemComponent>(PlayerState->GetAbilitySystemComponent());
-			UAuraAttributeSet* AttributeSet = Cast<UAuraAttributeSet>(PlayerState->GetAttributeSet());
-			const FAuraWidgetControllerParams Params(PlayerController, PlayerState, ASC, AttributeSet);
-			return AuraHUD->GetAuraOverlayWidgetController(Params);
-		}
-	}
+    // 从本地玩家获取UI Controller
+    if (AAuraPlayerController* PlayerController =
+        Cast<AAuraPlayerController>(WorldContextObject->GetWorld()->GetFirstPlayerController()))
+    {
+        if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(PlayerController->GetHUD()))
+        {
+            AAuraPlayerState* PlayerState = PlayerController->GetPlayerState<AAuraPlayerState>();
+            UAuraAbilitySystemComponent* ASC = Cast<UAuraAbilitySystemComponent>(PlayerState->GetAbilitySystemComponent());
+            UAuraAttributeSet* AttributeSet = Cast<UAuraAttributeSet>(PlayerState->GetAttributeSet());
+            const FAuraWidgetControllerParams Params(PlayerController, PlayerState, ASC, AttributeSet);
+            return AuraHUD->GetAuraOverlayWidgetController(Params);
+        }
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
 UAuraAttributeMenuWidgetController* UAuraAbilitySystemLibrary::GetAuraAttributeMenuWidgetController(const UObject* WorldContextObject)
 {
-	// 从本地玩家获取UI Controller
-	if (AAuraPlayerController* PlayerController =
-		Cast<AAuraPlayerController>(WorldContextObject->GetWorld()->GetFirstPlayerController()))
-	{
-		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(PlayerController->GetHUD()))
-		{
-			AAuraPlayerState* PlayerState = PlayerController->GetPlayerState<AAuraPlayerState>();
-			UAuraAbilitySystemComponent* ASC = Cast<UAuraAbilitySystemComponent>(PlayerState->GetAbilitySystemComponent());
-			UAuraAttributeSet* AttributeSet = Cast<UAuraAttributeSet>(PlayerState->GetAttributeSet());
-			const FAuraWidgetControllerParams Params(PlayerController, PlayerState, ASC, AttributeSet);
-			return AuraHUD->GetAuraAttributeMenuWidgetController(Params);
-		}
-	}
+    // 从本地玩家获取UI Controller
+    if (AAuraPlayerController* PlayerController =
+        Cast<AAuraPlayerController>(WorldContextObject->GetWorld()->GetFirstPlayerController()))
+    {
+        if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(PlayerController->GetHUD()))
+        {
+            AAuraPlayerState* PlayerState = PlayerController->GetPlayerState<AAuraPlayerState>();
+            UAuraAbilitySystemComponent* ASC = Cast<UAuraAbilitySystemComponent>(PlayerState->GetAbilitySystemComponent());
+            UAuraAttributeSet* AttributeSet = Cast<UAuraAttributeSet>(PlayerState->GetAttributeSet());
+            const FAuraWidgetControllerParams Params(PlayerController, PlayerState, ASC, AttributeSet);
+            return AuraHUD->GetAuraAttributeMenuWidgetController(Params);
+        }
+    }
 
-	return nullptr;
+    return nullptr;
+}
+
+UCharacterClassInfo* UAuraAbilitySystemLibrary::GetEnemyCharacterClassInfo(const UObject* WorldContextObject)
+{
+    if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject)))
+    {
+        return AuraGameMode->EnemyCharacterClassInfo;
+    }
+
+    return nullptr;
 }
 
 void UAuraAbilitySystemLibrary::InitEnemyDefaultAttributesByClass(const UObject* WorldContextObject,
                                                                   ECharacterClass EnemyClass, float Level,
                                                                   UAuraAbilitySystemComponent* ASC)
 {
-	if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject)))
-	{
-		UCharacterClassInfo* EnemyClassInfo = AuraGameMode->EnemyCharacterClassInfo;
-		FCharacterClassDefaultInfo EnemyClassDefaultInfo = EnemyClassInfo->GetClassDefaultInfo(EnemyClass);
+    if (UCharacterClassInfo* EnemyClassInfo = GetEnemyCharacterClassInfo(WorldContextObject))
+    {
+        FCharacterClassDefaultInfo EnemyClassDefaultInfo = EnemyClassInfo->GetClassDefaultInfo(EnemyClass);
 
-		AActor* AvatarActor = ASC->GetAvatarActor();
-		// Primary Attributes
-		FGameplayEffectContextHandle PrimaryAttrGEContextHandle = ASC->MakeEffectContext();
-		PrimaryAttrGEContextHandle.AddSourceObject(AvatarActor);
-		const FGameplayEffectSpecHandle PrimaryAttrGESpecHandle = ASC->MakeOutgoingSpec(EnemyClassDefaultInfo.PrimaryAttributes, Level,
-		                                                                                PrimaryAttrGEContextHandle);
-		ASC->ApplyGameplayEffectSpecToSelf(*PrimaryAttrGESpecHandle.Data);
+        AActor* AvatarActor = ASC->GetAvatarActor();
+        // Primary Attributes
+        FGameplayEffectContextHandle PrimaryAttrGEContextHandle = ASC->MakeEffectContext();
+        PrimaryAttrGEContextHandle.AddSourceObject(AvatarActor);
+        const FGameplayEffectSpecHandle PrimaryAttrGESpecHandle = ASC->MakeOutgoingSpec(EnemyClassDefaultInfo.PrimaryAttributes, Level,
+                                                                                        PrimaryAttrGEContextHandle);
+        ASC->ApplyGameplayEffectSpecToSelf(*PrimaryAttrGESpecHandle.Data);
 
-		// Secondary Attributes
-		FGameplayEffectContextHandle SecondaryAttrGEContextHandle = ASC->MakeEffectContext();
-		SecondaryAttrGEContextHandle.AddSourceObject(AvatarActor);
-		const FGameplayEffectSpecHandle SecondaryAttrGESpecHandle = ASC->MakeOutgoingSpec(
-			EnemyClassInfo->SecondaryAttributes, Level, SecondaryAttrGEContextHandle);
-		ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttrGESpecHandle.Data);
+        // Secondary Attributes
+        FGameplayEffectContextHandle SecondaryAttrGEContextHandle = ASC->MakeEffectContext();
+        SecondaryAttrGEContextHandle.AddSourceObject(AvatarActor);
+        const FGameplayEffectSpecHandle SecondaryAttrGESpecHandle = ASC->MakeOutgoingSpec(
+            EnemyClassInfo->SecondaryAttributes, Level, SecondaryAttrGEContextHandle);
+        ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttrGESpecHandle.Data);
 
-		// Vital Attributes
-		FGameplayEffectContextHandle VitalAttrGEContextHandle = ASC->MakeEffectContext();
-		VitalAttrGEContextHandle.AddSourceObject(AvatarActor);
-		const FGameplayEffectSpecHandle VitalAttrGESpecHandle = ASC->MakeOutgoingSpec(
-			EnemyClassInfo->VitalAttributes, Level, VitalAttrGEContextHandle);
-		ASC->ApplyGameplayEffectSpecToSelf(*VitalAttrGESpecHandle.Data);
-	}
+        // Vital Attributes
+        FGameplayEffectContextHandle VitalAttrGEContextHandle = ASC->MakeEffectContext();
+        VitalAttrGEContextHandle.AddSourceObject(AvatarActor);
+        const FGameplayEffectSpecHandle VitalAttrGESpecHandle = ASC->MakeOutgoingSpec(
+            EnemyClassInfo->VitalAttributes, Level, VitalAttrGEContextHandle);
+        ASC->ApplyGameplayEffectSpecToSelf(*VitalAttrGESpecHandle.Data);
+    }
 }
 
 void UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC)
 {
-	if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject)))
-	{
-		UCharacterClassInfo* EnemyClassInfo = AuraGameMode->EnemyCharacterClassInfo;
-		for (const auto& AbilityClass : EnemyClassInfo->CommonAbilities)
-		{
-			FGameplayAbilitySpec GASpec = FGameplayAbilitySpec(AbilityClass, 1);
-			ASC->GiveAbility(GASpec);
-		}
-	}
+    if (UCharacterClassInfo* EnemyClassInfo = GetEnemyCharacterClassInfo(WorldContextObject))
+    {
+        for (const auto& AbilityClass : EnemyClassInfo->CommonAbilities)
+        {
+            FGameplayAbilitySpec GASpec = FGameplayAbilitySpec(AbilityClass, 1);
+            ASC->GiveAbility(GASpec);
+        }
+    }
 }
