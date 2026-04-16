@@ -5,6 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "AbilitySystem/AuraAbilityTypes.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Game/AuraGameplayTags.h"
 #include "Interaction/Interface/CombatInterface.h"
@@ -26,6 +27,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 {
     // 获取必要信息
     const FGameplayEffectSpec& GESpec = ExecutionParams.GetOwningSpec();
+    FGameplayEffectContextHandle GEContextHandle = GESpec.GetContext();
     const UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
     const UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
     AActor* SourceAvatarActor = SourceASC ? SourceASC->GetAvatarActor() : nullptr;
@@ -54,6 +56,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
     const bool bSuccessfulBlock = FMath::RandRange(1, 100) <= TargetBlockChance;
     Damage = bSuccessfulBlock ? Damage * 0.5f : Damage;
+    UAuraAbilitySystemLibrary::SetIsBlockedHit(GEContextHandle, bSuccessfulBlock);
 #pragma endregion
 
 #pragma region 伤害计算: Armor和ArmorPenetration部分
@@ -111,6 +114,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
                                                                0.f);
     const bool bSuccessfulCriticalHit = FMath::RandRange(1, 100) <= EffectiveCriticalHitChance;
     Damage = bSuccessfulCriticalHit ? Damage * 2.f + SourceCriticalHitBonusDamage : Damage;
+    UAuraAbilitySystemLibrary::SetIsCriticalHit(GEContextHandle, bSuccessfulCriticalHit);
 #pragma endregion
 
     // 修改IncomingDamage属性的值为Damage, 并应用

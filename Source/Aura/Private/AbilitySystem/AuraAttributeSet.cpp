@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayEffectExtension.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Game/AuraGameplayTags.h"
 #include "Interaction/Interface/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -116,6 +117,8 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 			// 在敌人身上显示伤害数字
 			if (EffectProperties.SourceCharacter != EffectProperties.TargetCharacter)
 			{
+				const bool bBlockedHit = UAuraAbilitySystemLibrary::GetIsBlockedHit(EffectProperties.EffectContextHandle);
+				const bool bCriticalHit = UAuraAbilitySystemLibrary::GetIsCriticalHit(EffectProperties.EffectContextHandle);
 				for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 				{
 					if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(It->Get()))

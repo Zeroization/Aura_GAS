@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/AuraAbilityTypes.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Game/AuraGameModeBase.h"
@@ -102,5 +103,39 @@ void UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(const UObject* WorldC
             FGameplayAbilitySpec GASpec = FGameplayAbilitySpec(AbilityClass, 1);
             ASC->GiveAbility(GASpec);
         }
+    }
+}
+
+bool UAuraAbilitySystemLibrary::GetIsBlockedHit(const FGameplayEffectContextHandle& GEContextHandle)
+{
+    if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        return GEContext->GetIsBlockedHit();
+    }
+    return false;
+}
+
+bool UAuraAbilitySystemLibrary::GetIsCriticalHit(const FGameplayEffectContextHandle& GEContextHandle)
+{
+    if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        return GEContext->GetIsCriticalHit();
+    }
+    return false;
+}
+
+void UAuraAbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& GEContextHandle, bool InIsBlockedHit)
+{
+    if (FAuraGameplayEffectContext* GEContext = static_cast<FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        GEContext->SetIsBlockedHit(InIsBlockedHit);
+    }
+}
+
+void UAuraAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& GEContextHandle, bool InIsCriticalHit)
+{
+    if (FAuraGameplayEffectContext* GEContext = static_cast<FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        GEContext->SetIsCriticalHit(InIsCriticalHit);
     }
 }

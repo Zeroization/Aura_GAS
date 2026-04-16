@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "AuraAbilitySystemLibrary.generated.h"
 
+struct FGameplayEffectContextHandle;
 class UCharacterClassInfo;
 class UAuraAbilitySystemComponent;
 enum class ECharacterClass : uint8;
@@ -35,4 +36,16 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults", meta = (WorldContext="WorldContextObject"))
     static void GrantEnemyStartupAbilities(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC);
+
+    UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static bool GetIsBlockedHit(const FGameplayEffectContextHandle& GEContextHandle);
+
+    UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static bool GetIsCriticalHit(const FGameplayEffectContextHandle& GEContextHandle);
+
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& GEContextHandle, bool InIsBlockedHit);
+
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& GEContextHandle, bool InIsCriticalHit);
 };
