@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+struct FDamageFloatingTextProperty;
 class UDamageFloatingTextComponent;
 class USplineComponent;
 class UAuraAbilitySystemComponent;
@@ -28,7 +29,7 @@ public:
 	AAuraPlayerController();
 
 	UFUNCTION(Client, Reliable)
-	void ShowDamageFloatingText(float DamageAmount, ACharacter* TargetCharacter);
+	void ShowDamageFloatingText(float DamageAmount, ACharacter* TargetCharacter, const FDamageFloatingTextProperty& Property);
 
 	virtual void PlayerTick(float DeltaTime) override;
 

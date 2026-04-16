@@ -3,17 +3,17 @@
 
 #include "Player/AuraPlayerController.h"
 
-#include "Game/AuraGameplayTags.h"
-#include "Interaction/Interface/Interactable.h"
-#include "GameFramework/Character.h"
-#include "AbilitySystem/AuraAbilitySystemComponent.h"
-#include "UI/Widget/DamageFloatingTextComponent.h"
-#include "Components/SplineComponent.h"
-#include "Input/AuraInputComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "Components/SplineComponent.h"
+#include "Game/AuraGameplayTags.h"
+#include "GameFramework/Character.h"
+#include "Input/AuraInputComponent.h"
+#include "Interaction/Interface/Interactable.h"
+#include "UI/Widget/DamageFloatingTextComponent.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
@@ -23,7 +23,8 @@ AAuraPlayerController::AAuraPlayerController()
 	Spline = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
 }
 
-void AAuraPlayerController::ShowDamageFloatingText_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+void AAuraPlayerController::ShowDamageFloatingText_Implementation(float DamageAmount, ACharacter* TargetCharacter,
+	const FDamageFloatingTextProperty& Property)
 {
 	if (IsValid(TargetCharacter) && IsValid(DamageFloatingTextComponentClass))
 	{
@@ -34,7 +35,7 @@ void AAuraPlayerController::ShowDamageFloatingText_Implementation(float DamageAm
 		// 为了只在敌人受击时的位置处显示伤害数字, 需要附加并脱离敌人的根组件
 		DamageTextComp->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		DamageTextComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		DamageTextComp->SetDamageValue(DamageAmount);
+		DamageTextComp->SetDamageValue(DamageAmount, Property);
 	}
 }
 

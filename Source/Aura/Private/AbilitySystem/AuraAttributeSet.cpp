@@ -7,11 +7,11 @@
 #include "GameplayEffectExtension.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Game/AuraGameplayTags.h"
+#include "GameFramework/Character.h"
 #include "Interaction/Interface/CombatInterface.h"
-#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/AuraPlayerController.h"
-#include "GameFramework/Character.h"
+#include "UI/Widget/DamageFloatingTextComponent.h"
 
 
 UAuraAttributeSet::UAuraAttributeSet()
@@ -119,11 +119,16 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 			{
 				const bool bBlockedHit = UAuraAbilitySystemLibrary::GetIsBlockedHit(EffectProperties.EffectContextHandle);
 				const bool bCriticalHit = UAuraAbilitySystemLibrary::GetIsCriticalHit(EffectProperties.EffectContextHandle);
+				
+				FDamageFloatingTextProperty DamageFloatingTextProperty;
+				DamageFloatingTextProperty.bIsBlockedHit = bBlockedHit;
+				DamageFloatingTextProperty.bIsCriticalHit = bCriticalHit;
+				
 				for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 				{
 					if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(It->Get()))
 					{
-						PC->ShowDamageFloatingText(LocalIncomingDamage, EffectProperties.TargetCharacter);
+						PC->ShowDamageFloatingText(LocalIncomingDamage, EffectProperties.TargetCharacter, DamageFloatingTextProperty);
 					}
 				}
 			}
