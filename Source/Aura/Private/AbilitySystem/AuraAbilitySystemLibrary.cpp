@@ -139,3 +139,15 @@ void UAuraAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& G
         GEContext->SetIsCriticalHit(InIsCriticalHit);
     }
 }
+
+bool UAuraAbilitySystemLibrary::ContainsDamageTypeByProperty(const FDamageFloatingTextProperty& Property,
+                                                   EAuraDamageType DamageType)
+{
+    return ContainsDamageTypeByFlags(Property.DamageTypeFlags, DamageType);
+}
+
+bool UAuraAbilitySystemLibrary::ContainsDamageTypeByFlags(uint8 DamageTypeFlags, EAuraDamageType DamageType)
+{
+    const uint8 DamageTypeFlag = static_cast<uint8>(DamageType);
+    return DamageTypeFlag != static_cast<uint8>(EAuraDamageType::None) && (DamageTypeFlags & DamageTypeFlag) != 0;
+}

@@ -3,19 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Aura/Aura.h"
 #include "Components/WidgetComponent.h"
 #include "DamageFloatingTextComponent.generated.h"
 
 USTRUCT(BlueprintType)
 struct FDamageFloatingTextProperty
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly)
-	bool bIsBlockedHit = false;
+    UPROPERTY(BlueprintReadOnly)
+    float Damage = 0.f;
 
-	UPROPERTY(BlueprintReadOnly)
-	bool bIsCriticalHit = false;
+	UPROPERTY(BlueprintReadOnly, meta=(Bitflags))
+	uint8 DamageTypeFlags = static_cast<uint8>(EAuraDamageType::None);
 };
 
 /**
@@ -24,9 +25,9 @@ struct FDamageFloatingTextProperty
 UCLASS()
 class AURA_API UDamageFloatingTextComponent : public UWidgetComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void SetDamageValue(float Damage, const FDamageFloatingTextProperty& Property);
+    UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+    void SetDamageValue(const FDamageFloatingTextProperty& Property);
 };

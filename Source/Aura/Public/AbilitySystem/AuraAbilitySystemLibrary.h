@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "UI/Widget/DamageFloatingTextComponent.h"
 #include "AuraAbilitySystemLibrary.generated.h"
 
 struct FGameplayEffectContextHandle;
@@ -48,4 +49,10 @@ public:
 
     UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
     static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& GEContextHandle, bool InIsCriticalHit);
+
+    UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|Damage")
+    static bool ContainsDamageTypeByProperty(const FDamageFloatingTextProperty& Property, EAuraDamageType DamageType);
+
+    UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|Damage")
+    static bool ContainsDamageTypeByFlags(uint8 DamageTypeFlags, EAuraDamageType DamageType);
 };
