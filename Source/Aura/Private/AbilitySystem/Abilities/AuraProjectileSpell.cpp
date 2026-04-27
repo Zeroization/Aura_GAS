@@ -41,9 +41,11 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
         GEContextHandle.AddSourceObject(Projectile);
         const FGameplayEffectSpecHandle GESpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(),
                                                                                    GEContextHandle);
-        const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
-        GESpecHandle.Data->SetSetByCallerMagnitude(AuraGameplayTags::Attribute::Meta::IncomingDamage.GetTag(),
-                                                   ScaledDamage);
+        for (const auto& [DamageElemType, DamageValueTable] : DamageElemToValue)
+        {
+            const float ScaledDamage = DamageValueTable.GetValueAtLevel(GetAbilityLevel());
+            GESpecHandle.Data->SetSetByCallerMagnitude(DamageElemType, ScaledDamage);
+        }
 
         Projectile->DamageEffectSpecHandle = GESpecHandle;
         Projectile->FinishSpawning(SpawnTransform);

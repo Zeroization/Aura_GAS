@@ -45,7 +45,13 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
     EvaluateParameters.TargetTags = GESpec.CapturedTargetTags.GetAggregatedTags();
 
     // 通过SetByCaller获取Damage
-    float Damage = GESpec.GetSetByCallerMagnitude(AuraGameplayTags::Attribute::Meta::IncomingDamage.GetTag());
+    FGameplayTagContainer DamageElemTypeTags = UGameplayTagsManager::Get()
+        .RequestGameplayTagChildren(AuraGameplayTags::Damage::ElemType::Root);
+    float Damage = 0.f;
+    for (const FGameplayTag& DamageElemType : DamageElemTypeTags)
+    {
+        Damage += GESpec.GetSetByCallerMagnitude(DamageElemType);
+    }
 
 #pragma region 伤害计算: BlockChance部分
     // 捕捉Target的BlockChance: 用于判断是否成功格挡, 是则Damage减半
