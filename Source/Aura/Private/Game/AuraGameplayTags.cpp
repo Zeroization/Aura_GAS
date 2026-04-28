@@ -81,6 +81,25 @@ namespace AuraGameplayTags
             UE_DEFINE_GAMEPLAY_TAG_COMMENT(MaxHealth,
                                            "Attribute.Secondary.MaxHealth",
                                            "Max Health: 依赖属性VIG, Health的最大值");
+
+            namespace ElemResistance
+            {
+                UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                               "Attribute.Secondary.ElemResistance",
+                                               "元素伤害抗性; 此Tag仅用于Tag相关操作(如Matches)");
+                UE_DEFINE_GAMEPLAY_TAG_COMMENT(Fire,
+                                               "Attribute.Secondary.ElemResistance.Fire",
+                                               "火元素伤害抗性");
+                UE_DEFINE_GAMEPLAY_TAG_COMMENT(Lightning,
+                                               "Attribute.Secondary.ElemResistance.Lightning",
+                                               "电元素伤害抗性");
+                UE_DEFINE_GAMEPLAY_TAG_COMMENT(Arcane,
+                                               "Attribute.Secondary.ElemResistance.Arcane",
+                                               "奥术元素伤害抗性");
+                UE_DEFINE_GAMEPLAY_TAG_COMMENT(Physical,
+                                               "Attribute.Secondary.ElemResistance.Physical",
+                                               "物理伤害抗性");
+            }
         }
 
         namespace Meta
@@ -114,10 +133,32 @@ namespace AuraGameplayTags
         {
             UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
                                            "Damage.ElemType",
-                                           "伤害元素类型; 此Tag仅用于Tag相关操作(如Matches)");
+                                           "伤害的元素类型; 此Tag仅用于Tag相关操作(如Matches)");
             UE_DEFINE_GAMEPLAY_TAG_COMMENT(Fire,
                                            "Damage.ElemType.Fire",
                                            "火元素伤害");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Lightning,
+                                           "Damage.ElemType.Lightning",
+                                           "电元素伤害");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Arcane,
+                                           "Damage.ElemType.Arcane",
+                                           "奥术元素伤害");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Physical,
+                                           "Damage.ElemType.Physical",
+                                           "物理伤害");
+
+            const TMap<FGameplayTag, FGameplayTag>& GetElemTypeToResistanceMap()
+            {
+                static const TMap<FGameplayTag, FGameplayTag> Map =
+                {
+                    {Fire, Attribute::Secondary::ElemResistance::Fire},
+                    {Lightning, Attribute::Secondary::ElemResistance::Lightning},
+                    {Arcane, Attribute::Secondary::ElemResistance::Arcane},
+                    {Physical, Attribute::Secondary::ElemResistance::Physical}
+                };
+
+                return Map;
+            }
         }
     }
 

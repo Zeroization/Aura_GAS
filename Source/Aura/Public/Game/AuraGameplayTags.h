@@ -41,6 +41,15 @@ namespace AuraGameplayTags
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(CriticalHitBonusDamage); // "Attribute.Secondary.CriticalHitBonusDamage"
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(HealthRegeneration);     // "Attribute.Secondary.HealthRegeneration"
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(MaxHealth);              // "Attribute.Secondary.MaxHealth"
+
+            namespace ElemResistance
+            {
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);      // "Attribute.Secondary.ElemResistance"
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Fire);      // "Attribute.Secondary.ElemResistance.Fire"
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Lightning); // "Attribute.Secondary.ElemResistance.Lightning"
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Arcane);    // "Attribute.Secondary.ElemResistance.Arcane"
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Physical);  // "Attribute.Secondary.ElemResistance.Physical"
+            }
         }
 
         namespace Meta
@@ -62,8 +71,13 @@ namespace AuraGameplayTags
 
         namespace ElemType
         {
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "Damage.ElemType"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Fire); // "Damage.ElemType.Fire"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);      // "Damage.ElemType"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Fire);      // "Damage.ElemType.Fire"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Lightning); // "Damage.ElemType.Lightning"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Arcane);    // "Damage.ElemType.Arcane"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Physical);  // "Damage.ElemType.Physical"
+
+            const TMap<FGameplayTag, FGameplayTag>& GetElemTypeToResistanceMap();
         }
     }
 

@@ -20,6 +20,10 @@ UExecCalc_Damage::UExecCalc_Damage()
     RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().CriticalHitChanceDef);
     RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().CriticalHitResistanceDef);
     RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().CriticalHitBonusDamageDef);
+    RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().FireResistanceDef);
+    RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().LightningResistanceDef);
+    RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().ArcaneResistanceDef);
+    RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().PhysicalResistanceDef);
 }
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -45,12 +49,18 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
     EvaluateParameters.TargetTags = GESpec.CapturedTargetTags.GetAggregatedTags();
 
     // 通过SetByCaller获取Damage
-    FGameplayTagContainer DamageElemTypeTags = UGameplayTagsManager::Get()
-        .RequestGameplayTagChildren(AuraGameplayTags::Damage::ElemType::Root);
     float Damage = 0.f;
-    for (const FGameplayTag& DamageElemType : DamageElemTypeTags)
+    for (const auto& [ElemType, ResistanceType] : AuraGameplayTags::Damage::ElemType::GetElemTypeToResistanceMap())
     {
-        Damage += GESpec.GetSetByCallerMagnitude(DamageElemType);
+        float ElemResistance = 0.f;
+        FGameplayEffectAttributeCaptureDefinition ResistanceDef = AuraDamageAttributeStatics::Get().TagToCaptureDefs[ResistanceType];
+        ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(ResistanceDef, EvaluateParameters, ElemResistance);
+        ElemResistance = FMath::Clamp(ElemResistance, 0.f, 100.f);
+     
+        float ElemDamage = GESpec.GetSetByCallerMagnitude(ElemType, false, 0.f);
+        ElemDamage *= (100.f - ElemResistance) / 100.f;
+        
+        Damage += ElemDamage;
     }
 
 #pragma region 伤害计算: BlockChance部分

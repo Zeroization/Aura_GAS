@@ -24,7 +24,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
     {
         const TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(Owner);
         FRotator Rotation = (TargetLocation - Owner->GetActorLocation()).Rotation();
-        Rotation.Pitch = 0.f;
+        // Rotation.Pitch = 0.f;
 
         FTransform SpawnTransform;
         SpawnTransform.SetLocation(CombatInterface->GetProjectileSpawnLocation());
