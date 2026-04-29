@@ -5,6 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "AbilitySystem/AuraAbilityTypes.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Game/AuraGameplayTags.h"
 #include "Interaction/Interface/CombatInterface.h"
@@ -19,6 +20,10 @@ UExecCalc_Damage::UExecCalc_Damage()
     RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().CriticalHitChanceDef);
     RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().CriticalHitResistanceDef);
     RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().CriticalHitBonusDamageDef);
+    RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().FireResistanceDef);
+    RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().LightningResistanceDef);
+    RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().ArcaneResistanceDef);
+    RelevantAttributesToCapture.Add(AuraDamageAttributeStatics::Get().PhysicalResistanceDef);
 }
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -26,6 +31,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 {
     // 获取必要信息
     const FGameplayEffectSpec& GESpec = ExecutionParams.GetOwningSpec();
+    FGameplayEffectContextHandle GEContextHandle = GESpec.GetContext();
     const UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
     const UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
     AActor* SourceAvatarActor = SourceASC ? SourceASC->GetAvatarActor() : nullptr;
@@ -43,7 +49,19 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
     EvaluateParameters.TargetTags = GESpec.CapturedTargetTags.GetAggregatedTags();
 
     // 通过SetByCaller获取Damage
-    float Damage = GESpec.GetSetByCallerMagnitude(AuraGameplayTags::Attribute::Meta::IncomingDamage.GetTag());
+    float Damage = 0.f;
+    for (const auto& [ElemType, ResistanceType] : AuraGameplayTags::Damage::ElemType::GetElemTypeToResistanceMap())
+    {
+        float ElemResistance = 0.f;
+        FGameplayEffectAttributeCaptureDefinition ResistanceDef = AuraDamageAttributeStatics::Get().TagToCaptureDefs[ResistanceType];
+        ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(ResistanceDef, EvaluateParameters, ElemResistance);
+        ElemResistance = FMath::Clamp(ElemResistance, 0.f, 100.f);
+     
+        float ElemDamage = GESpec.GetSetByCallerMagnitude(ElemType, false, 0.f);
+        ElemDamage *= (100.f - ElemResistance) / 100.f;
+        
+        Damage += ElemDamage;
+    }
 
 #pragma region 伤害计算: BlockChance部分
     // 捕捉Target的BlockChance: 用于判断是否成功格挡, 是则Damage减半
@@ -54,6 +72,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
     const bool bSuccessfulBlock = FMath::RandRange(1, 100) <= TargetBlockChance;
     Damage = bSuccessfulBlock ? Damage * 0.5f : Damage;
+    UAuraAbilitySystemLibrary::SetIsBlockedHit(GEContextHandle, bSuccessfulBlock);
 #pragma endregion
 
 #pragma region 伤害计算: Armor和ArmorPenetration部分
@@ -111,6 +130,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
                                                                0.f);
     const bool bSuccessfulCriticalHit = FMath::RandRange(1, 100) <= EffectiveCriticalHitChance;
     Damage = bSuccessfulCriticalHit ? Damage * 2.f + SourceCriticalHitBonusDamage : Damage;
+    UAuraAbilitySystemLibrary::SetIsCriticalHit(GEContextHandle, bSuccessfulCriticalHit);
 #pragma endregion
 
     // 修改IncomingDamage属性的值为Damage, 并应用

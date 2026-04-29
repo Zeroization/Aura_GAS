@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/AuraAbilityTypes.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Game/AuraGameModeBase.h"
@@ -103,4 +104,50 @@ void UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(const UObject* WorldC
             ASC->GiveAbility(GASpec);
         }
     }
+}
+
+bool UAuraAbilitySystemLibrary::GetIsBlockedHit(const FGameplayEffectContextHandle& GEContextHandle)
+{
+    if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        return GEContext->GetIsBlockedHit();
+    }
+    return false;
+}
+
+bool UAuraAbilitySystemLibrary::GetIsCriticalHit(const FGameplayEffectContextHandle& GEContextHandle)
+{
+    if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        return GEContext->GetIsCriticalHit();
+    }
+    return false;
+}
+
+void UAuraAbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& GEContextHandle, bool InIsBlockedHit)
+{
+    if (FAuraGameplayEffectContext* GEContext = static_cast<FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        GEContext->SetIsBlockedHit(InIsBlockedHit);
+    }
+}
+
+void UAuraAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& GEContextHandle, bool InIsCriticalHit)
+{
+    if (FAuraGameplayEffectContext* GEContext = static_cast<FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        GEContext->SetIsCriticalHit(InIsCriticalHit);
+    }
+}
+
+bool UAuraAbilitySystemLibrary::ContainsDamageTypeByProperty(const FDamageFloatingTextProperty& Property,
+                                                   EAuraDamageType DamageType)
+{
+    return ContainsDamageTypeByFlags(Property.DamageTypeFlags, DamageType);
+}
+
+bool UAuraAbilitySystemLibrary::ContainsDamageTypeByFlags(uint8 DamageTypeFlags, EAuraDamageType DamageType)
+{
+    const uint8 DamageTypeFlag = static_cast<uint8>(DamageType);
+    return DamageTypeFlag != static_cast<uint8>(EAuraDamageType::None) && (DamageTypeFlags & DamageTypeFlag) != 0;
 }

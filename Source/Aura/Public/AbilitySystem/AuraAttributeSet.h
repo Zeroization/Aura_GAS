@@ -145,6 +145,26 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth, Category = "Attributes|Secondary Attributes")
 	FGameplayAttributeData MaxHealth;
 	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, MaxHealth);
+	
+	/// Fire Resistance: 依赖属性RES, 火元素伤害抗性
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_FireResistance, Category = "Attributes|Secondary Attributes")
+	FGameplayAttributeData FireResistance;
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, FireResistance);
+	
+	/// Lightning Resistance: 依赖属性RES, 电元素伤害抗性
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_LightningResistance, Category = "Attributes|Secondary Attributes")
+	FGameplayAttributeData LightningResistance;
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, LightningResistance);
+	
+	/// Arcane Resistance: 依赖属性RES, 奥术元素伤害抗性
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_ArcaneResistance, Category = "Attributes|Secondary Attributes")
+	FGameplayAttributeData ArcaneResistance;
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, ArcaneResistance);
+	
+	/// Physical Resistance: 依赖属性RES, 物理伤害抗性
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_PhysicalResistance, Category = "Attributes|Secondary Attributes")
+	FGameplayAttributeData PhysicalResistance;
+	AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, PhysicalResistance);
 #pragma endregion
 
 #pragma region Meta Attributes: 元属性
@@ -211,6 +231,18 @@ public:
 
 	UFUNCTION()
 	void OnRep_HealthRegeneration(const FGameplayAttributeData& OldData) const;
+	
+	UFUNCTION()
+	void OnRep_FireResistance(const FGameplayAttributeData& OldData) const;
+	
+	UFUNCTION()
+	void OnRep_LightningResistance(const FGameplayAttributeData& OldData) const;
+	
+	UFUNCTION()
+	void OnRep_ArcaneResistance(const FGameplayAttributeData& OldData) const;
+	
+	UFUNCTION()
+	void OnRep_PhysicalResistance(const FGameplayAttributeData& OldData) const;
 	// End: OnRep_ Functions   >>>>>>>>>>>>>>>>>>>>>>
 
 private:
