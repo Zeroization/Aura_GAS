@@ -12,68 +12,71 @@ class UGameplayEffect;
 UENUM(BlueprintType)
 enum class EEffectApplicationPolicy : uint8
 {
-	EEAP_ApplyOnBeginOverlap UMETA(DisplayName = "ApplyOnBeginOverlap"),
-	EEAP_ApplyOnEndOverlap UMETA(DisplayName = "ApplyOnEndOverlap"),
-	EEAP_DoNotApply UMETA(DisplayName = "DoNotApply")
+    EEAP_ApplyOnBeginOverlap UMETA(DisplayName = "ApplyOnBeginOverlap"),
+    EEAP_ApplyOnEndOverlap UMETA(DisplayName = "ApplyOnEndOverlap"),
+    EEAP_DoNotApply UMETA(DisplayName = "DoNotApply")
 };
 
 UENUM(BlueprintType)
 enum class EEffectRemovalPolicy : uint8
 {
-	EERP_RemoveOnEndOverlap UMETA(DisplayName = "RemoveOnEndOverlap"),
-	EERP_DoNotRemove UMETA(DisplayName = "DoNotRemove")
+    EERP_RemoveOnEndOverlap UMETA(DisplayName = "RemoveOnEndOverlap"),
+    EERP_DoNotRemove UMETA(DisplayName = "DoNotRemove")
 };
 
 USTRUCT(BlueprintType)
 struct FEffectActorGE
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-	// Instant GE: 一般会永久改变BaseValue
-	// Has Duration GE & Infinite GE: 一般会改变CurrentValue, 并在时间到后撤回修改
-	// 可通过修改Period变成周期对BaseValue修改的GE
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UGameplayEffect> GEClass;
+    // Instant GE: 一般会永久改变BaseValue
+    // Has Duration GE & Infinite GE: 一般会改变CurrentValue, 并在时间到后撤回修改
+    // 可通过修改Period变成周期对BaseValue修改的GE
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    TSubclassOf<UGameplayEffect> GEClass;
 
-	// GE应用的处理方式
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	EEffectApplicationPolicy GEApplicationPolicy = EEffectApplicationPolicy::EEAP_DoNotApply;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    float GELevel = 1.f;
 
-	// GE移除的处理方式
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	EEffectRemovalPolicy GERemovalPolicy = EEffectRemovalPolicy::EERP_DoNotRemove;
+    // GE应用的处理方式
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    EEffectApplicationPolicy GEApplicationPolicy = EEffectApplicationPolicy::EEAP_DoNotApply;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float GELevel = 1.f;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bDestroyOnEndOverlap = false;
+    // GE移除的处理方式
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    EEffectRemovalPolicy GERemovalPolicy = EEffectRemovalPolicy::EERP_DoNotRemove;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    bool bDestroyOnEndOverlap = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    bool bAppleEffectToEnemies = false;
 };
 
 UCLASS()
 class AURA_API AAuraEffectActor : public AActor
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	AAuraEffectActor();
+    AAuraEffectActor();
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS|Gameplay Effects")
-	TArray<FEffectActorGE> EffectActorGEs;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS|Gameplay Effects")
+    TArray<FEffectActorGE> EffectActorGEs;
 
-	// 用于激活/移除Infinite类型GE的TMap
-	UPROPERTY()
-	TMap<FActiveGameplayEffectHandle, TObjectPtr<UAbilitySystemComponent>> ActiveInfiniteGEHandles;
+    // 用于激活/移除Infinite类型GE的TMap
+    UPROPERTY()
+    TMap<FActiveGameplayEffectHandle, TObjectPtr<UAbilitySystemComponent>> ActiveInfiniteGEHandles;
 
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable)
-	void ApplyEffectToTarget(AActor* InTargetActor, const FEffectActorGE& InEffectActorGE);
+    UFUNCTION(BlueprintCallable)
+    void ApplyEffectToTarget(AActor* InTargetActor, const FEffectActorGE& InEffectActorGE);
 
-	UFUNCTION(BlueprintCallable)
-	void OnBeginOverlap(AActor* TargetActor);
+    UFUNCTION(BlueprintCallable)
+    void OnBeginOverlap(AActor* TargetActor);
 
-	UFUNCTION(BlueprintCallable)
-	void OnEndOverlap(AActor* TargetActor);
+    UFUNCTION(BlueprintCallable)
+    void OnEndOverlap(AActor* TargetActor);
 };

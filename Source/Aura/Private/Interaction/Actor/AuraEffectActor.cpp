@@ -6,104 +6,123 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
+#include "Aura/Aura.h"
 
 
 AAuraEffectActor::AAuraEffectActor()
 {
-	PrimaryActorTick.bCanEverTick = false;
+    PrimaryActorTick.bCanEverTick = false;
 
-	USceneComponent* SceneComponent = CreateDefaultSubobject<USceneComponent>("SceneRoot");
-	SetRootComponent(SceneComponent);
+    USceneComponent* SceneComponent = CreateDefaultSubobject<USceneComponent>("SceneRoot");
+    SetRootComponent(SceneComponent);
 }
 
 void AAuraEffectActor::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 }
 
 void AAuraEffectActor::ApplyEffectToTarget(AActor* InTargetActor, const FEffectActorGE& InEffectActorGE)
 {
-	if (InTargetActor->Implements<UAbilitySystemInterface>())
-	{
-		checkf(InEffectActorGE.GEClass, TEXT("[%hs] GEClass is empty, please fill out in editor!"), __FUNCTION__);
+    if (const bool bTargetIsEnemy = InTargetActor->ActorHasTag(AURA_ACTOR_FNAME_TAG_ENEMY);
+        bTargetIsEnemy && !InEffectActorGE.bAppleEffectToEnemies)
+    {
+        return;
+    }
 
-		// 1. 获取Target自己的ASC
-		const TScriptInterface<IAbilitySystemInterface> ASCInterface = TScriptInterface<IAbilitySystemInterface>(
-			InTargetActor);
-		UAbilitySystemComponent* TargetActorAsc = ASCInterface->GetAbilitySystemComponent();
-		// 2. 创建GEContextHandle(封装GEContext + 工具函数)
-		FGameplayEffectContextHandle GEContextHandle = TargetActorAsc->MakeEffectContext();
-		GEContextHandle.AddSourceObject(this);
-		// 3. 创建GESpecHandle(封装GESpec + 工具函数)
-		const FGameplayEffectSpecHandle GESpecHandle = TargetActorAsc->MakeOutgoingSpec(
-			InEffectActorGE.GEClass, InEffectActorGE.GELevel, GEContextHandle);
-		// 4. 对Target自己的ASC施加GE
-		const FActiveGameplayEffectHandle ActiveGEHandle = TargetActorAsc->ApplyGameplayEffectSpecToSelf(
-			*GESpecHandle.Data);
+    if (InTargetActor->Implements<UAbilitySystemInterface>())
+    {
+        checkf(InEffectActorGE.GEClass, TEXT("[%hs] GEClass is empty, please fill out in editor!"), __FUNCTION__);
 
-		// 5. 对于Infinite类GE, 需要存储激活它的FActiveGameplayEffectHandle, 以便后续移除它
-		if (GESpecHandle.Data->Def->DurationPolicy == EGameplayEffectDurationType::Infinite &&
-			InEffectActorGE.GERemovalPolicy == EEffectRemovalPolicy::EERP_RemoveOnEndOverlap)
-		{
-			ActiveInfiniteGEHandles.Add(ActiveGEHandle, TargetActorAsc);
-		}
-	}
+        // 1. 获取Target自己的ASC
+        const TScriptInterface<IAbilitySystemInterface> ASCInterface = TScriptInterface<IAbilitySystemInterface>(
+            InTargetActor);
+        UAbilitySystemComponent* TargetActorAsc = ASCInterface->GetAbilitySystemComponent();
+        // 2. 创建GEContextHandle(封装GEContext + 工具函数)
+        FGameplayEffectContextHandle GEContextHandle = TargetActorAsc->MakeEffectContext();
+        GEContextHandle.AddSourceObject(this);
+        // 3. 创建GESpecHandle(封装GESpec + 工具函数)
+        const FGameplayEffectSpecHandle GESpecHandle = TargetActorAsc->MakeOutgoingSpec(
+            InEffectActorGE.GEClass, InEffectActorGE.GELevel, GEContextHandle);
+        // 4. 对Target自己的ASC施加GE
+        const FActiveGameplayEffectHandle ActiveGEHandle = TargetActorAsc->ApplyGameplayEffectSpecToSelf(
+            *GESpecHandle.Data);
 
-	// 获取ASC的另一个方法:
-	// UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
+        // 5. 对于Infinite类GE, 需要存储激活它的FActiveGameplayEffectHandle, 以便后续移除它
+        if (GESpecHandle.Data->Def->DurationPolicy == EGameplayEffectDurationType::Infinite &&
+            InEffectActorGE.GERemovalPolicy == EEffectRemovalPolicy::EERP_RemoveOnEndOverlap)
+        {
+            ActiveInfiniteGEHandles.Add(ActiveGEHandle, TargetActorAsc);
+        }
+    }
+
+    // 获取ASC的另一个方法:
+    // UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
 }
 
 void AAuraEffectActor::OnBeginOverlap(AActor* TargetActor)
 {
-	for (const auto& EffectActorGE : EffectActorGEs)
-	{
-		if (EffectActorGE.GEApplicationPolicy == EEffectApplicationPolicy::EEAP_ApplyOnBeginOverlap)
-		{
-			ApplyEffectToTarget(TargetActor, EffectActorGE);
-		}
-		
-		// 真正的销毁是在OnEndOverlap()中实现, 这里先取消可见性吧
-		if (EffectActorGE.bDestroyOnEndOverlap)
-		{
-			GetRootComponent()->SetVisibility(false, true);
-		}
-	}
+    for (const auto& EffectActorGE : EffectActorGEs)
+    {
+        if (const bool bTargetIsEnemy = TargetActor->ActorHasTag(AURA_ACTOR_FNAME_TAG_ENEMY);
+            bTargetIsEnemy && !EffectActorGE.bAppleEffectToEnemies)
+        {
+            continue;
+        }
+
+        if (EffectActorGE.GEApplicationPolicy == EEffectApplicationPolicy::EEAP_ApplyOnBeginOverlap)
+        {
+            ApplyEffectToTarget(TargetActor, EffectActorGE);
+        }
+
+        // 真正的销毁是在OnEndOverlap()中实现, 这里先取消可见性吧
+        if (EffectActorGE.bDestroyOnEndOverlap)
+        {
+            GetRootComponent()->SetVisibility(false, true);
+        }
+    }
 }
 
 void AAuraEffectActor::OnEndOverlap(AActor* TargetActor)
 {
-	for (const auto& EffectActorGE : EffectActorGEs)
-	{
-		if (EffectActorGE.GEApplicationPolicy == EEffectApplicationPolicy::EEAP_ApplyOnEndOverlap)
-		{
-			ApplyEffectToTarget(TargetActor, EffectActorGE);
-		}
-		if (EffectActorGE.GERemovalPolicy == EEffectRemovalPolicy::EERP_RemoveOnEndOverlap)
-		{
-			UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
-			if (!IsValid(TargetASC))
-			{
-				return;
-			}
+    for (const auto& EffectActorGE : EffectActorGEs)
+    {
+        if (const bool bTargetIsEnemy = TargetActor->ActorHasTag(AURA_ACTOR_FNAME_TAG_ENEMY);
+            bTargetIsEnemy && !EffectActorGE.bAppleEffectToEnemies)
+        {
+            continue;
+        }
 
-			TArray<FActiveGameplayEffectHandle> HandlesToRemove;
-			for (auto& [InfiniteGEHandle, ASC] : ActiveInfiniteGEHandles)
-			{
-				if (TargetASC == ASC)
-				{
-					TargetASC->RemoveActiveGameplayEffect(InfiniteGEHandle, 1);
-					HandlesToRemove.Add(InfiniteGEHandle);
-				}
-			}
-			for (auto& Handle : HandlesToRemove)
-			{
-				ActiveInfiniteGEHandles.Remove(Handle);
-			}
-		}
+        if (EffectActorGE.GEApplicationPolicy == EEffectApplicationPolicy::EEAP_ApplyOnEndOverlap)
+        {
+            ApplyEffectToTarget(TargetActor, EffectActorGE);
+        }
+        if (EffectActorGE.GERemovalPolicy == EEffectRemovalPolicy::EERP_RemoveOnEndOverlap)
+        {
+            UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+            if (!IsValid(TargetASC))
+            {
+                return;
+            }
 
-		if (EffectActorGE.bDestroyOnEndOverlap)
-		{
-			Destroy();
-		}
-	}
+            TArray<FActiveGameplayEffectHandle> HandlesToRemove;
+            for (auto& [InfiniteGEHandle, ASC] : ActiveInfiniteGEHandles)
+            {
+                if (TargetASC == ASC)
+                {
+                    TargetASC->RemoveActiveGameplayEffect(InfiniteGEHandle, 1);
+                    HandlesToRemove.Add(InfiniteGEHandle);
+                }
+            }
+            for (auto& Handle : HandlesToRemove)
+            {
+                ActiveInfiniteGEHandles.Remove(Handle);
+            }
+        }
+
+        if (EffectActorGE.bDestroyOnEndOverlap)
+        {
+            Destroy();
+        }
+    }
 }

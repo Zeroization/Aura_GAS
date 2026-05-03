@@ -23,6 +23,12 @@ AAuraEnemy::AAuraEnemy()
     GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
     GetMesh()->SetGenerateOverlapEvents(true);
 
+    // 敌人平滑转弯
+    bUseControllerRotationPitch = false;
+    bUseControllerRotationRoll = false;
+    bUseControllerRotationYaw = false;
+    GetCharacterMovement()->bUseControllerDesiredRotation = true;
+
     /* Begin: Ability System */
     // 对于敌人, 将 AbilitySystem 和 AttributeSet 放到这里即可
     AuraAbilitySystemComponent = CreateDefaultSubobject<UAuraAbilitySystemComponent>("AbilitySystemComponent");
@@ -42,6 +48,11 @@ void AAuraEnemy::OnGEHitReactTagChanged(const FGameplayTag CallbackTag, int32 Ne
 {
     bDoHitReacting = NewCount > 0;
     GetCharacterMovement()->MaxWalkSpeed = bDoHitReacting ? 0.f : DefaultWalkSpeed;
+    
+    if (IsValid(AuraAIController))
+    {
+        AuraAIController->GetBlackboardComponent()->SetValueAsBool("IsHitReacting", bDoHitReacting);
+    }
 }
 
 void AAuraEnemy::BeginPlay()
@@ -91,9 +102,13 @@ void AAuraEnemy::BeginPlay()
 void AAuraEnemy::PossessedBy(AController* NewController)
 {
     Super::PossessedBy(NewController);
-    
+
     AuraAIController = Cast<AAuraAIController>(NewController);
+    // 初始化黑板
     AuraAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+    AuraAIController->GetBlackboardComponent()->SetValueAsBool("IsHitReacting", false);
+    AuraAIController->GetBlackboardComponent()->SetValueAsBool("IsRangedAttacker", CharacterClass != ECharacterClass::ECC_Warrior);
+    // 运行敌人行为树
     AuraAIController->RunBehaviorTree(BehaviorTree);
 }
 

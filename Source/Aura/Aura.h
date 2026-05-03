@@ -13,8 +13,8 @@
 #define ECC_Projectile ECollisionChannel::ECC_GameTraceChannel1
 
 // Actor FName Tag
-#define ACTOR_FNAME_TAG_PLAYER "Player"
-#define ACTOR_FNAME_TAG_ENEMY "Enemy"
+#define AURA_ACTOR_FNAME_TAG_PLAYER "Player"
+#define AURA_ACTOR_FNAME_TAG_ENEMY "Enemy"
 
 UENUM(BlueprintType, meta=(Bitflags))
 enum class EAuraDamageType : uint8
