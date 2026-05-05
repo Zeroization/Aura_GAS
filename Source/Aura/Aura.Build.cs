@@ -12,7 +12,7 @@ public class Aura : ModuleRules
 		{
 			"Core", "CoreUObject", "Engine", "InputCore",
 			"EnhancedInput", "GameplayAbilities", "GameplayTags", "GameplayTasks",
-			"NavigationSystem", "MotionWarping", "Niagara"
+			"NavigationSystem", "MotionWarping", "Niagara", "AIModule"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]

@@ -4,11 +4,17 @@
 
 #include "CoreMinimal.h"
 
+// 描边
 #define OUTLINE_COLOR_RED	250
 #define OUTLINE_COLOR_BLUE	251
 #define OUTLINE_COLOR_WHITE 252
 
+// 自定义碰撞通道
 #define ECC_Projectile ECollisionChannel::ECC_GameTraceChannel1
+
+// Actor FName Tag
+#define AURA_ACTOR_FNAME_TAG_PLAYER "Player"
+#define AURA_ACTOR_FNAME_TAG_ENEMY "Enemy"
 
 UENUM(BlueprintType, meta=(Bitflags))
 enum class EAuraDamageType : uint8
