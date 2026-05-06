@@ -123,6 +123,16 @@ namespace AuraGameplayTags
                                        "当GE HitReact被施加时, 赋予目标Target");
     }
 
+    namespace GA
+    {
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                       "GA",
+                                       "实现的Gameplay Ability; 此Tag仅用于Tag相关操作(如Matches)");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attack,
+                                       "GA.Attack",
+                                       "通过此Tag激活GA: AuraMeleeAttackGA(暂定)");
+    }
+
     namespace Damage
     {
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,

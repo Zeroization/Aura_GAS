@@ -36,7 +36,8 @@ public:
                                                   UAuraAbilitySystemComponent* ASC);
 
     UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults", meta = (WorldContext="WorldContextObject"))
-    static void GrantEnemyStartupAbilities(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC);
+    static void GrantEnemyStartupAbilities(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC,
+                                           ECharacterClass CharacterClass);
 
     UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|GameplayEffects")
     static bool GetIsBlockedHit(const FGameplayEffectContextHandle& GEContextHandle);

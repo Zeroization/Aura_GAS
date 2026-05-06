@@ -48,7 +48,7 @@ void AAuraEnemy::OnGEHitReactTagChanged(const FGameplayTag CallbackTag, int32 Ne
 {
     bDoHitReacting = NewCount > 0;
     GetCharacterMovement()->MaxWalkSpeed = bDoHitReacting ? 0.f : DefaultWalkSpeed;
-    
+
     if (IsValid(AuraAIController))
     {
         AuraAIController->GetBlackboardComponent()->SetValueAsBool("IsHitReacting", bDoHitReacting);
@@ -63,7 +63,7 @@ void AAuraEnemy::BeginPlay()
 
     /* Begin: Ability System */
     InitAbilitySystem();
-    UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(this, AuraAbilitySystemComponent);
+    UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(this, AuraAbilitySystemComponent, CharacterClass);
     // 绑定特定GameplayTag被添加/移除的回调
     AuraAbilitySystemComponent->RegisterGameplayTagEvent(AuraGameplayTags::GE::HitReact.GetTag(), EGameplayTagEventType::NewOrRemoved)
                               .AddUObject(this, &AAuraEnemy::OnGEHitReactTagChanged);

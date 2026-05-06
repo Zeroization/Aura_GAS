@@ -7,6 +7,7 @@
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Game/AuraGameModeBase.h"
+#include "Interaction/Interface/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
@@ -94,10 +95,25 @@ void UAuraAbilitySystemLibrary::InitEnemyDefaultAttributesByClass(const UObject*
     }
 }
 
-void UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC)
+void UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC,
+                                                           ECharacterClass CharacterClass)
 {
     if (UCharacterClassInfo* EnemyClassInfo = GetEnemyCharacterClassInfo(WorldContextObject))
     {
+        // 职业GA
+        const FCharacterClassDefaultInfo ClassDefaultInfo = EnemyClassInfo->CharacterClassInfoMap[CharacterClass];
+        int32 EnemyLevel = 1;
+        if (TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(ASC->GetAvatarActor()))
+        {
+            EnemyLevel = CombatInterface->GetActorLevel();            
+        }
+        for (const auto& AbilityClass : ClassDefaultInfo.DefaultAbilities)
+        {
+            FGameplayAbilitySpec GASpec = FGameplayAbilitySpec(AbilityClass, EnemyLevel);
+            ASC->GiveAbility(GASpec);
+        }
+
+        // 通用GA
         for (const auto& AbilityClass : EnemyClassInfo->CommonAbilities)
         {
             FGameplayAbilitySpec GASpec = FGameplayAbilitySpec(AbilityClass, 1);
@@ -141,7 +157,7 @@ void UAuraAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& G
 }
 
 bool UAuraAbilitySystemLibrary::ContainsDamageTypeByProperty(const FDamageFloatingTextProperty& Property,
-                                                   EAuraDamageType DamageType)
+                                                             EAuraDamageType DamageType)
 {
     return ContainsDamageTypeByFlags(Property.DamageTypeFlags, DamageType);
 }

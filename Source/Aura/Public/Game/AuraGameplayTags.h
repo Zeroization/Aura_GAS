@@ -65,6 +65,12 @@ namespace AuraGameplayTags
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(HitReact); // "GE.HitReact"
     }
 
+    namespace GA
+    {
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);   // "GA"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack); // "GA.Attack"
+    }
+
     namespace Damage
     {
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "Damage"
