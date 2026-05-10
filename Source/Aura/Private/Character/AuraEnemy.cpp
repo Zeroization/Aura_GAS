@@ -16,6 +16,23 @@
 #include "UI/Widget/AuraUserWidget.h"
 
 
+void AAuraEnemy::SetCombatTarget_Implementation(AActor* InCombatTarget)
+{
+    if (IsValid(InCombatTarget))
+    {
+        CombatTarget = InCombatTarget;
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[%hs] Invalid CombatTarget! Character: %s"), __FUNCTION__, *GetNameSafe(this));
+    }
+}
+
+AActor* AAuraEnemy::GetCombatTarget_Implementation() const
+{
+    return CombatTarget;
+}
+
 AAuraEnemy::AAuraEnemy()
 {
     // 初始化Character Mesh的Visibility碰撞通道为Block, 方便鼠标追踪
