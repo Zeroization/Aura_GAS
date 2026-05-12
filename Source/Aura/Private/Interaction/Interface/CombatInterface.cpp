@@ -9,8 +9,3 @@ int32 ICombatInterface::GetActorLevel()
 {
 	return 0;
 }
-
-FVector ICombatInterface::GetProjectileSpawnLocation()
-{
-	return {};
-}

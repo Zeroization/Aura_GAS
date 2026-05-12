@@ -60,7 +60,7 @@ void AAuraCharacterBase::Die()
 	MulticastOnCharacterDeath();
 }
 
-FVector AAuraCharacterBase::GetProjectileSpawnLocation()
+FVector AAuraCharacterBase::GetWeaponSocketLocation_Implementation()
 {
 	checkf(IsValid(Weapon), TEXT("[%hs]: Character [%s] 's weapon is null!!!"), __FUNCTION__, *GetNameSafe(this));
 	return Weapon->GetSocketLocation(WeaponTipSocketName);

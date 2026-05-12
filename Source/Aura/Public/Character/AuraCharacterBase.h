@@ -45,7 +45,7 @@ protected:
 	virtual void MulticastOnCharacterDeath();
 	/// 服务器: 该角色死亡的逻辑
 	virtual void Die() override;
-	virtual FVector GetProjectileSpawnLocation() override;
+	virtual FVector GetWeaponSocketLocation_Implementation() override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	/// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
