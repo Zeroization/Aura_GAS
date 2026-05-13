@@ -105,7 +105,7 @@ void UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(const UObject* WorldC
         int32 EnemyLevel = 1;
         if (TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(ASC->GetAvatarActor()))
         {
-            EnemyLevel = CombatInterface->GetActorLevel();            
+            EnemyLevel = CombatInterface->GetActorLevel();
         }
         for (const auto& AbilityClass : ClassDefaultInfo.DefaultAbilities)
         {
@@ -166,4 +166,32 @@ bool UAuraAbilitySystemLibrary::ContainsDamageTypeByFlags(uint8 DamageTypeFlags,
 {
     const uint8 DamageTypeFlag = static_cast<uint8>(DamageType);
     return DamageTypeFlag != static_cast<uint8>(EAuraDamageType::None) && (DamageTypeFlags & DamageTypeFlag) != 0;
+}
+
+void UAuraAbilitySystemLibrary::QueryActorsInSphere(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors,
+                                                    const TArray<AActor*> ActorsToIgnore, float SphereRadius, const FVector& SphereOrigin)
+{
+    // 1.设置碰撞检测参数
+    FCollisionQueryParams SphereParams;
+    SphereParams.AddIgnoredActors(ActorsToIgnore);
+
+    // 2.进行碰撞检测
+    // Ref: UGameplayStatics::ApplyRadialDamageWithFalloff()
+    TArray<FOverlapResult> Overlaps;
+    if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
+    {
+        World->OverlapMultiByObjectType(Overlaps, SphereOrigin, FQuat::Identity,
+                                        FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects),
+                                        FCollisionShape::MakeSphere(SphereRadius), SphereParams);
+
+        for (auto& Overlap : Overlaps)
+        {
+            if (AActor* OverlappedActor = Overlap.GetActor();
+                OverlappedActor->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsDead(OverlappedActor))
+            {
+                // 3.获取符合要求的Actor
+                OutOverlappingActors.AddUnique(ICombatInterface::Execute_GetAvatar(OverlappedActor));
+            }
+        }
+    }
 }

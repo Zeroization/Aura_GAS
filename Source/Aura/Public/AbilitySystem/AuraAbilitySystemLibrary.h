@@ -56,4 +56,8 @@ public:
 
     UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|Damage")
     static bool ContainsDamageTypeByFlags(uint8 DamageTypeFlags, EAuraDamageType DamageType);
+
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|Environment Query", meta = (WorldContext="WorldContextObject"))
+    static void QueryActorsInSphere(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors,
+                                    const TArray<AActor*> ActorsToIgnore, float SphereRadius, const FVector& SphereOrigin);
 };

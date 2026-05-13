@@ -11,7 +11,7 @@
 UINTERFACE(MinimalAPI)
 class UCombatInterface : public UInterface
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 };
 
 /**
@@ -19,27 +19,37 @@ class UCombatInterface : public UInterface
  */
 class AURA_API ICombatInterface
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
+    // Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual int32 GetActorLevel();
-	virtual void Die() = 0;
+#pragma region 通用
+    virtual int32 GetActorLevel();
+    virtual void Die() = 0;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	FVector GetWeaponSocketLocation();
-	
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void SetFacingWarpTarget(const FVector& TargetLocation);
-	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	UAnimMontage* GetHitReactMontage();
-	
-	// 设置敌人的CombatTarget
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void SetCombatTarget(AActor* InCombatTarget);
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    FVector GetWeaponSocketLocation();
 
-	// 获取敌人的CombatTarget
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	AActor* GetCombatTarget() const;
+    UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+    void SetFacingWarpTarget(const FVector& TargetLocation);
+
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    bool IsDead() const;
+
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    AActor* GetAvatar();
+#pragma endregion
+
+#pragma region 敌人
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    UAnimMontage* GetHitReactMontage();
+
+    // 设置敌人的CombatTarget
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    void SetCombatTarget(AActor* InCombatTarget);
+
+    // 获取敌人的CombatTarget
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    AActor* GetCombatTarget() const;
+#pragma endregion
 };

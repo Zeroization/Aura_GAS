@@ -48,6 +48,19 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
     EvaluateParameters.SourceTags = GESpec.CapturedSourceTags.GetAggregatedTags();
     EvaluateParameters.TargetTags = GESpec.CapturedTargetTags.GetAggregatedTags();
 
+    // 禁止友军伤害
+    if (IsValid(SourceAvatarActor) && IsValid(TargetAvatarActor))
+    {
+        bool bIsFriendlyFire =
+            (SourceAvatarActor->ActorHasTag(AURA_ACTOR_FNAME_TAG_PLAYER) && TargetAvatarActor->ActorHasTag(AURA_ACTOR_FNAME_TAG_PLAYER)) ||
+            (SourceAvatarActor->ActorHasTag(AURA_ACTOR_FNAME_TAG_ENEMY) && TargetAvatarActor->ActorHasTag(AURA_ACTOR_FNAME_TAG_ENEMY));
+
+        if (bIsFriendlyFire)
+        {
+            return;
+        }
+    }
+
     // 通过SetByCaller获取Damage
     float Damage = 0.f;
     for (const auto& [ElemType, ResistanceType] : AuraGameplayTags::Damage::ElemType::GetElemTypeToResistanceMap())
@@ -56,10 +69,10 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
         FGameplayEffectAttributeCaptureDefinition ResistanceDef = AuraDamageAttributeStatics::Get().TagToCaptureDefs[ResistanceType];
         ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(ResistanceDef, EvaluateParameters, ElemResistance);
         ElemResistance = FMath::Clamp(ElemResistance, 0.f, 100.f);
-     
+
         float ElemDamage = GESpec.GetSetByCallerMagnitude(ElemType, false, 0.f);
         ElemDamage *= (100.f - ElemResistance) / 100.f;
-        
+
         Damage += ElemDamage;
     }
 
