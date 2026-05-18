@@ -7,6 +7,7 @@
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Aura/Aura.h"
 #include "Components/CapsuleComponent.h"
+#include "Game/AuraGameplayTags.h"
 
 
 AAuraCharacterBase::AAuraCharacterBase()
@@ -62,10 +63,31 @@ void AAuraCharacterBase::Die()
     MulticastOnCharacterDeath();
 }
 
-FVector AAuraCharacterBase::GetWeaponSocketLocation_Implementation()
+FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
-    checkf(IsValid(Weapon), TEXT("[%hs]: Character [%s] 's weapon is null!!!"), __FUNCTION__, *GetNameSafe(this));
-    return Weapon->GetSocketLocation(WeaponTipSocketName);
+    FName SocketName = MontageTagToSocketName[MontageTag];
+    checkf(!SocketName.IsNone(), TEXT("Socket name is none!"));
+    
+    if (MontageTag.MatchesTagExact(AuraGameplayTags::MontageToSocket::Attack::Weapon) && IsValid(Weapon))
+    {
+        return Weapon->GetSocketLocation(SocketName);
+    }
+    if (MontageTag.MatchesTagExact(AuraGameplayTags::MontageToSocket::Attack::LeftHand))
+    {
+        return GetMesh()->GetSocketLocation(SocketName);
+    }
+    if (MontageTag.MatchesTagExact(AuraGameplayTags::MontageToSocket::Attack::RightHand))
+    {
+        return GetMesh()->GetSocketLocation(SocketName);
+    }
+
+    checkf(false, TEXT("Should NOT go here."));
+    return {};
+}
+
+TArray<FAuraTaggedMontage> AAuraCharacterBase::GetTaggedAttackMontages_Implementation()
+{
+    return AttackMontages;
 }
 
 UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation()

@@ -3,9 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UObject/Interface.h"
 
 #include "CombatInterface.generated.h"
+
+// 将蒙太奇和GameplayTag: MontageToSocket.* 作映射的结构体 
+USTRUCT(BlueprintType)
+struct FAuraTaggedMontage
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TObjectPtr<UAnimMontage> Montage;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    FGameplayTag MontageTag;
+};
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -28,16 +42,19 @@ public:
     virtual void Die() = 0;
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-    FVector GetWeaponSocketLocation();
+    FVector GetCombatSocketLocation(const FGameplayTag& MontageTag);
 
-    UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-    void SetFacingWarpTarget(const FVector& TargetLocation);
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    TArray<FAuraTaggedMontage> GetTaggedAttackMontages();
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     bool IsDead() const;
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     AActor* GetAvatar();
+
+    UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+    void SetFacingWarpTarget(const FVector& TargetLocation);
 #pragma endregion
 
 #pragma region 敌人

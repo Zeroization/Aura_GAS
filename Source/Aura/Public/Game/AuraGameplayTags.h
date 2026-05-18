@@ -87,6 +87,19 @@ namespace AuraGameplayTags
         }
     }
 
+    namespace MontageToSocket
+    {
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "MontageToSocket"
+
+        namespace Attack
+        {
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);      // "MontageToSocket.Attack"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Weapon);    // "MontageToSocket.Attack.Weapon"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(LeftHand);  // "MontageToSocket.Attack.LeftHand"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(RightHand); // "MontageToSocket.Attack.RightHand"
+        }
+    }
+
     namespace UI
     {
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "UI"

@@ -172,6 +172,29 @@ namespace AuraGameplayTags
         }
     }
 
+    namespace MontageToSocket
+    {
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                       "MontageToSocket",
+                                       "将蒙太奇动画与它使用的骨骼Socket相关联的GameplayTag; 此Tag仅用于Tag相关操作(如Matches)");
+
+        namespace Attack
+        {
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                           "MontageToSocket.Attack",
+                                           "攻击类型蒙太奇; 此Tag仅用于Tag相关操作(如Matches)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Weapon,
+                                           "MontageToSocket.Attack.Weapon",
+                                           "攻击类型蒙太奇, 使用武器上的Socket");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(LeftHand,
+                                           "MontageToSocket.Attack.LeftHand",
+                                           "攻击类型蒙太奇, 使用角色自身左手的Socket");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(RightHand,
+                                           "MontageToSocket.Attack.RightHand",
+                                           "攻击类型蒙太奇, 使用角色自身右手的Socket");
+        }
+    }
+
     namespace UI
     {
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,

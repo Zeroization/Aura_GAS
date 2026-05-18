@@ -38,7 +38,10 @@ protected:
     TObjectPtr<USkeletalMeshComponent> Weapon;
 
     UPROPERTY(EditAnywhere, Category = "AuraCharacter|Combat")
-    FName WeaponTipSocketName;
+    TMap<FGameplayTag, FName> MontageTagToSocketName;
+
+    UPROPERTY(EditAnywhere, Category = "AuraCharacter|Combat")
+    TArray<FAuraTaggedMontage> AttackMontages;
 
     bool bIsDead = false;
 
@@ -47,7 +50,8 @@ protected:
     virtual void MulticastOnCharacterDeath();
     /// 服务器: 该角色死亡的逻辑
     virtual void Die() override;
-    virtual FVector GetWeaponSocketLocation_Implementation() override;
+    virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
+    virtual TArray<FAuraTaggedMontage> GetTaggedAttackMontages_Implementation() override;
     virtual UAnimMontage* GetHitReactMontage_Implementation() override;
     virtual bool IsDead_Implementation() const override;
     virtual AActor* GetAvatar_Implementation() override;
