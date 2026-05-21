@@ -37,7 +37,7 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "AuraCharacter|Combat")
     TObjectPtr<AActor> CombatTarget;
 
-    UPROPERTY(BlueprintReadOnly, Category = "AuraCharacter|Combat")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AuraCharacter|Combat")
     float DefaultWalkSpeed = 250.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|Combat")
