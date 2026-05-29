@@ -22,12 +22,12 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
     // 生成投射物, 撞到物体后对它应用GE
     if (Owner->Implements<UCombatInterface>())
     {
-        const TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(Owner);
         FRotator Rotation = (TargetLocation - Owner->GetActorLocation()).Rotation();
         // Rotation.Pitch = 0.f;
 
         FTransform SpawnTransform;
-        SpawnTransform.SetLocation(CombatInterface->GetProjectileSpawnLocation());
+        SpawnTransform.SetLocation(
+            ICombatInterface::Execute_GetCombatSocketLocation(Owner, AuraGameplayTags::MontageToSocket::Attack::Weapon));
         SpawnTransform.SetRotation(Rotation.Quaternion());
 
         AAuraProjectile* Projectile = GetWorld()->SpawnActorDeferred<AAuraProjectile>(

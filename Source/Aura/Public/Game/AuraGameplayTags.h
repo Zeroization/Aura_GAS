@@ -65,6 +65,12 @@ namespace AuraGameplayTags
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(HitReact); // "GE.HitReact"
     }
 
+    namespace GA
+    {
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);   // "GA"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack); // "GA.Attack"
+    }
+
     namespace Damage
     {
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "Damage"
@@ -78,6 +84,19 @@ namespace AuraGameplayTags
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Physical);  // "Damage.ElemType.Physical"
 
             const TMap<FGameplayTag, FGameplayTag>& GetElemTypeToResistanceMap();
+        }
+    }
+
+    namespace MontageToSocket
+    {
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "MontageToSocket"
+
+        namespace Attack
+        {
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);      // "MontageToSocket.Attack"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Weapon);    // "MontageToSocket.Attack.Weapon"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(LeftHand);  // "MontageToSocket.Attack.LeftHand"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(RightHand); // "MontageToSocket.Attack.RightHand"
         }
     }
 

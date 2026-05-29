@@ -123,6 +123,16 @@ namespace AuraGameplayTags
                                        "当GE HitReact被施加时, 赋予目标Target");
     }
 
+    namespace GA
+    {
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                       "GA",
+                                       "实现的Gameplay Ability; 此Tag仅用于Tag相关操作(如Matches)");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attack,
+                                       "GA.Attack",
+                                       "通过此Tag激活GA: AuraMeleeAttackGA(暂定)");
+    }
+
     namespace Damage
     {
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
@@ -159,6 +169,29 @@ namespace AuraGameplayTags
 
                 return Map;
             }
+        }
+    }
+
+    namespace MontageToSocket
+    {
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                       "MontageToSocket",
+                                       "将蒙太奇动画与它使用的骨骼Socket相关联的GameplayTag; 此Tag仅用于Tag相关操作(如Matches)");
+
+        namespace Attack
+        {
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                           "MontageToSocket.Attack",
+                                           "攻击类型蒙太奇; 此Tag仅用于Tag相关操作(如Matches)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Weapon,
+                                           "MontageToSocket.Attack.Weapon",
+                                           "攻击类型蒙太奇, 使用武器上的Socket");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(LeftHand,
+                                           "MontageToSocket.Attack.LeftHand",
+                                           "攻击类型蒙太奇, 使用角色自身左手的Socket");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(RightHand,
+                                           "MontageToSocket.Attack.RightHand",
+                                           "攻击类型蒙太奇, 使用角色自身右手的Socket");
         }
     }
 

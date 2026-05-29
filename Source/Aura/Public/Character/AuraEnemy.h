@@ -34,7 +34,10 @@ public:
     UPROPERTY()
     TObjectPtr<AAuraAIController> AuraAIController;
 
-    UPROPERTY(BlueprintReadOnly, Category = "AuraCharacter|Combat")
+    UPROPERTY(BlueprintReadWrite, Category = "AuraCharacter|Combat")
+    TObjectPtr<AActor> CombatTarget;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AuraCharacter|Combat")
     float DefaultWalkSpeed = 250.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|Combat")
@@ -42,7 +45,7 @@ public:
 
     UPROPERTY(BlueprintReadOnly, Category = "AuraCharacter|Combat")
     bool bDoHitReacting = false;
-
+    
     AAuraEnemy();
 
     void OnGEHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
@@ -60,6 +63,8 @@ public:
     /// >>>> Begin: Combat Interface
     virtual void Die() override;
     virtual int32 GetActorLevel() override;
+    virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
+    virtual AActor* GetCombatTarget_Implementation() const override;
     /// >>>> End: Combat Interface
 
 protected:

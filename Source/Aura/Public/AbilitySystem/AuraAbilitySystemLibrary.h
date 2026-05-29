@@ -36,7 +36,8 @@ public:
                                                   UAuraAbilitySystemComponent* ASC);
 
     UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults", meta = (WorldContext="WorldContextObject"))
-    static void GrantEnemyStartupAbilities(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC);
+    static void GrantEnemyStartupAbilities(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC,
+                                           ECharacterClass CharacterClass);
 
     UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|GameplayEffects")
     static bool GetIsBlockedHit(const FGameplayEffectContextHandle& GEContextHandle);
@@ -55,4 +56,8 @@ public:
 
     UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|Damage")
     static bool ContainsDamageTypeByFlags(uint8 DamageTypeFlags, EAuraDamageType DamageType);
+
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|Environment Query", meta = (WorldContext="WorldContextObject"))
+    static void QueryActorsInSphere(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors,
+                                    const TArray<AActor*> ActorsToIgnore, float SphereRadius, const FVector& SphereOrigin);
 };
