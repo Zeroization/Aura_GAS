@@ -34,7 +34,7 @@ protected:
     ///									额外检查.
     ///		2. 延迟加载 Lazy Loading:	当对象来自外部包时，它可以保存一个轻量级
     ///								的句柄，在访问时才真正加载对象。
-    UPROPERTY(EditAnywhere, Category = "AuraCharacter|Combat")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|Combat")
     TObjectPtr<USkeletalMeshComponent> Weapon;
 
     UPROPERTY(EditAnywhere, Category = "AuraCharacter|Combat")
