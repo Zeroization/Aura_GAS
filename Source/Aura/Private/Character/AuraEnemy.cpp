@@ -162,6 +162,10 @@ void AAuraEnemy::UnHighlightActor()
 void AAuraEnemy::Die()
 {
     SetLifeSpan(DyingLifeSpan);
+    if (AuraAIController)
+    {
+        AuraAIController->GetBlackboardComponent()->SetValueAsBool("IsDead", true);
+    }
 
     Super::Die();
 }
