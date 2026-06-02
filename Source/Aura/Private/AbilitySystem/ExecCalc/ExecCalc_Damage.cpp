@@ -51,11 +51,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
     // 禁止友军伤害
     if (IsValid(SourceAvatarActor) && IsValid(TargetAvatarActor))
     {
-        bool bIsFriendlyFire =
-            (SourceAvatarActor->ActorHasTag(AURA_ACTOR_FNAME_TAG_PLAYER) && TargetAvatarActor->ActorHasTag(AURA_ACTOR_FNAME_TAG_PLAYER)) ||
-            (SourceAvatarActor->ActorHasTag(AURA_ACTOR_FNAME_TAG_ENEMY) && TargetAvatarActor->ActorHasTag(AURA_ACTOR_FNAME_TAG_ENEMY));
-
-        if (bIsFriendlyFire)
+        if (UAuraAbilitySystemLibrary::IsFriendlyFire(SourceAvatarActor, TargetAvatarActor))
         {
             return;
         }

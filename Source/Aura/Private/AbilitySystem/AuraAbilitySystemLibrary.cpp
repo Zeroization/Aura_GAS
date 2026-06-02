@@ -168,6 +168,18 @@ bool UAuraAbilitySystemLibrary::ContainsDamageTypeByFlags(uint8 DamageTypeFlags,
     return DamageTypeFlag != static_cast<uint8>(EAuraDamageType::None) && (DamageTypeFlags & DamageTypeFlag) != 0;
 }
 
+bool UAuraAbilitySystemLibrary::IsFriendlyFire(AActor* First, AActor* Second)
+{
+    if (IsValid(First) && IsValid(Second))
+    {
+        return (First->ActorHasTag(AURA_ACTOR_FNAME_TAG_PLAYER) && Second->ActorHasTag(AURA_ACTOR_FNAME_TAG_PLAYER)) ||
+            (First->ActorHasTag(AURA_ACTOR_FNAME_TAG_ENEMY) && Second->ActorHasTag(AURA_ACTOR_FNAME_TAG_ENEMY));
+    }
+
+    checkf(false, TEXT("Invalid actor"));
+    return false;
+}
+
 void UAuraAbilitySystemLibrary::QueryActorsInSphere(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors,
                                                     const TArray<AActor*> ActorsToIgnore, float SphereRadius, const FVector& SphereOrigin)
 {
