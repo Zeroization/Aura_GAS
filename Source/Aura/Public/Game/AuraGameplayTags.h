@@ -87,16 +87,26 @@ namespace AuraGameplayTags
         }
     }
 
-    namespace MontageToSocket
+    namespace CombatSocket
     {
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "MontageToSocket"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);      // "CombatSocket"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Weapon);    // "CombatSocket.Weapon"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(LeftHand);  // "CombatSocket.LeftHand"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(RightHand); // "CombatSocket.RightHand"
+    }
+
+    namespace Montage
+    {
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "Montage"
 
         namespace Attack
         {
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);      // "MontageToSocket.Attack"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Weapon);    // "MontageToSocket.Attack.Weapon"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(LeftHand);  // "MontageToSocket.Attack.LeftHand"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(RightHand); // "MontageToSocket.Attack.RightHand"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);  // "Montage.Attack"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Slot1); // "Montage.Attack.Slot1"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Slot2); // "Montage.Attack.Slot2"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Slot3); // "Montage.Attack.Slot3"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Slot4); // "Montage.Attack.Slot4"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Slot5); // "Montage.Attack.Slot5"
         }
     }
 

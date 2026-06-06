@@ -78,7 +78,11 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, 
         return;
     }
 
-    PlayImpactSFX();
+    if (!bIsImpactSFXPlayed)
+    {
+        bIsImpactSFXPlayed = true;
+        PlayImpactSFX();
+    }
 
     if (HasAuthority())
     {

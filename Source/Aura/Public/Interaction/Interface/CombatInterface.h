@@ -8,6 +8,17 @@
 
 #include "CombatInterface.generated.h"
 
+class UNiagaraSystem;
+
+USTRUCT(BlueprintType)
+struct FAuraTaggedMontageAttachment
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TObjectPtr<USoundBase> ImpactSound;
+};
+
 // 将蒙太奇和GameplayTag: MontageToSocket.* 作映射的结构体 
 USTRUCT(BlueprintType)
 struct FAuraTaggedMontage
@@ -19,6 +30,12 @@ struct FAuraTaggedMontage
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FGameplayTag MontageTag;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    FGameplayTag SocketTag;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    FAuraTaggedMontageAttachment Attachment;
 };
 
 // This class does not need to be modified.
@@ -42,7 +59,7 @@ public:
     virtual void Die() = 0;
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-    FVector GetCombatSocketLocation(const FGameplayTag& MontageTag);
+    FVector GetCombatSocketLocation(const FGameplayTag& SocketTag);
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     TArray<FAuraTaggedMontage> GetTaggedAttackMontages();
@@ -52,6 +69,12 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     AActor* GetAvatar();
+
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    UNiagaraSystem* GetImpactBloodEffect();
+
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    FAuraTaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag);
 
     UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
     void SetFacingWarpTarget(const FVector& TargetLocation);
