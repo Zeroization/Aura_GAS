@@ -99,6 +99,9 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|SFX")
     TObjectPtr<UNiagaraSystem> BloodImpactEffect;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|SFX")
+    TObjectPtr<USoundBase> DeathSound;
 
     virtual UNiagaraSystem* GetImpactBloodEffect_Implementation() override;
 

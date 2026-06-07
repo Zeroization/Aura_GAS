@@ -8,6 +8,7 @@
 #include "Aura/Aura.h"
 #include "Components/CapsuleComponent.h"
 #include "Game/AuraGameplayTags.h"
+#include "Kismet/GameplayStatics.h"
 
 
 AAuraCharacterBase::AAuraCharacterBase()
@@ -39,6 +40,9 @@ void AAuraCharacterBase::MulticastOnCharacterDeath_Implementation()
 {
     bIsDead = true;
 
+    // 播放死亡音效
+    UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
+    
     // 设定武器掉落相关参数
     Weapon->SetSimulatePhysics(true);
     Weapon->SetEnableGravity(true);
