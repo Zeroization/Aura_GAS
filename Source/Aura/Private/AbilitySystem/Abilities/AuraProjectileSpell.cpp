@@ -10,7 +10,7 @@
 #include "Game/AuraGameplayTags.h"
 
 
-void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
+void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation, const FGameplayTag& SocketTag)
 {
     // 只有服务器才能生成投射物
     AActor* Owner = GetAvatarActorFromActorInfo();
@@ -26,8 +26,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
         // Rotation.Pitch = 0.f;
 
         FTransform SpawnTransform;
-        SpawnTransform.SetLocation(
-            ICombatInterface::Execute_GetCombatSocketLocation(Owner, AuraGameplayTags::CombatSocket::Weapon));
+        SpawnTransform.SetLocation(ICombatInterface::Execute_GetCombatSocketLocation(Owner, SocketTag));
         SpawnTransform.SetRotation(Rotation.Quaternion());
 
         AAuraProjectile* Projectile = GetWorld()->SpawnActorDeferred<AAuraProjectile>(

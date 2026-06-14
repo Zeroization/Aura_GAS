@@ -89,10 +89,16 @@ namespace AuraGameplayTags
 
     namespace CombatSocket
     {
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);      // "CombatSocket"
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Weapon);    // "CombatSocket.Weapon"
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(LeftHand);  // "CombatSocket.LeftHand"
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(RightHand); // "CombatSocket.RightHand"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);   // "CombatSocket"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Weapon); // "CombatSocket.Weapon"
+
+        namespace SelfMesh
+        {
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);      // "CombatSocket.SelfMesh"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(LeftHand);  // "CombatSocket.SelfMesh.LeftHand"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(RightHand); // "CombatSocket.SelfMesh.RightHand"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tail);      // "CombatSocket.SelfMesh.Tail"
+        }
     }
 
     namespace Montage

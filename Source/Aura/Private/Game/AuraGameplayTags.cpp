@@ -180,12 +180,22 @@ namespace AuraGameplayTags
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Weapon,
                                        "CombatSocket.Weapon",
                                        "角色持有武器上的Socket");
-        UE_DEFINE_GAMEPLAY_TAG_COMMENT(LeftHand,
-                                       "CombatSocket.LeftHand",
-                                       "角色自身左手的Socket");
-        UE_DEFINE_GAMEPLAY_TAG_COMMENT(RightHand,
-                                       "CombatSocket.RightHand",
-                                       "角色自身右手的Socket");
+
+        namespace SelfMesh
+        {
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                           "CombatSocket.SelfMesh",
+                                           "角色模型自身的Socket; 此Tag仅用于Tag相关操作(如Matches)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(LeftHand,
+                                           "CombatSocket.SelfMesh.LeftHand",
+                                           "角色模型自身左手的Socket");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(RightHand,
+                                           "CombatSocket.SelfMesh.RightHand",
+                                           "角色模型自身右手的Socket");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tail,
+                                           "CombatSocket.SelfMesh.Tail",
+                                           "角色模型自身尾巴的Socket");
+        }
     }
 
     namespace Montage

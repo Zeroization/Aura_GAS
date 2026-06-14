@@ -42,7 +42,7 @@ void AAuraCharacterBase::MulticastOnCharacterDeath_Implementation()
 
     // 播放死亡音效
     UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
-    
+
     // 设定武器掉落相关参数
     Weapon->SetSimulatePhysics(true);
     Weapon->SetEnableGravity(true);
@@ -76,11 +76,7 @@ FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGamepl
     {
         return Weapon->GetSocketLocation(SocketName);
     }
-    if (SocketTag.MatchesTagExact(AuraGameplayTags::CombatSocket::LeftHand))
-    {
-        return GetMesh()->GetSocketLocation(SocketName);
-    }
-    if (SocketTag.MatchesTagExact(AuraGameplayTags::CombatSocket::RightHand))
+    if (SocketTag.MatchesTag(AuraGameplayTags::CombatSocket::SelfMesh::Root))
     {
         return GetMesh()->GetSocketLocation(SocketName);
     }
