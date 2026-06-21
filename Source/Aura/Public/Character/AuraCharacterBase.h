@@ -8,6 +8,7 @@
 #include "Interaction/Interface/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UNiagaraSystem;
 class UMotionWarpingComponent;
 class UAuraGameplayAbility;
 class UGameplayEffect;
@@ -38,23 +39,30 @@ protected:
     TObjectPtr<USkeletalMeshComponent> Weapon;
 
     UPROPERTY(EditAnywhere, Category = "AuraCharacter|Combat")
-    TMap<FGameplayTag, FName> MontageTagToSocketName;
+    TMap<FGameplayTag, FName> SocketTagToName;
 
     UPROPERTY(EditAnywhere, Category = "AuraCharacter|Combat")
     TArray<FAuraTaggedMontage> AttackMontages;
 
     bool bIsDead = false;
+    
+    /* 随从 */
+    int32 MinionCount = 0;
+    /* 随从 */
 
     /// 所有客户端: 该角色死亡的逻辑(例如播放动画等)
     UFUNCTION(NetMulticast, Reliable)
     virtual void MulticastOnCharacterDeath();
     /// 服务器: 该角色死亡的逻辑
     virtual void Die() override;
-    virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
+    virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& SocketTag) override;
+    virtual FAuraTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
     virtual TArray<FAuraTaggedMontage> GetTaggedAttackMontages_Implementation() override;
     virtual UAnimMontage* GetHitReactMontage_Implementation() override;
     virtual bool IsDead_Implementation() const override;
     virtual AActor* GetAvatar_Implementation() override;
+    virtual int32 GetMinionCount_Implementation() override;
+    virtual void IncreaseMinionCountByAmount_Implementation(int32 Amount) override;
     /// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     /// Begin: Ability System <<<<<<<<<<<<<<<
@@ -94,6 +102,14 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|SFX")
     TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|SFX")
+    TObjectPtr<UNiagaraSystem> BloodImpactEffect;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|SFX")
+    TObjectPtr<USoundBase> DeathSound;
+
+    virtual UNiagaraSystem* GetImpactBloodEffect_Implementation() override;
 
     /// 在角色死亡时替换溶解材质
     void Dissolve();

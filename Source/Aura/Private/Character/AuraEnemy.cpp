@@ -59,6 +59,11 @@ AAuraEnemy::AAuraEnemy()
     HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
     HealthBar->SetupAttachment(GetRootComponent());
     /* End: UI */
+
+    /* Begin: AI */
+    // 通过SpawnActor()生成时自动生成对应Controller
+    AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+    /* End: AI */
 }
 
 void AAuraEnemy::OnGEHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)

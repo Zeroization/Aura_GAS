@@ -6,6 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Aura/Aura.h"
 #include "Character/AuraCharacter.h"
 #include "Components/AudioComponent.h"
@@ -18,81 +19,90 @@
 // Sets default values
 AAuraProjectile::AAuraProjectile()
 {
-	PrimaryActorTick.bCanEverTick = false;
-	bReplicates = true;
+    PrimaryActorTick.bCanEverTick = false;
+    bReplicates = true;
 
-	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
-	Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	Sphere->SetCollisionObjectType(ECC_Projectile);
-	Sphere->SetCollisionResponseToAllChannels(ECR_Ignore);
-	Sphere->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
-	Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
-	Sphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	SetRootComponent(Sphere);
+    Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
+    Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    Sphere->SetCollisionObjectType(ECC_Projectile);
+    Sphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+    Sphere->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+    Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
+    Sphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+    SetRootComponent(Sphere);
 
-	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
-	ProjectileMovement->InitialSpeed = 550.f;
-	ProjectileMovement->MaxSpeed = 550.f;
-	ProjectileMovement->ProjectileGravityScale = 0.f;
+    ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
+    ProjectileMovement->InitialSpeed = 550.f;
+    ProjectileMovement->MaxSpeed = 550.f;
+    ProjectileMovement->ProjectileGravityScale = 0.f;
 
-	LoopSoundComponent = CreateDefaultSubobject<UAudioComponent>("LoopSound");
-	LoopSoundComponent->bStopWhenOwnerDestroyed = true;
+    LoopSoundComponent = CreateDefaultSubobject<UAudioComponent>("LoopSound");
+    LoopSoundComponent->bStopWhenOwnerDestroyed = true;
 }
 
 // Called when the game starts or when spawned
 void AAuraProjectile::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
-	SetLifeSpan(ProjectileLifeSpan);
+    SetLifeSpan(ProjectileLifeSpan);
 
-	// 防止投射物撞到发射它的网格体
-	Sphere->IgnoreActorWhenMoving(GetInstigator(), true);
-	if (AAuraCharacter* InstigatorCharacter = Cast<AAuraCharacter>(GetInstigator()))
-	{
-		InstigatorCharacter->GetCapsuleComponent()->IgnoreActorWhenMoving(this, true);
-		InstigatorCharacter->GetMesh()->IgnoreActorWhenMoving(this, true);
-	}
+    // 防止投射物撞到发射它的网格体
+    Sphere->IgnoreActorWhenMoving(GetInstigator(), true);
+    if (AAuraCharacter* InstigatorCharacter = Cast<AAuraCharacter>(GetInstigator()))
+    {
+        InstigatorCharacter->GetCapsuleComponent()->IgnoreActorWhenMoving(this, true);
+        InstigatorCharacter->GetMesh()->IgnoreActorWhenMoving(this, true);
+    }
 
-	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AAuraProjectile::OnSphereBeginOverlap);
+    Sphere->OnComponentBeginOverlap.AddDynamic(this, &AAuraProjectile::OnSphereBeginOverlap);
 
-	LoopSoundComponent->Play();
+    LoopSoundComponent->Play();
 }
 
 void AAuraProjectile::Destroyed()
 {
-	if (!bIsImpactSFXPlayed && !HasAuthority())
-	{
-		PlayImpactSFX();
-	}
+    if (!bIsImpactSFXPlayed && !HasAuthority())
+    {
+        PlayImpactSFX();
+    }
 
-	Super::Destroyed();
+    Super::Destroyed();
 }
 
 void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                                            int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	PlayImpactSFX();
+    if (UAuraAbilitySystemLibrary::IsFriendlyFire(this->Owner, OtherActor))
+    {
+        return;
+    }
 
-	if (HasAuthority())
-	{
-		// 服务器逻辑
-		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
-		{
-			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data);
-		}
+    if (!bIsImpactSFXPlayed)
+    {
+        bIsImpactSFXPlayed = true;
+        PlayImpactSFX();
+    }
 
-		Destroy();
-	}
-	else
-	{
-		// 客户端逻辑
-		bIsImpactSFXPlayed = true;
-	}
+    if (HasAuthority())
+    {
+        // 服务器逻辑
+        if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
+        {
+            TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data);
+        }
+
+        Destroy();
+    }
+    else
+    {
+        // 客户端逻辑
+        bIsImpactSFXPlayed = true;
+    }
 }
 
 void AAuraProjectile::PlayImpactSFX()
 {
-	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+    UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
 }

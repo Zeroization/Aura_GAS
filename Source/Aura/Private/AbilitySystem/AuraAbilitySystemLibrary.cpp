@@ -168,6 +168,18 @@ bool UAuraAbilitySystemLibrary::ContainsDamageTypeByFlags(uint8 DamageTypeFlags,
     return DamageTypeFlag != static_cast<uint8>(EAuraDamageType::None) && (DamageTypeFlags & DamageTypeFlag) != 0;
 }
 
+bool UAuraAbilitySystemLibrary::IsFriendlyFire(AActor* First, AActor* Second)
+{
+    if (IsValid(First) && IsValid(Second))
+    {
+        return (First->ActorHasTag(AURA_ACTOR_FNAME_TAG_PLAYER) && Second->ActorHasTag(AURA_ACTOR_FNAME_TAG_PLAYER)) ||
+            (First->ActorHasTag(AURA_ACTOR_FNAME_TAG_ENEMY) && Second->ActorHasTag(AURA_ACTOR_FNAME_TAG_ENEMY));
+    }
+
+    checkf(false, TEXT("Invalid actor"));
+    return false;
+}
+
 void UAuraAbilitySystemLibrary::QueryActorsInSphere(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors,
                                                     const TArray<AActor*> ActorsToIgnore, float SphereRadius, const FVector& SphereOrigin)
 {
@@ -194,4 +206,49 @@ void UAuraAbilitySystemLibrary::QueryActorsInSphere(const UObject* WorldContextO
             }
         }
     }
+}
+
+void UAuraAbilitySystemLibrary::DrawDebugArc(const UObject* WorldContextObject, const FVector& CenterPos, const FVector& ForwardDir,
+                                             float Radius, float ArcAngle, int32 Segments, FLinearColor Color, float Duration,
+                                             float Thickness)
+{
+    if (!IsValid(WorldContextObject))
+    {
+        return;
+    }
+
+    // 从左往右绘制
+    const float StartAngle = -ArcAngle * 0.5f;
+    const float AngleStep = ArcAngle / Segments;
+
+    FVector PrevPointPos = CenterPos + ForwardDir.RotateAngleAxis(StartAngle, FVector::UpVector) * Radius;
+    for (int32 i = 1; i <= Segments; ++i)
+    {
+        const float CurrentAngle = StartAngle + AngleStep * i;
+        FVector CurrentPointPos = CenterPos + ForwardDir.RotateAngleAxis(CurrentAngle, FVector::UpVector) * Radius;
+
+        UKismetSystemLibrary::DrawDebugLine(WorldContextObject, PrevPointPos, CurrentPointPos, Color, Duration, Thickness);
+        PrevPointPos = CurrentPointPos;
+    }
+}
+
+void UAuraAbilitySystemLibrary::DrawDebugSector(const UObject* WorldContextObject, const FVector& CenterPos, const FVector& ForwardDir,
+                                                float InnerRadius, float OuterRadius, float ArcAngle, FLinearColor Color, float Duration,
+                                                float Thickness)
+{
+    if (!IsValid(WorldContextObject))
+    {
+        return;
+    }
+
+    DrawDebugArc(WorldContextObject, CenterPos, ForwardDir, OuterRadius, ArcAngle, 32, Color, Duration, Thickness);
+    DrawDebugArc(WorldContextObject, CenterPos, ForwardDir, InnerRadius, ArcAngle, 32, Color, Duration, Thickness);
+
+    FVector LeftStartPos = CenterPos + ForwardDir.RotateAngleAxis(-ArcAngle / 2.0f, FVector::UpVector) * InnerRadius;
+    FVector LeftEndPos = CenterPos + ForwardDir.RotateAngleAxis(-ArcAngle / 2.0f, FVector::UpVector) * OuterRadius;
+    UKismetSystemLibrary::DrawDebugLine(WorldContextObject, LeftStartPos, LeftEndPos, Color, Duration, Thickness);
+
+    FVector RightStartPos = CenterPos + ForwardDir.RotateAngleAxis(ArcAngle / 2.0f, FVector::UpVector) * InnerRadius;
+    FVector RightEndPos = CenterPos + ForwardDir.RotateAngleAxis(ArcAngle / 2.0f, FVector::UpVector) * OuterRadius;
+    UKismetSystemLibrary::DrawDebugLine(WorldContextObject, RightStartPos, RightEndPos, Color, Duration, Thickness);
 }

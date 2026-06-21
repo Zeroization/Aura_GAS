@@ -8,6 +8,7 @@
 #include "Aura/Aura.h"
 #include "Components/CapsuleComponent.h"
 #include "Game/AuraGameplayTags.h"
+#include "Kismet/GameplayStatics.h"
 
 
 AAuraCharacterBase::AAuraCharacterBase()
@@ -39,6 +40,9 @@ void AAuraCharacterBase::MulticastOnCharacterDeath_Implementation()
 {
     bIsDead = true;
 
+    // 播放死亡音效
+    UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
+
     // 设定武器掉落相关参数
     Weapon->SetSimulatePhysics(true);
     Weapon->SetEnableGravity(true);
@@ -63,26 +67,34 @@ void AAuraCharacterBase::Die()
     MulticastOnCharacterDeath();
 }
 
-FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
+FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& SocketTag)
 {
-    FName SocketName = MontageTagToSocketName[MontageTag];
+    FName SocketName = SocketTagToName[SocketTag];
     checkf(!SocketName.IsNone(), TEXT("Socket name is none!"));
-    
-    if (MontageTag.MatchesTagExact(AuraGameplayTags::MontageToSocket::Attack::Weapon) && IsValid(Weapon))
+
+    if (SocketTag.MatchesTagExact(AuraGameplayTags::CombatSocket::Weapon) && IsValid(Weapon))
     {
         return Weapon->GetSocketLocation(SocketName);
     }
-    if (MontageTag.MatchesTagExact(AuraGameplayTags::MontageToSocket::Attack::LeftHand))
-    {
-        return GetMesh()->GetSocketLocation(SocketName);
-    }
-    if (MontageTag.MatchesTagExact(AuraGameplayTags::MontageToSocket::Attack::RightHand))
+    if (SocketTag.MatchesTag(AuraGameplayTags::CombatSocket::SelfMesh::Root))
     {
         return GetMesh()->GetSocketLocation(SocketName);
     }
 
     checkf(false, TEXT("Should NOT go here."));
     return {};
+}
+
+FAuraTaggedMontage AAuraCharacterBase::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
+{
+    FAuraTaggedMontage* TaggedMontage = AttackMontages.FindByPredicate([&MontageTag](const FAuraTaggedMontage& Elem) -> bool
+    {
+        return Elem.MontageTag.MatchesTagExact(MontageTag);
+    });
+    checkf(TaggedMontage != nullptr, TEXT("[%s]: Can't find FAuraTaggedMontage by tag [ %s ]"), ANSI_TO_TCHAR(__FUNCTION__),
+           *MontageTag.GetTagName().ToString());
+
+    return *TaggedMontage;
 }
 
 TArray<FAuraTaggedMontage> AAuraCharacterBase::GetTaggedAttackMontages_Implementation()
@@ -103,6 +115,16 @@ bool AAuraCharacterBase::IsDead_Implementation() const
 AActor* AAuraCharacterBase::GetAvatar_Implementation()
 {
     return this;
+}
+
+int32 AAuraCharacterBase::GetMinionCount_Implementation()
+{
+    return MinionCount;
+}
+
+void AAuraCharacterBase::IncreaseMinionCountByAmount_Implementation(int32 Amount)
+{
+    MinionCount += Amount;
 }
 
 void AAuraCharacterBase::InitAbilitySystem()
@@ -141,6 +163,11 @@ void AAuraCharacterBase::GrantCharacterStartupAbilities()
 bool AAuraCharacterBase::CheckMotionWarpTargetExists(const FName& WarpTargetName)
 {
     return MotionWarping->FindWarpTarget(WarpTargetName) != nullptr;
+}
+
+UNiagaraSystem* AAuraCharacterBase::GetImpactBloodEffect_Implementation()
+{
+    return BloodImpactEffect;
 }
 
 void AAuraCharacterBase::Dissolve()

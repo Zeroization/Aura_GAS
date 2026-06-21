@@ -130,7 +130,10 @@ namespace AuraGameplayTags
                                        "实现的Gameplay Ability; 此Tag仅用于Tag相关操作(如Matches)");
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attack,
                                        "GA.Attack",
-                                       "通过此Tag激活GA: AuraMeleeAttackGA(暂定)");
+                                       "通过此Tag激活攻击类型的GA");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Summon,
+                                       "GA.Summon",
+                                       "通过此Tag激活召唤类型的GA");
     }
 
     namespace Damage
@@ -172,26 +175,58 @@ namespace AuraGameplayTags
         }
     }
 
-    namespace MontageToSocket
+    namespace CombatSocket
     {
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
-                                       "MontageToSocket",
-                                       "将蒙太奇动画与它使用的骨骼Socket相关联的GameplayTag; 此Tag仅用于Tag相关操作(如Matches)");
+                                       "CombatSocket",
+                                       "与角色骨骼Socket相关的GameplayTag; 此Tag仅用于Tag相关操作(如Matches)");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Weapon,
+                                       "CombatSocket.Weapon",
+                                       "角色持有武器上的Socket");
+
+        namespace SelfMesh
+        {
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                           "CombatSocket.SelfMesh",
+                                           "角色模型自身的Socket; 此Tag仅用于Tag相关操作(如Matches)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(LeftHand,
+                                           "CombatSocket.SelfMesh.LeftHand",
+                                           "角色模型自身左手的Socket");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(RightHand,
+                                           "CombatSocket.SelfMesh.RightHand",
+                                           "角色模型自身右手的Socket");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tail,
+                                           "CombatSocket.SelfMesh.Tail",
+                                           "角色模型自身尾巴的Socket");
+        }
+    }
+
+    namespace Montage
+    {
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                       "Montage",
+                                       "蒙太奇相关GameplayTag; 此Tag仅用于Tag相关操作(如Matches)");
 
         namespace Attack
         {
             UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
-                                           "MontageToSocket.Attack",
+                                           "Montage.Attack",
                                            "攻击类型蒙太奇; 此Tag仅用于Tag相关操作(如Matches)");
-            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Weapon,
-                                           "MontageToSocket.Attack.Weapon",
-                                           "攻击类型蒙太奇, 使用武器上的Socket");
-            UE_DEFINE_GAMEPLAY_TAG_COMMENT(LeftHand,
-                                           "MontageToSocket.Attack.LeftHand",
-                                           "攻击类型蒙太奇, 使用角色自身左手的Socket");
-            UE_DEFINE_GAMEPLAY_TAG_COMMENT(RightHand,
-                                           "MontageToSocket.Attack.RightHand",
-                                           "攻击类型蒙太奇, 使用角色自身右手的Socket");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Slot1,
+                                           "Montage.Attack.Slot1",
+                                           "攻击类蒙太奇槽位1");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Slot2,
+                                           "Montage.Attack.Slot2",
+                                           "攻击类蒙太奇槽位2");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Slot3,
+                                           "Montage.Attack.Slot3",
+                                           "攻击类蒙太奇槽位3");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Slot4,
+                                           "Montage.Attack.Slot4",
+                                           "攻击类蒙太奇槽位4");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Slot5,
+                                           "Montage.Attack.Slot5",
+                                           "攻击类蒙太奇槽位5");
         }
     }
 
