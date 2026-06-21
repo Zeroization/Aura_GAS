@@ -62,6 +62,9 @@ public:
     FVector GetCombatSocketLocation(const FGameplayTag& SocketTag);
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    FAuraTaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag);
+    
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     TArray<FAuraTaggedMontage> GetTaggedAttackMontages();
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
@@ -71,10 +74,13 @@ public:
     AActor* GetAvatar();
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-    UNiagaraSystem* GetImpactBloodEffect();
-
+    int32 GetMinionCount();
+    
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-    FAuraTaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag);
+    void IncreaseMinionCountByAmount(int32 Amount);
+    
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    UNiagaraSystem* GetImpactBloodEffect();
 
     UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
     void SetFacingWarpTarget(const FVector& TargetLocation);

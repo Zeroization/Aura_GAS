@@ -117,6 +117,16 @@ AActor* AAuraCharacterBase::GetAvatar_Implementation()
     return this;
 }
 
+int32 AAuraCharacterBase::GetMinionCount_Implementation()
+{
+    return MinionCount;
+}
+
+void AAuraCharacterBase::IncreaseMinionCountByAmount_Implementation(int32 Amount)
+{
+    MinionCount += Amount;
+}
+
 void AAuraCharacterBase::InitAbilitySystem()
 {
 }

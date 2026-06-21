@@ -130,7 +130,10 @@ namespace AuraGameplayTags
                                        "实现的Gameplay Ability; 此Tag仅用于Tag相关操作(如Matches)");
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attack,
                                        "GA.Attack",
-                                       "通过此Tag激活Attack类型的GA");
+                                       "通过此Tag激活攻击类型的GA");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Summon,
+                                       "GA.Summon",
+                                       "通过此Tag激活召唤类型的GA");
     }
 
     namespace Damage

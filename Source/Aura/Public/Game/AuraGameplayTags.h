@@ -69,6 +69,7 @@ namespace AuraGameplayTags
     {
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);   // "GA"
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack); // "GA.Attack"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Summon); // "GA.Summon"
     }
 
     namespace Damage

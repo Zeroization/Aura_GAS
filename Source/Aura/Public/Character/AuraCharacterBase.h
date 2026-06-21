@@ -45,6 +45,10 @@ protected:
     TArray<FAuraTaggedMontage> AttackMontages;
 
     bool bIsDead = false;
+    
+    /* 随从 */
+    int32 MinionCount = 0;
+    /* 随从 */
 
     /// 所有客户端: 该角色死亡的逻辑(例如播放动画等)
     UFUNCTION(NetMulticast, Reliable)
@@ -57,6 +61,8 @@ protected:
     virtual UAnimMontage* GetHitReactMontage_Implementation() override;
     virtual bool IsDead_Implementation() const override;
     virtual AActor* GetAvatar_Implementation() override;
+    virtual int32 GetMinionCount_Implementation() override;
+    virtual void IncreaseMinionCountByAmount_Implementation(int32 Amount) override;
     /// End Category: Combat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     /// Begin: Ability System <<<<<<<<<<<<<<<
