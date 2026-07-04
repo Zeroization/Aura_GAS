@@ -109,7 +109,7 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 void AAuraPlayerController::CursorTrace()
 {
     // 只有 Visibility Channel 为 Blocked 的才能被指针发现
-    GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+    GetHitResultUnderCursorByChannel(TraceTypeQuery1, false, CursorHit);
     if (!CursorHit.bBlockingHit)
     {
         return;
