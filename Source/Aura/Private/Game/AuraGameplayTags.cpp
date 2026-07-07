@@ -134,6 +134,16 @@ namespace AuraGameplayTags
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Summon,
                                        "GA.Summon",
                                        "通过此Tag激活召唤类型的GA");
+
+        namespace Fire
+        {
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                           "GA.Fire",
+                                           "火属性攻击类型GA; 此Tag仅用于Tag相关操作(如Matches)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(FireBolt,
+                                           "GA.Fire.FireBolt",
+                                           "通过此Tag激活火球攻击");
+        }
     }
 
     namespace Damage

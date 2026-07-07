@@ -5,38 +5,38 @@
 
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
-#include "AbilitySystem/Data/AuraAttributeInfo.h"
+#include "AbilitySystem/Data/DataAssets/AuraAttributeInfo.h"
 
 
 void UAuraAttributeMenuWidgetController::BindDelegateCallbackFunctions()
 {
-	checkf(IsValid(AttributeInfo), TEXT("[%hs]: AttributeInfo is empty, plz fill it in BP_AttributeMenuWidgetController !!"),
-	       __FUNCTION__);
+    checkf(IsValid(AttributeInfo), TEXT("[%hs]: AttributeInfo is empty, plz fill it in BP_AttributeMenuWidgetController !!"),
+           __FUNCTION__);
 
-	for (FAuraAttributeData& AttributeData : AttributeInfo->AttributeDataList)
-	{
-		AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeData.Attribute).AddLambda(
-			[this, &AttributeData](const FOnAttributeChangeData& ChangedData)
-			{
-				BroadcastAttributeData(AttributeData);
-			}
-		);
-	}
+    for (FAuraAttributeData& AttributeData : AttributeInfo->AttributeDataList)
+    {
+        AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeData.Attribute).AddLambda(
+            [this, &AttributeData](const FOnAttributeChangeData& ChangedData)
+            {
+                BroadcastAttributeData(AttributeData);
+            }
+        );
+    }
 }
 
 void UAuraAttributeMenuWidgetController::BroadcastInitialValues()
 {
-	checkf(IsValid(AttributeInfo), TEXT("[%hs]: AttributeInfo is empty, plz fill it in BP_AttributeMenuWidgetController !!"),
-	       __FUNCTION__);
+    checkf(IsValid(AttributeInfo), TEXT("[%hs]: AttributeInfo is empty, plz fill it in BP_AttributeMenuWidgetController !!"),
+           __FUNCTION__);
 
-	for (FAuraAttributeData& AttributeData : AttributeInfo->AttributeDataList)
-	{
-		BroadcastAttributeData(AttributeData);
-	}
+    for (FAuraAttributeData& AttributeData : AttributeInfo->AttributeDataList)
+    {
+        BroadcastAttributeData(AttributeData);
+    }
 }
 
 void UAuraAttributeMenuWidgetController::BroadcastAttributeData(FAuraAttributeData& AttributeData) const
 {
-	AttributeData.AttributeValue = AttributeData.Attribute.GetNumericValue(AuraAttributeSet);
-	AttributeDataDelegate.Broadcast(AttributeData);
+    AttributeData.AttributeValue = AttributeData.Attribute.GetNumericValue(AuraAttributeSet);
+    AttributeDataDelegate.Broadcast(AttributeData);
 }

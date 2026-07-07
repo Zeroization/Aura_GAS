@@ -24,7 +24,7 @@ void AAuraEnemy::SetCombatTarget_Implementation(AActor* InCombatTarget)
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("[%hs] Invalid CombatTarget! Character: %s"), __FUNCTION__, *GetNameSafe(this));
+        UE_LOG(LogAuraGame, Warning, TEXT("[%hs] Invalid CombatTarget! Character: %s"), __FUNCTION__, *GetNameSafe(this));
     }
 }
 

@@ -7,7 +7,10 @@
 #include "AuraAbilitySystemComponent.generated.h"
 
 class UAuraGameplayAbility;
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGetGEAssetTagDelegate, const FGameplayTagContainer&);
+DECLARE_MULTICAST_DELEGATE(FOnAbilitiesGivenDelegate);
+DECLARE_DELEGATE_OneParam(FForEachAbilityExecuteDelegate, const FGameplayAbilitySpec&);
 
 /**
  * 
@@ -15,23 +18,34 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnGetGEAssetTagDelegate, const FGameplayTag
 UCLASS()
 class AURA_API UAuraAbilitySystemComponent : public UAbilitySystemComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	FOnGetGEAssetTagDelegate OnGetGEAssetTag;
+    FOnGetGEAssetTagDelegate OnGetGEAssetTag;
+    FOnAbilitiesGivenDelegate OnAbilitiesGiven;
 
-	/// 在 ASC->InitAbilityActorInfo() 被调用后执行
-	void OnAbilityActorInfoSet();
+    bool bStartupAbilitiesGiven = false;
 
-	/// 赋予Actor GA
-	void GrantActorGA(const TArray<TSubclassOf<UAuraGameplayAbility>>& AbilityClasses);
+    /// 在 ASC->InitAbilityActorInfo() 被调用后执行
+    void OnAbilityActorInfoSet();
 
-	/// 根据输入Tag触发的GA回调
-	void AbilityInputTagOnHeld(const FGameplayTag& InputTag);
-	void AbilityInputTagOnReleased(const FGameplayTag& InputTag);
+    /// 赋予Actor默认GA
+    void GrantActorStartupGAs(const TArray<TSubclassOf<UAuraGameplayAbility>>& StartupAbilityClasses);
+
+    /// 根据输入Tag触发的GA回调
+    void AbilityInputTagOnHeld(const FGameplayTag& InputTag);
+    void AbilityInputTagOnReleased(const FGameplayTag& InputTag);
+
+    /// 让每个GA执行一次FForEachAbilityExecuteDelegate回调
+    void ForEachAbility(const FForEachAbilityExecuteDelegate& DelegateToExecute);
+
+    static FGameplayTag GetAbilityTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec);
+    static FGameplayTag GetInputTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec);
 
 protected:
-	UFUNCTION(Client, Reliable)
-	void OnGEApplied(UAbilitySystemComponent* InASC, const FGameplayEffectSpec& InGESpec,
-	                 FActiveGameplayEffectHandle ActiveGEHandle);
+    virtual void OnRep_ActivateAbilities() override;
+
+    UFUNCTION(Client, Reliable)
+    void OnGEApplied(UAbilitySystemComponent* InASC, const FGameplayEffectSpec& InGESpec,
+                     FActiveGameplayEffectHandle ActiveGEHandle);
 };
