@@ -146,6 +146,23 @@ namespace AuraGameplayTags
         }
     }
 
+    namespace Cooldown
+    {
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                       "Cooldown",
+                                       "用于GA冷却相关的Tag; 此Tag仅用于Tag相关操作(如Matches)");
+
+        namespace Fire
+        {
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                           "Cooldown.Fire",
+                                           "火属性攻击类型GA; 此Tag仅用于Tag相关操作(如Matches)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(FireBolt,
+                                           "Cooldown.Fire.FireBolt",
+                                           "火球攻击");
+        }
+    }
+
     namespace Damage
     {
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,

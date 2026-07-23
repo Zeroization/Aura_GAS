@@ -14,6 +14,9 @@ struct FAuraAbilityData
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability的GameplayTag"))
     FGameplayTag AbilityTag;
+    
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability的唯一冷却Tag"))
+    FGameplayTag CooldownTag;
 
     UPROPERTY(BlueprintReadOnly)
     FGameplayTag InputTag;

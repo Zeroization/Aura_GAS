@@ -78,6 +78,17 @@ namespace AuraGameplayTags
         }
     }
 
+    namespace Cooldown
+    {
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "Cooldown"
+
+        namespace Fire
+        {
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "Cooldown.Fire"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(FireBolt); // "Cooldown.Fire.FireBolt"
+        }
+    }
+
     namespace Damage
     {
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "Damage"
