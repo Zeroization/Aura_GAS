@@ -4,6 +4,7 @@
 #include "Input/AuraInputConfig.h"
 
 #include "InputAction.h"
+#include "Aura/Aura.h"
 
 
 TObjectPtr<UInputAction> UAuraInputConfig::FindAbilityInputActionByTag(const FGameplayTag& Tag, bool bLogNotFound) const
@@ -18,7 +19,7 @@ TObjectPtr<UInputAction> UAuraInputConfig::FindAbilityInputActionByTag(const FGa
 
 	if (bLogNotFound)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[%hs]: Can't find AbilityInputAction by tag [ %s ], in [ %s ]"), __FUNCTION__, *Tag.ToString(),
+		UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't find AbilityInputAction by tag [ %s ], in [ %s ]"), __FUNCTION__, *Tag.ToString(),
 		       *GetNameSafe(this));
 	}
 

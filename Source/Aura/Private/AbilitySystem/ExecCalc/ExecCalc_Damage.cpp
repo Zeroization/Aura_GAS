@@ -6,7 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAbilityTypes.h"
-#include "AbilitySystem/Data/CharacterClassInfo.h"
+#include "AbilitySystem/Data/DataAssets/CharacterClassInfo.h"
 #include "Game/AuraGameplayTags.h"
 #include "Interaction/Interface/CombatInterface.h"
 

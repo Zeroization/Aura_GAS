@@ -4,6 +4,7 @@
 #include "AbilitySystem/MMC/MaxHealthMMC.h"
 
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "Aura/Aura.h"
 #include "Interaction/Interface/CombatInterface.h"
 
 UMaxHealthMMC::UMaxHealthMMC()
@@ -43,7 +44,7 @@ float UMaxHealthMMC::CalculateBaseMagnitude_Implementation(const FGameplayEffect
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("[%hs] Target actor is not player (Not implements ICombatInterface)"), __FUNCTION__);
+		UE_LOG(LogAuraGame, Error, TEXT("[%hs] Target actor is not player (Not implements ICombatInterface)"), __FUNCTION__);
 	}
 
 	return MaxHealth;

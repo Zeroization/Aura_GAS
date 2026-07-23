@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/Data/CharacterClassInfo.h"
+#include "AbilitySystem/Data/DataAssets/CharacterClassInfo.h"
 #include "Character/AuraCharacterBase.h"
 #include "Interaction/Interface/Interactable.h"
 #include "UI/WidgetController/AuraOverlayWidgetController.h"
@@ -45,7 +45,7 @@ public:
 
     UPROPERTY(BlueprintReadOnly, Category = "AuraCharacter|Combat")
     bool bDoHitReacting = false;
-    
+
     AAuraEnemy();
 
     void OnGEHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
