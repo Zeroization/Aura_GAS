@@ -38,8 +38,39 @@ void AAuraPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AAuraPlayerState, Level);
+	DOREPLIFETIME(AAuraPlayerState, Xp);
+}
+
+void AAuraPlayerState::AddLevel(int32 InLevel)
+{
+	Level += InLevel;
+	OnPlayerLevelChange.Broadcast(Level);
+}
+
+void AAuraPlayerState::AddXp(int32 InXp)
+{
+	Xp += InXp;
+	OnPlayerXpChange.Broadcast(Xp);
+}
+
+void AAuraPlayerState::SetLevel(int32 NewLevel)
+{
+	Level = NewLevel;
+	OnPlayerLevelChange.Broadcast(Level);
+}
+
+void AAuraPlayerState::SetXp(int32 NewXp)
+{
+	Xp = NewXp;
+	OnPlayerXpChange.Broadcast(Xp);
 }
 
 void AAuraPlayerState::OnRep_Level(int32 OldLevel)
 {
+	OnPlayerLevelChange.Broadcast(Level);
+}
+
+void AAuraPlayerState::OnRep_Xp(int32 OldXp)
+{
+	OnPlayerXpChange.Broadcast(Xp);
 }

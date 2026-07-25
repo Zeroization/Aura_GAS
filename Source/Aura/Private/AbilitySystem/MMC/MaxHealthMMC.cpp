@@ -32,7 +32,7 @@ float UMaxHealthMMC::CalculateBaseMagnitude_Implementation(const FGameplayEffect
 	float TargetVigorValue = 0.f;
 	GetCapturedAttributeMagnitude(VigorDef, Spec, EvalParams, TargetVigorValue);
 
-	// 自定义计算: MaxHealth = 80.0 + 2.5 * Vigor + 10.0 * PlayerLevel
+	// 自定义计算: MaxHealth = 40.0 + 2.0 * Vigor + 10.0 * PlayerLevel
 	TargetVigorValue = FMath::Max<float>(TargetVigorValue, 0.f);
 	float MaxHealth = 0.f;
 	if (UObject* Player = Spec.GetContext().GetSourceObject();
@@ -40,7 +40,7 @@ float UMaxHealthMMC::CalculateBaseMagnitude_Implementation(const FGameplayEffect
 	{
 		const TScriptInterface<ICombatInterface> PlayerCombatInterface = TScriptInterface<ICombatInterface>(Player);
 		const int32 PlayerLevel = PlayerCombatInterface->GetActorLevel();
-		MaxHealth = 80.f + 2.5f * TargetVigorValue + 10.f * PlayerLevel;
+		MaxHealth = 40.f + 2.0f * TargetVigorValue + 10.f * PlayerLevel;
 	}
 	else
 	{

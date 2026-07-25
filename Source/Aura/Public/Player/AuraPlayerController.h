@@ -31,6 +31,11 @@ public:
     UFUNCTION(Client, Reliable)
     void ShowDamageFloatingText(ACharacter* TargetCharacter, const FDamageFloatingTextProperty& Property);
 
+#pragma region Debug/Cheat
+    UFUNCTION(Server, Reliable)
+    void ServerAddXp(int32 Amount);
+#pragma endregion
+
     virtual void PlayerTick(float DeltaTime) override;
 
 protected:

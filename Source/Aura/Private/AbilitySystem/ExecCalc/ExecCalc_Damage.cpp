@@ -101,7 +101,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
     FRealCurve* ArmorPenetrationCoefCurve = EnemyCharacterClassInfo->DamageCalcCoefficientTable->FindCurve(FName("ArmorPenetration"), {});
     float ArmorPenetrationCoef = (SourceCombatInterface && ArmorPenetrationCoefCurve)
                                      ? ArmorPenetrationCoefCurve->Eval(SourceCombatInterface->GetActorLevel())
-                                     : 0.5f;
+                                     : 0.25f;
     FRealCurve* EffectiveArmorCoefCurve = EnemyCharacterClassInfo->DamageCalcCoefficientTable->FindCurve(FName("EffectiveArmor"), {});
     float EffectiveArmorCoef = (TargetCombatInterface && EffectiveArmorCoefCurve)
                                    ? EffectiveArmorCoefCurve->Eval(TargetCombatInterface->GetActorLevel())

@@ -13,11 +13,14 @@
 #include "GameFramework/Character.h"
 #include "Input/AuraInputComponent.h"
 #include "Interaction/Interface/Interactable.h"
+#include "Player/AuraPlayerState.h"
+#include "Tools/AuraCheatManager.h"
 #include "UI/Widget/DamageFloatingTextComponent.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
     bReplicates = true;
+    CheatClass = UAuraCheatManager::StaticClass();
 
     // 鼠标-按键行走: 初始化
     Spline = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
@@ -67,6 +70,11 @@ void AAuraPlayerController::BeginPlay()
     InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
     InputModeData.SetHideCursorDuringCapture(false);
     SetInputMode(InputModeData);
+    
+#if WITH_EDITOR
+    // 开启作弊
+    EnableCheats();
+#endif
 }
 
 void AAuraPlayerController::SetupInputComponent()
@@ -264,4 +272,10 @@ void AAuraPlayerController::AbilityInputTagOnHeld(FGameplayTag InputTag)
 
     // 其他按键按住时的逻辑
     InitAndGetAuraASC()->AbilityInputTagOnHeld(InputTag);
+}
+
+void AAuraPlayerController::ServerAddXp_Implementation(int32 Amount)
+{
+    AAuraPlayerState* AuraPS = CastChecked<AAuraPlayerState>(PlayerState);
+    AuraPS->AddXp(Amount);
 }
