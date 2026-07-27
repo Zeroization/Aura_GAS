@@ -45,7 +45,7 @@ protected:
     TArray<FAuraTaggedMontage> AttackMontages;
 
     bool bIsDead = false;
-    
+
     /* 随从 */
     int32 MinionCount = 0;
     /* 随从 */
@@ -105,7 +105,7 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|SFX")
     TObjectPtr<UNiagaraSystem> BloodImpactEffect;
-    
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|SFX")
     TObjectPtr<USoundBase> DeathSound;
 
@@ -124,6 +124,9 @@ protected:
 private:
     UPROPERTY(EditAnywhere, Category = "AuraCharacter|Abilities")
     TArray<TSubclassOf<UAuraGameplayAbility>> StartupAbilities;
+
+    UPROPERTY(EditAnywhere, Category = "AuraCharacter|Abilities")
+    TArray<TSubclassOf<UAuraGameplayAbility>> StartupPassiveAbilities;
 
     UPROPERTY(EditAnywhere, Category = "AuraCharacter|Combat")
     TObjectPtr<UAnimMontage> HitReactMontage;

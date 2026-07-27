@@ -33,7 +33,7 @@ public:
 
 #pragma region Debug/Cheat
     UFUNCTION(Server, Reliable)
-    void ServerAddXp(int32 Amount);
+    void ServerAddXpForDebug(int32 Amount);
 #pragma endregion
 
     virtual void PlayerTick(float DeltaTime) override;

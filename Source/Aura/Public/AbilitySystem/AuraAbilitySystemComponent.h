@@ -32,6 +32,9 @@ public:
     /// 赋予Actor默认GA
     void GrantActorStartupGAs(const TArray<TSubclassOf<UAuraGameplayAbility>>& StartupAbilityClasses);
 
+    /// 赋予Actor默认被动GA
+    void GrantActorPassiveStartupGAs(const TArray<TSubclassOf<UAuraGameplayAbility>>& StartupPassiveAbilityClasses);
+
     /// 根据输入Tag触发的GA回调
     void AbilityInputTagOnHeld(const FGameplayTag& InputTag);
     void AbilityInputTagOnReleased(const FGameplayTag& InputTag);

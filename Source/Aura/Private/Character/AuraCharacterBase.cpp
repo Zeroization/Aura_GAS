@@ -158,6 +158,7 @@ void AAuraCharacterBase::GrantCharacterStartupAbilities()
     }
 
     AuraAbilitySystemComponent->GrantActorStartupGAs(StartupAbilities);
+    AuraAbilitySystemComponent->GrantActorPassiveStartupGAs(StartupPassiveAbilities);
 }
 
 bool AAuraCharacterBase::CheckMotionWarpTargetExists(const FName& WarpTargetName)

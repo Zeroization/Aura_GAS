@@ -14,12 +14,18 @@ struct FAuraAbilityData
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability的GameplayTag"))
     FGameplayTag AbilityTag;
-    
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability的唯一冷却Tag"))
     FGameplayTag CooldownTag;
 
     UPROPERTY(BlueprintReadOnly)
     FGameplayTag InputTag;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability是否为被动类型"))
+    bool bIsPassive = false;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability是否该显示到技能球上(TODO: 教程还没讲到这里)"))
+    bool bIsHidden = false;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="对应SpellGlobe上的技能图标"))
     TObjectPtr<UTexture2D> SkillIcon;

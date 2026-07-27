@@ -9,6 +9,7 @@
 #include "Game/AuraGameplayTags.h"
 #include "GameFramework/Character.h"
 #include "Interaction/Interface/CombatInterface.h"
+#include "Interaction/Interface/PlayerInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/AuraPlayerController.h"
 #include "UI/Widget/DamageFloatingTextComponent.h"
@@ -80,6 +81,7 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
     FEffectProperties EffectProperties;
     SetEffectProperties(Data, EffectProperties);
 
+    // 处理Health和Mana
     // 在GE之后对Current Value再次Clamp, 防止在PreAttributeChange()中Clamp错误的NewValue
     if (Data.EvaluatedData.Attribute == GetHealthAttribute())
     {
@@ -101,12 +103,15 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
             const float NewHealth = GetHealth() - LocalIncomingDamage;
             SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 
+            // 处理目标受伤逻辑
             const bool bIsDead = NewHealth <= 0.f;
             if (bIsDead)
             {
                 AActor* TargetAvatarActor = EffectProperties.TargetAvatarActor;
                 if (TargetAvatarActor->Implements<UCombatInterface>())
                 {
+                    SendXpRewardEvent(EffectProperties);
+                    
                     const TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(TargetAvatarActor);
                     CombatInterface->Die();
                 }
@@ -121,28 +126,22 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
             // 在敌人身上显示伤害数字
             if (EffectProperties.SourceCharacter != EffectProperties.TargetCharacter)
             {
-                const bool bBlockedHit = UAuraAbilitySystemLibrary::GetIsBlockedHit(EffectProperties.EffectContextHandle);
-                const bool bCriticalHit = UAuraAbilitySystemLibrary::GetIsCriticalHit(EffectProperties.EffectContextHandle);
-
-                FDamageFloatingTextProperty DamageFloatingTextProperty;
-                DamageFloatingTextProperty.Damage = LocalIncomingDamage;
-                if (bBlockedHit)
-                {
-                    DamageFloatingTextProperty.DamageTypeFlags |= static_cast<uint8>(EAuraDamageType::Blocked);
-                }
-                if (bCriticalHit)
-                {
-                    DamageFloatingTextProperty.DamageTypeFlags |= static_cast<uint8>(EAuraDamageType::Critical);
-                }
-
-                for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-                {
-                    if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(It->Get()))
-                    {
-                        PC->ShowDamageFloatingText(EffectProperties.TargetCharacter, DamageFloatingTextProperty);
-                    }
-                }
+                ShowDamageText(EffectProperties, LocalIncomingDamage);
             }
+        }
+    }
+
+    // 处理IncomingXp
+    if (Data.EvaluatedData.Attribute == GetIncomingXpAttribute())
+    {
+        const float LocalIncomingXp = GetIncomingXp();
+        SetIncomingXp(0.f);
+        
+        // TODO: 处理升级逻辑
+        
+        if (EffectProperties.SourceCharacter->Implements<UPlayerInterface>())
+        {
+            IPlayerInterface::Execute_PlayerAddXp(EffectProperties.SourceCharacter, LocalIncomingXp);
         }
     }
 }
@@ -247,7 +246,7 @@ void UAuraAttributeSet::OnRep_PhysicalResistance(const FGameplayAttributeData& O
     GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, PhysicalResistance, OldData);
 }
 
-void UAuraAttributeSet::SetEffectProperties(const struct FGameplayEffectModCallbackData& Data, FEffectProperties& Props)
+void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props)
 {
     Props.EffectContextHandle = Data.EffectSpec.GetContext();
 
@@ -283,5 +282,47 @@ void UAuraAttributeSet::SetEffectProperties(const struct FGameplayEffectModCallb
         }
         Props.TargetCharacter = Props.TargetController->GetCharacter();
         Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
+    }
+}
+
+void UAuraAttributeSet::ShowDamageText(const FEffectProperties& Props, float LocalIncomingDamage)
+{
+    const bool bBlockedHit = UAuraAbilitySystemLibrary::GetIsBlockedHit(Props.EffectContextHandle);
+    const bool bCriticalHit = UAuraAbilitySystemLibrary::GetIsCriticalHit(Props.EffectContextHandle);
+
+    FDamageFloatingTextProperty DamageFloatingTextProperty;
+    DamageFloatingTextProperty.Damage = LocalIncomingDamage;
+    if (bBlockedHit)
+    {
+        DamageFloatingTextProperty.DamageTypeFlags |= static_cast<uint8>(EAuraDamageType::Blocked);
+    }
+    if (bCriticalHit)
+    {
+        DamageFloatingTextProperty.DamageTypeFlags |= static_cast<uint8>(EAuraDamageType::Critical);
+    }
+
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(It->Get()))
+        {
+            PC->ShowDamageFloatingText(Props.TargetCharacter, DamageFloatingTextProperty);
+        }
+    }
+}
+
+void UAuraAttributeSet::SendXpRewardEvent(const FEffectProperties& Props)
+{
+    if (Props.TargetCharacter->Implements<UCombatInterface>())
+    {
+        const TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(Props.TargetCharacter);
+        const int32 TargetLevel = CombatInterface->GetActorLevel();
+        const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClassEnum(Props.TargetCharacter);
+        int32 XpReward = UAuraAbilitySystemLibrary::GetEnemyXpRewardByClassAndLevel(Props.TargetCharacter, TargetClass, TargetLevel);
+        
+        FGameplayEventData Payload;
+        Payload.EventTag = AuraGameplayTags::Attribute::Meta::IncomingXp;
+        Payload.EventMagnitude = XpReward;
+        UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Props.SourceCharacter, AuraGameplayTags::Attribute::Meta::IncomingXp,
+                                                                 Payload);
     }
 }

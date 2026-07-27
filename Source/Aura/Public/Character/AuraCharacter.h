@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/AuraCharacterBase.h"
+#include "Interaction/Interface/PlayerInterface.h"
 #include "AuraCharacter.generated.h"
 
 class UCameraComponent;
@@ -12,31 +13,36 @@ class USpringArmComponent;
  * 
  */
 UCLASS()
-class AURA_API AAuraCharacter : public AAuraCharacterBase
+class AURA_API AAuraCharacter : public AAuraCharacterBase, public IPlayerInterface
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	AAuraCharacter();
+    AAuraCharacter();
 
-	virtual void PossessedBy(AController* NewController) override;
-	virtual void OnRep_PlayerState() override;
+    virtual void PossessedBy(AController* NewController) override;
+    virtual void OnRep_PlayerState() override;
 
-	/// Begin: Combat Interface <<<<
-	virtual int32 GetActorLevel() override;
-	/// End: Combat Interface <<<<<<
+    /// Begin: Combat Interface <<<<
+    virtual int32 GetActorLevel() override;
+    virtual ECharacterClass GetCharacterClassEnum_Implementation() override;
+    /// End: Combat Interface <<<<<<
+    
+    /// Begin: Player Interface <<<<
+    virtual void PlayerAddXp_Implementation(int32 InXp) override;
+    /// End: Player Interface <<<<<<
 
 private:
-	/// Begin Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	UPROPERTY(EditAnywhere, Category = "AuraCharacter|Camera")
-	TObjectPtr<USpringArmComponent> SpringArmComponent;
+    /// Begin Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    UPROPERTY(EditAnywhere, Category = "AuraCharacter|Camera")
+    TObjectPtr<USpringArmComponent> SpringArmComponent;
 
-	UPROPERTY(EditAnywhere, Category = "AuraCharacter|Camera")
-	TObjectPtr<UCameraComponent> CameraComponent;
-	/// End Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    UPROPERTY(EditAnywhere, Category = "AuraCharacter|Camera")
+    TObjectPtr<UCameraComponent> CameraComponent;
+    /// End Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-	/// Begin: Init <<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	virtual void InitAbilitySystem() override;
-	void InitPlayerHUD();
-	/// End: Init  <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    /// Begin: Init <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    virtual void InitAbilitySystem() override;
+    void InitPlayerHUD();
+    /// End: Init  <<<<<<<<<<<<<<<<<<<<<<<<<<<<
 };

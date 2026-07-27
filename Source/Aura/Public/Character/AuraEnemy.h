@@ -65,6 +65,7 @@ public:
     virtual int32 GetActorLevel() override;
     virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
     virtual AActor* GetCombatTarget_Implementation() const override;
+    virtual ECharacterClass GetCharacterClassEnum_Implementation() override;
     /// >>>> End: Combat Interface
 
 protected:

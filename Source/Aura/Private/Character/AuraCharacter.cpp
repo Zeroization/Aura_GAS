@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "AbilitySystem/Data/DataAssets/CharacterClassInfo.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -17,83 +18,97 @@
 
 AAuraCharacter::AAuraCharacter()
 {
-	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+    GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 
-	/// Begin Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
-	SpringArmComponent->bInheritPitch = false;
-	SpringArmComponent->bInheritRoll = false;
-	SpringArmComponent->bInheritYaw = false;
-	SpringArmComponent->SetupAttachment(RootComponent);
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
-	CameraComponent->SetupAttachment(SpringArmComponent);
-	/// End Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    /// Begin Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
+    SpringArmComponent->bInheritPitch = false;
+    SpringArmComponent->bInheritRoll = false;
+    SpringArmComponent->bInheritYaw = false;
+    SpringArmComponent->SetupAttachment(RootComponent);
+    CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
+    CameraComponent->SetupAttachment(SpringArmComponent);
+    /// End Category: Camera <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-	/// Begin: Movement
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
-	GetCharacterMovement()->bConstrainToPlane = true;
-	GetCharacterMovement()->bSnapToPlaneAtStart = true;
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationRoll = false;
-	bUseControllerRotationYaw = false;
-	/// End: Movement
+    /// Begin: Movement
+    GetCharacterMovement()->bOrientRotationToMovement = true;
+    GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
+    GetCharacterMovement()->bConstrainToPlane = true;
+    GetCharacterMovement()->bSnapToPlaneAtStart = true;
+    bUseControllerRotationPitch = false;
+    bUseControllerRotationRoll = false;
+    bUseControllerRotationYaw = false;
+    /// End: Movement
 }
 
 void AAuraCharacter::PossessedBy(AController* NewController)
 {
-	Super::PossessedBy(NewController);
+    Super::PossessedBy(NewController);
 
-	// 服务端初始化
-	InitAbilitySystem();
-	InitPlayerHUD();
+    // 服务端初始化
+    InitAbilitySystem();
+    InitPlayerHUD();
 }
 
 void AAuraCharacter::OnRep_PlayerState()
 {
-	Super::OnRep_PlayerState();
+    Super::OnRep_PlayerState();
 
-	// 客户端初始化
-	InitAbilitySystem();
-	InitPlayerHUD();
+    // 客户端初始化
+    InitAbilitySystem();
+    InitPlayerHUD();
 }
 
 int32 AAuraCharacter::GetActorLevel()
 {
-	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	checkf(AuraPlayerState, TEXT("[%hs] AuraPlayerState is nullptr!"), __FUNCTION__);
-	return AuraPlayerState->GetPlayerLevel();
+    AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+    checkf(AuraPlayerState, TEXT("[%hs] AuraPlayerState is nullptr!"), __FUNCTION__);
+    return AuraPlayerState->GetPlayerLevel();
+}
+
+ECharacterClass AAuraCharacter::GetCharacterClassEnum_Implementation()
+{
+    // 目前主角只有这一个职业
+    return ECharacterClass::ECC_Elementalist;
+}
+
+void AAuraCharacter::PlayerAddXp_Implementation(int32 InXp)
+{
+    AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+    checkf(IsValid(AuraPlayerState), TEXT("Can't get AuraPlayerState !!!"));
+    
+    AuraPlayerState->AddXp(InXp);
 }
 
 void AAuraCharacter::InitAbilitySystem()
 {
-	Super::InitAbilitySystem();
+    Super::InitAbilitySystem();
 
-	// 1. 初始化ASC
-	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	checkf(IsValid(AuraPlayerState), TEXT("Can't get AuraPlayerState !!!"));
-	AuraAbilitySystemComponent = CastChecked<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent());
-	AuraAbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
-	AuraAbilitySystemComponent->OnAbilityActorInfoSet();
+    // 1. 初始化ASC
+    AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+    checkf(IsValid(AuraPlayerState), TEXT("Can't get AuraPlayerState !!!"));
+    AuraAbilitySystemComponent = CastChecked<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent());
+    AuraAbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
+    AuraAbilitySystemComponent->OnAbilityActorInfoSet();
 
-	// 2. 初始化AttributeSet和Attributes
-	AuraAttributeSet = CastChecked<UAuraAttributeSet>(AuraPlayerState->GetAttributeSet());
-	InitDefaultAttributes();
+    // 2. 初始化AttributeSet和Attributes
+    AuraAttributeSet = CastChecked<UAuraAttributeSet>(AuraPlayerState->GetAttributeSet());
+    InitDefaultAttributes();
 
-	// 3. 初始化GA
-	GrantCharacterStartupAbilities();
+    // 3. 初始化GA
+    GrantCharacterStartupAbilities();
 }
 
 void AAuraCharacter::InitPlayerHUD()
 {
-	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
-	{
-		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
-		{
-			AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-			checkf(AuraPlayerState, TEXT("Can't get AuraPlayerState !!!"));
+    if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
+    {
+        if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
+        {
+            AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+            checkf(AuraPlayerState, TEXT("Can't get AuraPlayerState !!!"));
 
-			AuraHUD->InitHUD(AuraPlayerController, AuraPlayerState, AuraAbilitySystemComponent, AuraAttributeSet);
-		}
-	}
+            AuraHUD->InitHUD(AuraPlayerController, AuraPlayerState, AuraAbilitySystemComponent, AuraAttributeSet);
+        }
+    }
 }

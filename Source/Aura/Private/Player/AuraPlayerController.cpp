@@ -274,7 +274,7 @@ void AAuraPlayerController::AbilityInputTagOnHeld(FGameplayTag InputTag)
     InitAndGetAuraASC()->AbilityInputTagOnHeld(InputTag);
 }
 
-void AAuraPlayerController::ServerAddXp_Implementation(int32 Amount)
+void AAuraPlayerController::ServerAddXpForDebug_Implementation(int32 Amount)
 {
     AAuraPlayerState* AuraPS = CastChecked<AAuraPlayerState>(PlayerState);
     AuraPS->AddXp(Amount);

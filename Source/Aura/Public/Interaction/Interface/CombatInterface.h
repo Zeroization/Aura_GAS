@@ -63,7 +63,7 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     FAuraTaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag);
-    
+
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     TArray<FAuraTaggedMontage> GetTaggedAttackMontages();
 
@@ -75,10 +75,10 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     int32 GetMinionCount();
-    
+
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     void IncreaseMinionCountByAmount(int32 Amount);
-    
+
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     UNiagaraSystem* GetImpactBloodEffect();
 
@@ -97,5 +97,8 @@ public:
     // 获取敌人的CombatTarget
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     AActor* GetCombatTarget() const;
+
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    ECharacterClass GetCharacterClassEnum();
 #pragma endregion
 };

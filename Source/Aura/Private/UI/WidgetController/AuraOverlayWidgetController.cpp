@@ -100,6 +100,10 @@ void UAuraOverlayWidgetController::OnInitStartupAbilities()
     {
         // 1. 在AbilityInfo中获取并补充Ability相关信息
         FAuraAbilityData Data = AbilityInfo->FindAbilityDataByTag(AuraAbilitySystemComponent->GetAbilityTagByAbilitySpec(AbilitySpec));
+        if (Data.bIsHidden)
+        {
+            return;
+        }
         Data.InputTag = AuraAbilitySystemComponent->GetInputTagByAbilitySpec(AbilitySpec);
 
         // 2. 向UI组件广播相关信息
