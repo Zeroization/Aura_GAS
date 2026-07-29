@@ -27,6 +27,15 @@ void UAuraAbilitySystemComponent::GrantActorStartupGAs(const TArray<TSubclassOf<
     OnAbilitiesGiven.Broadcast();
 }
 
+void UAuraAbilitySystemComponent::GrantActorPassiveStartupGAs(const TArray<TSubclassOf<UAuraGameplayAbility>>& StartupPassiveAbilityClasses)
+{
+    for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupPassiveAbilityClasses)
+    {
+        FGameplayAbilitySpec GASpec = FGameplayAbilitySpec(AbilityClass, 1);
+        GiveAbilityAndActivateOnce(GASpec);
+    }
+}
+
 void UAuraAbilitySystemComponent::AbilityInputTagOnHeld(const FGameplayTag& InputTag)
 {
     if (!InputTag.IsValid())

@@ -33,6 +33,11 @@ AActor* AAuraEnemy::GetCombatTarget_Implementation() const
     return CombatTarget;
 }
 
+ECharacterClass AAuraEnemy::GetCharacterClassEnum_Implementation()
+{
+    return CharacterClass;
+}
+
 AAuraEnemy::AAuraEnemy()
 {
     // 初始化Character Mesh的Visibility碰撞通道为Block, 方便鼠标追踪
@@ -146,7 +151,7 @@ void AAuraEnemy::InitAbilitySystem()
 
 void AAuraEnemy::InitDefaultAttributes() const
 {
-    UAuraAbilitySystemLibrary::InitEnemyDefaultAttributesByClass(this, CharacterClass, Level, AuraAbilitySystemComponent);
+    UAuraAbilitySystemLibrary::InitEnemyDefaultAttributesByClass(this, AuraAbilitySystemComponent, CharacterClass, Level);
 }
 
 void AAuraEnemy::HighlightActor()
@@ -175,7 +180,7 @@ void AAuraEnemy::Die()
     Super::Die();
 }
 
-int32 AAuraEnemy::GetActorLevel()
+int32 AAuraEnemy::GetActorLevel_Implementation()
 {
     return Level;
 }

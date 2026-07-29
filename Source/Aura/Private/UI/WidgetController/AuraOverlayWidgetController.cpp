@@ -6,8 +6,10 @@
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/DataAssets/AuraAbilityInfo.h"
+#include "AbilitySystem/Data/DataAssets/CharacterLevelUpInfo.h"
 #include "Aura/Aura.h"
 #include "Game/AuraGameplayTags.h"
+#include "Player/AuraPlayerState.h"
 #include "Tools/AuraDataTableFunctionLibrary.h"
 
 
@@ -26,10 +28,21 @@ void UAuraOverlayWidgetController::BroadcastInitialValues()
     OnMaxHealthChanged.Broadcast(AuraAttributeSet->GetMaxHealth());
     OnManaChanged.Broadcast(AuraAttributeSet->GetMana());
     OnMaxManaChanged.Broadcast(AuraAttributeSet->GetMaxMana());
+    OnLevelNumberChanged.Broadcast(AuraPlayerState->GetPlayerLevel());
 }
 
 void UAuraOverlayWidgetController::BindDelegateCallbackFunctions()
 {
+#pragma region PS
+    // AAuraPlayerState::FOnPlayerStatChangeDelegate
+    AuraPlayerState->OnPlayerXpChange.AddUObject(this, &UAuraOverlayWidgetController::OnXpChanged);
+    AuraPlayerState->OnPlayerLevelChange.AddLambda([this](int32 NewLevel)
+    {
+        OnLevelNumberChanged.Broadcast(NewLevel);
+    });
+#pragma endregion
+
+#pragma region ASC
     // UAuraOverlayWidgetController::FOnAttributeChangedSignature
     AuraAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetHealthAttribute())
                               .AddLambda([this](const FOnAttributeChangeData& Data)
@@ -76,6 +89,7 @@ void UAuraOverlayWidgetController::BindDelegateCallbackFunctions()
 
     // UAuraAbilitySystemComponent::FOnAbilitiesGivenDelegate
     AuraAbilitySystemComponent->OnAbilitiesGiven.AddUObject(this, &UAuraOverlayWidgetController::OnInitStartupAbilities);
+#pragma endregion
 }
 
 void UAuraOverlayWidgetController::OnInitStartupAbilities()
@@ -91,10 +105,39 @@ void UAuraOverlayWidgetController::OnInitStartupAbilities()
     {
         // 1. 在AbilityInfo中获取并补充Ability相关信息
         FAuraAbilityData Data = AbilityInfo->FindAbilityDataByTag(AuraAbilitySystemComponent->GetAbilityTagByAbilitySpec(AbilitySpec));
+        if (Data.bIsHidden)
+        {
+            return;
+        }
         Data.InputTag = AuraAbilitySystemComponent->GetInputTagByAbilitySpec(AbilitySpec);
-        
+
         // 2. 向UI组件广播相关信息
         OnAbilityInfoSet.Broadcast(Data);
     });
     AuraAbilitySystemComponent->ForEachAbility(DelegateToExecute);
+}
+
+void UAuraOverlayWidgetController::OnXpChanged(int32 NewXp)
+{
+    UCharacterLevelUpInfo* LevelUpInfo = AuraPlayerState->AuraLevelUpInfo;
+    checkf(LevelUpInfo, TEXT("[%hs]: Can't find LevelUpInfo, please check out BP_AuraPlayerState."), __FUNCTION__);
+
+    int32 CurLevel = LevelUpInfo->GetLevelByXP(NewXp);
+    int32 MaxLevel = LevelUpInfo->LevelUpInfos.Num() - 1;
+    float XpBarPercent;
+    if (CurLevel <= MaxLevel && CurLevel != INDEX_NONE)
+    {
+        int32 PrevLevelRequireXp = (CurLevel >= 1) ? LevelUpInfo->LevelUpInfos[CurLevel - 1].LevelUpRequirement : 0;
+        int32 CurLevelRequireXP = LevelUpInfo->LevelUpInfos[CurLevel].LevelUpRequirement;
+
+        int32 XpBarCurXp = NewXp - PrevLevelRequireXp;
+        int32 XpBarDeltaXp = CurLevelRequireXP - PrevLevelRequireXp;
+        XpBarPercent = static_cast<float>(XpBarCurXp) / static_cast<float>(XpBarDeltaXp);
+    }
+    else
+    {
+        XpBarPercent = 1.f;
+    }
+
+    OnXpPercentChanged.Broadcast(XpBarPercent);
 }

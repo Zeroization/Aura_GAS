@@ -63,9 +63,8 @@ UCharacterClassInfo* UAuraAbilitySystemLibrary::GetEnemyCharacterClassInfo(const
     return nullptr;
 }
 
-void UAuraAbilitySystemLibrary::InitEnemyDefaultAttributesByClass(const UObject* WorldContextObject,
-                                                                  ECharacterClass EnemyClass, float Level,
-                                                                  UAuraAbilitySystemComponent* ASC)
+void UAuraAbilitySystemLibrary::InitEnemyDefaultAttributesByClass(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC,
+                                                                  ECharacterClass EnemyClass, int32 EnemyLevel)
 {
     if (UCharacterClassInfo* EnemyClassInfo = GetEnemyCharacterClassInfo(WorldContextObject))
     {
@@ -75,7 +74,7 @@ void UAuraAbilitySystemLibrary::InitEnemyDefaultAttributesByClass(const UObject*
         // Primary Attributes
         FGameplayEffectContextHandle PrimaryAttrGEContextHandle = ASC->MakeEffectContext();
         PrimaryAttrGEContextHandle.AddSourceObject(AvatarActor);
-        const FGameplayEffectSpecHandle PrimaryAttrGESpecHandle = ASC->MakeOutgoingSpec(EnemyClassDefaultInfo.PrimaryAttributes, Level,
+        const FGameplayEffectSpecHandle PrimaryAttrGESpecHandle = ASC->MakeOutgoingSpec(EnemyClassDefaultInfo.PrimaryAttributes, EnemyLevel,
                                                                                         PrimaryAttrGEContextHandle);
         ASC->ApplyGameplayEffectSpecToSelf(*PrimaryAttrGESpecHandle.Data);
 
@@ -83,29 +82,28 @@ void UAuraAbilitySystemLibrary::InitEnemyDefaultAttributesByClass(const UObject*
         FGameplayEffectContextHandle SecondaryAttrGEContextHandle = ASC->MakeEffectContext();
         SecondaryAttrGEContextHandle.AddSourceObject(AvatarActor);
         const FGameplayEffectSpecHandle SecondaryAttrGESpecHandle = ASC->MakeOutgoingSpec(
-            EnemyClassInfo->SecondaryAttributes, Level, SecondaryAttrGEContextHandle);
+            EnemyClassInfo->SecondaryAttributes, EnemyLevel, SecondaryAttrGEContextHandle);
         ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttrGESpecHandle.Data);
 
         // Vital Attributes
         FGameplayEffectContextHandle VitalAttrGEContextHandle = ASC->MakeEffectContext();
         VitalAttrGEContextHandle.AddSourceObject(AvatarActor);
         const FGameplayEffectSpecHandle VitalAttrGESpecHandle = ASC->MakeOutgoingSpec(
-            EnemyClassInfo->VitalAttributes, Level, VitalAttrGEContextHandle);
+            EnemyClassInfo->VitalAttributes, EnemyLevel, VitalAttrGEContextHandle);
         ASC->ApplyGameplayEffectSpecToSelf(*VitalAttrGESpecHandle.Data);
     }
 }
 
 void UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC,
-                                                           ECharacterClass CharacterClass)
+                                                           ECharacterClass CharacterClass, int32 EnemyLevel)
 {
     if (UCharacterClassInfo* EnemyClassInfo = GetEnemyCharacterClassInfo(WorldContextObject))
     {
         // 职业GA
         const FCharacterClassDefaultInfo ClassDefaultInfo = EnemyClassInfo->CharacterClassInfoMap[CharacterClass];
-        int32 EnemyLevel = 1;
-        if (TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(ASC->GetAvatarActor()))
+        if (ASC->GetAvatarActor()->Implements<UCombatInterface>())
         {
-            EnemyLevel = CombatInterface->GetActorLevel();
+            EnemyLevel = ICombatInterface::Execute_GetActorLevel(ASC->GetAvatarActor());
         }
         for (const auto& AbilityClass : ClassDefaultInfo.DefaultAbilities)
         {
@@ -120,6 +118,17 @@ void UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(const UObject* WorldC
             ASC->GiveAbility(GASpec);
         }
     }
+}
+
+int32 UAuraAbilitySystemLibrary::GetEnemyXpRewardByClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass,
+                                                                 int32 EnemyLevel)
+{
+    if (UCharacterClassInfo* EnemyClassInfo = GetEnemyCharacterClassInfo(WorldContextObject))
+    {
+        const FCharacterClassDefaultInfo ClassDefaultInfo = EnemyClassInfo->CharacterClassInfoMap[CharacterClass];
+        return ClassDefaultInfo.XpReward.GetValueAtLevel(EnemyLevel);
+    }
+    return 0;
 }
 
 bool UAuraAbilitySystemLibrary::GetIsBlockedHit(const FGameplayEffectContextHandle& GEContextHandle)
@@ -251,4 +260,17 @@ void UAuraAbilitySystemLibrary::DrawDebugSector(const UObject* WorldContextObjec
     FVector RightStartPos = CenterPos + ForwardDir.RotateAngleAxis(ArcAngle / 2.0f, FVector::UpVector) * InnerRadius;
     FVector RightEndPos = CenterPos + ForwardDir.RotateAngleAxis(ArcAngle / 2.0f, FVector::UpVector) * OuterRadius;
     UKismetSystemLibrary::DrawDebugLine(WorldContextObject, RightStartPos, RightEndPos, Color, Duration, Thickness);
+}
+
+void UAuraAbilitySystemLibrary::Debug_ApplyEventBasedEffect(UAuraAbilitySystemComponent* ASC, TSubclassOf<UGameplayEffect> GEClass,
+                                                            const FGameplayTag& MagnitudeTag, float MagnitudeValue)
+{
+    checkf(ASC, TEXT("[%hs] Invalid ASC!"), __FUNCTION__);
+    checkf(GEClass, TEXT("[%hs] Invalid GEClass, please fill in GE_EventBasedEffect!"), __FUNCTION__);
+
+    FGameplayEffectContextHandle GEContextHandle = ASC->MakeEffectContext();
+    FGameplayEffectSpecHandle GESpecHandle = ASC->MakeOutgoingSpec(GEClass, 1.f, GEContextHandle);
+    GESpecHandle.Data->SetSetByCallerMagnitude(MagnitudeTag, MagnitudeValue);
+
+    ASC->ApplyGameplayEffectSpecToSelf(*GESpecHandle.Data);
 }

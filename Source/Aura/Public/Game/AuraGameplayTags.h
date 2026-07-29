@@ -56,6 +56,7 @@ namespace AuraGameplayTags
         {
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);           // "Attribute.Meta"
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(IncomingDamage); // "Attribute.Meta.IncomingDamage"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(IncomingXp);     // "Attribute.Meta.IncomingXp"
         }
     }
 
@@ -75,6 +76,12 @@ namespace AuraGameplayTags
         {
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "GA.Fire"
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(FireBolt); // "GA.Fire.FireBolt"
+        }
+
+        namespace Passive
+        {
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);          // "GA.Passive"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(ListenForEvent) // "GA.Passive.ListenForEvent"
         }
     }
 

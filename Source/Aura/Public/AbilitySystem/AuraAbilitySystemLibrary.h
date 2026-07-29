@@ -7,6 +7,7 @@
 #include "UI/Widget/DamageFloatingTextComponent.h"
 #include "AuraAbilitySystemLibrary.generated.h"
 
+class UGameplayEffect;
 struct FGameplayEffectContextHandle;
 class UCharacterClassInfo;
 class UAuraAbilitySystemComponent;
@@ -35,12 +36,15 @@ public:
     static UCharacterClassInfo* GetEnemyCharacterClassInfo(const UObject* WorldContextObject);
 
     UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults", meta = (WorldContext="WorldContextObject"))
-    static void InitEnemyDefaultAttributesByClass(const UObject* WorldContextObject, ECharacterClass EnemyClass, float Level,
-                                                  UAuraAbilitySystemComponent* ASC);
+    static void InitEnemyDefaultAttributesByClass(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC,
+                                                  ECharacterClass EnemyClass, int32 EnemyLevel = 1);
 
     UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults", meta = (WorldContext="WorldContextObject"))
     static void GrantEnemyStartupAbilities(const UObject* WorldContextObject, UAuraAbilitySystemComponent* ASC,
-                                           ECharacterClass CharacterClass);
+                                           ECharacterClass CharacterClass, int32 EnemyLevel = 1);
+
+    UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults", meta = (WorldContext="WorldContextObject"))
+    static int32 GetEnemyXpRewardByClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 EnemyLevel = 1);
 #pragma endregion
 
 #pragma region Gameplay Effects
@@ -103,5 +107,9 @@ public:
     static void DrawDebugSector(const UObject* WorldContextObject, const FVector& CenterPos, const FVector& ForwardDir, float InnerRadius,
                                 float OuterRadius, float ArcAngle, FLinearColor Color = FLinearColor::Green, float Duration = 0.f,
                                 float Thickness = 2.f);
+
+    UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|Debug")
+    static void Debug_ApplyEventBasedEffect(UAuraAbilitySystemComponent* ASC, TSubclassOf<UGameplayEffect> GEClass,
+                                            const FGameplayTag& MagnitudeTag, float MagnitudeValue);
 #pragma endregion
 };

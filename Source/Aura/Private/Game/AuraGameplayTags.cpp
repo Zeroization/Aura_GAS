@@ -110,6 +110,9 @@ namespace AuraGameplayTags
             UE_DEFINE_GAMEPLAY_TAG_COMMENT(IncomingDamage,
                                            "Attribute.Meta.IncomingDamage",
                                            "当前角色在本次受到的总伤害, 在AttributeSet中统一处理");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(IncomingXp,
+                                           "Attribute.Meta.IncomingXp",
+                                           "当前角色在本次获取到的奖励经验总值, 在AttributeSet中统一处理");
         }
     }
 
@@ -143,6 +146,16 @@ namespace AuraGameplayTags
             UE_DEFINE_GAMEPLAY_TAG_COMMENT(FireBolt,
                                            "GA.Fire.FireBolt",
                                            "通过此Tag激活火球攻击");
+        }
+
+        namespace Passive
+        {
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                           "GA.Passive",
+                                           "被动触发类型GA; 此Tag仅用于Tag相关操作(如Matches)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(ListenForEvent,
+                                           "GA.Passive.ListenForEvent",
+                                           "监听GameplayTagEvent的被动GA")
         }
     }
 

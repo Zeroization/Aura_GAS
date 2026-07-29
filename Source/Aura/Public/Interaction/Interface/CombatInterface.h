@@ -55,15 +55,17 @@ class AURA_API ICombatInterface
     // Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 #pragma region 通用
-    virtual int32 GetActorLevel();
     virtual void Die() = 0;
+
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    int32 GetActorLevel();
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     FVector GetCombatSocketLocation(const FGameplayTag& SocketTag);
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     FAuraTaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag);
-    
+
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     TArray<FAuraTaggedMontage> GetTaggedAttackMontages();
 
@@ -75,10 +77,10 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     int32 GetMinionCount();
-    
+
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     void IncreaseMinionCountByAmount(int32 Amount);
-    
+
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     UNiagaraSystem* GetImpactBloodEffect();
 
@@ -97,5 +99,8 @@ public:
     // 获取敌人的CombatTarget
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     AActor* GetCombatTarget() const;
+
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+    ECharacterClass GetCharacterClassEnum();
 #pragma endregion
 };
