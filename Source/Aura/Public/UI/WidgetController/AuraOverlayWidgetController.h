@@ -45,6 +45,9 @@ public:
     UPROPERTY(BlueprintAssignable, Category = "GAS|Stats")
     FOnPlayerStatChangedSignature OnXpPercentChanged;
 
+    UPROPERTY(BlueprintAssignable, Category = "GAS|Stats")
+    FOnPlayerStatChangedSignature OnLevelNumberChanged;
+
     void BroadcastAbilityData();
     virtual void BroadcastInitialValues() override;
     virtual void BindDelegateCallbackFunctions() override;

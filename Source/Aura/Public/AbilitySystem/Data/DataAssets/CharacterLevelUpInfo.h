@@ -31,8 +31,8 @@ class AURA_API UCharacterLevelUpInfo : public UDataAsset
 
 public:
     UPROPERTY(EditDefaultsOnly)
-    TArray<FAuraSingleLevelUpInfo> AuraLevelUpInfo;
+    TArray<FAuraSingleLevelUpInfo> LevelUpInfos;
 
     UFUNCTION(BlueprintCallable)
-    int32 GetLevelByCurrentXP(int32 XP, bool bOutputLog = false) const;
+    int32 GetLevelByXP(int32 XP, bool bOutputLog = false) const;
 };

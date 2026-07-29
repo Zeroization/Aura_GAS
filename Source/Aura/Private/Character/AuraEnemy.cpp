@@ -180,7 +180,7 @@ void AAuraEnemy::Die()
     Super::Die();
 }
 
-int32 AAuraEnemy::GetActorLevel()
+int32 AAuraEnemy::GetActorLevel_Implementation()
 {
     return Level;
 }

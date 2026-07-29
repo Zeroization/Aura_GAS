@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+class UGameplayEffect;
 struct FDamageFloatingTextProperty;
 class UDamageFloatingTextComponent;
 class USplineComponent;
@@ -32,6 +33,9 @@ public:
     void ShowDamageFloatingText(ACharacter* TargetCharacter, const FDamageFloatingTextProperty& Property);
 
 #pragma region Debug/Cheat
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Aura Player Controller|Debug")
+    TSubclassOf<UGameplayEffect> GE_EventBasedEffect;
+
     UFUNCTION(Server, Reliable)
     void ServerAddXpForDebug(int32 Amount);
 #pragma endregion

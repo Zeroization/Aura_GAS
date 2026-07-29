@@ -7,6 +7,7 @@
 #include "UI/Widget/DamageFloatingTextComponent.h"
 #include "AuraAbilitySystemLibrary.generated.h"
 
+class UGameplayEffect;
 struct FGameplayEffectContextHandle;
 class UCharacterClassInfo;
 class UAuraAbilitySystemComponent;
@@ -106,5 +107,9 @@ public:
     static void DrawDebugSector(const UObject* WorldContextObject, const FVector& CenterPos, const FVector& ForwardDir, float InnerRadius,
                                 float OuterRadius, float ArcAngle, FLinearColor Color = FLinearColor::Green, float Duration = 0.f,
                                 float Thickness = 2.f);
+
+    UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|Debug")
+    static void Debug_ApplyEventBasedEffect(UAuraAbilitySystemComponent* ASC, TSubclassOf<UGameplayEffect> GEClass,
+                                            const FGameplayTag& MagnitudeTag, float MagnitudeValue);
 #pragma endregion
 };

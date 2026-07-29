@@ -8,6 +8,7 @@
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Components/SplineComponent.h"
 #include "Game/AuraGameplayTags.h"
 #include "GameFramework/Character.h"
@@ -70,7 +71,7 @@ void AAuraPlayerController::BeginPlay()
     InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
     InputModeData.SetHideCursorDuringCapture(false);
     SetInputMode(InputModeData);
-    
+
 #if WITH_EDITOR
     // 开启作弊
     EnableCheats();
@@ -276,6 +277,7 @@ void AAuraPlayerController::AbilityInputTagOnHeld(FGameplayTag InputTag)
 
 void AAuraPlayerController::ServerAddXpForDebug_Implementation(int32 Amount)
 {
-    AAuraPlayerState* AuraPS = CastChecked<AAuraPlayerState>(PlayerState);
-    AuraPS->AddXp(Amount);
+    UAuraAbilitySystemLibrary::Debug_ApplyEventBasedEffect(InitAndGetAuraASC(), GE_EventBasedEffect,
+                                                           AuraGameplayTags::Attribute::Meta::IncomingXp,
+                                                           Amount);
 }

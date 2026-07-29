@@ -36,12 +36,16 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
     const UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
     AActor* SourceAvatarActor = SourceASC ? SourceASC->GetAvatarActor() : nullptr;
     AActor* TargetAvatarActor = TargetASC ? TargetASC->GetAvatarActor() : nullptr;
-    TScriptInterface<ICombatInterface> SourceCombatInterface = (SourceAvatarActor && SourceAvatarActor->Implements<UCombatInterface>())
-                                                                   ? TScriptInterface<ICombatInterface>(SourceAvatarActor)
-                                                                   : nullptr;
-    TScriptInterface<ICombatInterface> TargetCombatInterface = (TargetAvatarActor && TargetAvatarActor->Implements<UCombatInterface>())
-                                                                   ? TScriptInterface<ICombatInterface>(TargetAvatarActor)
-                                                                   : nullptr;
+    int32 SourceAvatarActorLevel = 1;
+    if (SourceAvatarActor->Implements<UCombatInterface>())
+    {
+        SourceAvatarActorLevel = ICombatInterface::Execute_GetActorLevel(SourceAvatarActor);
+    }
+    int32 TargetAvatarActorLevel = 1;
+    if (TargetAvatarActor->Implements<UCombatInterface>())
+    {
+        TargetAvatarActorLevel = ICombatInterface::Execute_GetActorLevel(TargetAvatarActor);
+    }
 
     // 设置捕捉Attribute需要的参数
     FAggregatorEvaluateParameters EvaluateParameters;
@@ -99,13 +103,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
     // 获取CurveTable上的相关计算系数
     UCharacterClassInfo* EnemyCharacterClassInfo = UAuraAbilitySystemLibrary::GetEnemyCharacterClassInfo(SourceAvatarActor);
     FRealCurve* ArmorPenetrationCoefCurve = EnemyCharacterClassInfo->DamageCalcCoefficientTable->FindCurve(FName("ArmorPenetration"), {});
-    float ArmorPenetrationCoef = (SourceCombatInterface && ArmorPenetrationCoefCurve)
-                                     ? ArmorPenetrationCoefCurve->Eval(SourceCombatInterface->GetActorLevel())
-                                     : 0.25f;
+    float ArmorPenetrationCoef = ArmorPenetrationCoefCurve->Eval(SourceAvatarActorLevel);
     FRealCurve* EffectiveArmorCoefCurve = EnemyCharacterClassInfo->DamageCalcCoefficientTable->FindCurve(FName("EffectiveArmor"), {});
-    float EffectiveArmorCoef = (TargetCombatInterface && EffectiveArmorCoefCurve)
-                                   ? EffectiveArmorCoefCurve->Eval(TargetCombatInterface->GetActorLevel())
-                                   : 0.333f;
+    float EffectiveArmorCoef = EffectiveArmorCoefCurve->Eval(TargetAvatarActorLevel);
 
     float EffectiveTargetArmor = TargetArmor * (100.f - SourceArmorPenetration * ArmorPenetrationCoef) / 100.f;
     Damage = Damage * (100.f - EffectiveTargetArmor * EffectiveArmorCoef) / 100.f;
@@ -132,9 +132,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
     FRealCurve* CriticalHitResCoefCurve = EnemyCharacterClassInfo->DamageCalcCoefficientTable->
                                                                    FindCurve(FName("CriticalHitResistance"), {});
-    float CriticalHitResCoef = (TargetCombatInterface && CriticalHitResCoefCurve)
-                                   ? CriticalHitResCoefCurve->Eval(TargetCombatInterface->GetActorLevel())
-                                   : 0.15f;
+    float CriticalHitResCoef = CriticalHitResCoefCurve->Eval(TargetAvatarActorLevel);
     const float EffectiveCriticalHitChance = FMath::Max<float>(SourceCriticalHitChance - TargetCriticalHitResistance * CriticalHitResCoef,
                                                                0.f);
     const bool bSuccessfulCriticalHit = FMath::RandRange(1, 100) <= EffectiveCriticalHitChance;

@@ -28,6 +28,7 @@ void UAuraOverlayWidgetController::BroadcastInitialValues()
     OnMaxHealthChanged.Broadcast(AuraAttributeSet->GetMaxHealth());
     OnManaChanged.Broadcast(AuraAttributeSet->GetMana());
     OnMaxManaChanged.Broadcast(AuraAttributeSet->GetMaxMana());
+    OnLevelNumberChanged.Broadcast(AuraPlayerState->GetPlayerLevel());
 }
 
 void UAuraOverlayWidgetController::BindDelegateCallbackFunctions()
@@ -35,6 +36,10 @@ void UAuraOverlayWidgetController::BindDelegateCallbackFunctions()
 #pragma region PS
     // AAuraPlayerState::FOnPlayerStatChangeDelegate
     AuraPlayerState->OnPlayerXpChange.AddUObject(this, &UAuraOverlayWidgetController::OnXpChanged);
+    AuraPlayerState->OnPlayerLevelChange.AddLambda([this](int32 NewLevel)
+    {
+        OnLevelNumberChanged.Broadcast(NewLevel);
+    });
 #pragma endregion
 
 #pragma region ASC
@@ -116,14 +121,14 @@ void UAuraOverlayWidgetController::OnXpChanged(int32 NewXp)
 {
     UCharacterLevelUpInfo* LevelUpInfo = AuraPlayerState->AuraLevelUpInfo;
     checkf(LevelUpInfo, TEXT("[%hs]: Can't find LevelUpInfo, please check out BP_AuraPlayerState."), __FUNCTION__);
-    
-    int32 CurLevel = LevelUpInfo->GetLevelByCurrentXP(NewXp, WITH_EDITOR);
-    int32 MaxLevel = LevelUpInfo->AuraLevelUpInfo.Num() - 1;
+
+    int32 CurLevel = LevelUpInfo->GetLevelByXP(NewXp);
+    int32 MaxLevel = LevelUpInfo->LevelUpInfos.Num() - 1;
     float XpBarPercent;
     if (CurLevel <= MaxLevel && CurLevel != INDEX_NONE)
     {
-        int32 PrevLevelRequireXp = (CurLevel >= 1) ? LevelUpInfo->AuraLevelUpInfo[CurLevel - 1].LevelUpRequirement : 0;
-        int32 CurLevelRequireXP = LevelUpInfo->AuraLevelUpInfo[CurLevel].LevelUpRequirement;
+        int32 PrevLevelRequireXp = (CurLevel >= 1) ? LevelUpInfo->LevelUpInfos[CurLevel - 1].LevelUpRequirement : 0;
+        int32 CurLevelRequireXP = LevelUpInfo->LevelUpInfos[CurLevel].LevelUpRequirement;
 
         int32 XpBarCurXp = NewXp - PrevLevelRequireXp;
         int32 XpBarDeltaXp = CurLevelRequireXP - PrevLevelRequireXp;

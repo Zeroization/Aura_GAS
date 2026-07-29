@@ -98,37 +98,7 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
         const float LocalIncomingDamage = GetIncomingDamage();
         SetIncomingDamage(0.f);
 
-        if (LocalIncomingDamage > 0.f)
-        {
-            const float NewHealth = GetHealth() - LocalIncomingDamage;
-            SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
-
-            // 处理目标受伤逻辑
-            const bool bIsDead = NewHealth <= 0.f;
-            if (bIsDead)
-            {
-                AActor* TargetAvatarActor = EffectProperties.TargetAvatarActor;
-                if (TargetAvatarActor->Implements<UCombatInterface>())
-                {
-                    SendXpRewardEvent(EffectProperties);
-                    
-                    const TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(TargetAvatarActor);
-                    CombatInterface->Die();
-                }
-            }
-            else
-            {
-                FGameplayTagContainer TagContainer;
-                TagContainer.AddTag(AuraGameplayTags::GE::HitReact.GetTag());
-                EffectProperties.TargetASC->TryActivateAbilitiesByTag(TagContainer);
-            }
-
-            // 在敌人身上显示伤害数字
-            if (EffectProperties.SourceCharacter != EffectProperties.TargetCharacter)
-            {
-                ShowDamageText(EffectProperties, LocalIncomingDamage);
-            }
-        }
+        HandleIncomingDamage(EffectProperties, LocalIncomingDamage);
     }
 
     // 处理IncomingXp
@@ -136,13 +106,8 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
     {
         const float LocalIncomingXp = GetIncomingXp();
         SetIncomingXp(0.f);
-        
-        // TODO: 处理升级逻辑
-        
-        if (EffectProperties.SourceCharacter->Implements<UPlayerInterface>())
-        {
-            IPlayerInterface::Execute_PlayerAddXp(EffectProperties.SourceCharacter, LocalIncomingXp);
-        }
+
+        HandleIncomingXp(EffectProperties, LocalIncomingXp);
     }
 }
 
@@ -314,15 +279,89 @@ void UAuraAttributeSet::SendXpRewardEvent(const FEffectProperties& Props)
 {
     if (Props.TargetCharacter->Implements<UCombatInterface>())
     {
-        const TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(Props.TargetCharacter);
-        const int32 TargetLevel = CombatInterface->GetActorLevel();
+        const int32 TargetLevel = ICombatInterface::Execute_GetActorLevel(Props.TargetCharacter);
         const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClassEnum(Props.TargetCharacter);
         int32 XpReward = UAuraAbilitySystemLibrary::GetEnemyXpRewardByClassAndLevel(Props.TargetCharacter, TargetClass, TargetLevel);
-        
+
         FGameplayEventData Payload;
         Payload.EventTag = AuraGameplayTags::Attribute::Meta::IncomingXp;
         Payload.EventMagnitude = XpReward;
         UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Props.SourceCharacter, AuraGameplayTags::Attribute::Meta::IncomingXp,
                                                                  Payload);
+    }
+}
+
+void UAuraAttributeSet::HandleIncomingXp(const FEffectProperties& Props, float LocalIncomingXp)
+{
+    // GA_ListenForEvent施加GE_EventBasedEffect, 因此要对拥有者SourceCharacter增加经验
+    ACharacter* SourceCharacter = Props.SourceCharacter;
+    if (!SourceCharacter || !SourceCharacter->Implements<UCombatInterface>() || !SourceCharacter->Implements<UCombatInterface>())
+    {
+        return;
+    }
+
+    // 处理升级逻辑
+    const int32 XpReward = FMath::RoundToInt(LocalIncomingXp);
+    const int32 OldLevel = ICombatInterface::Execute_GetActorLevel(SourceCharacter);
+    const int32 OldXp = IPlayerInterface::Execute_PlayerGetXp(SourceCharacter);
+
+    const int32 NewXp = OldXp + XpReward;
+    const int32 NewLevel = IPlayerInterface::Execute_PlayerGetLevelByXp(SourceCharacter, NewXp);
+    const int32 DeltaLevel = NewLevel - OldLevel;
+
+    IPlayerInterface::Execute_PlayerAddXp(Props.SourceCharacter, XpReward);
+
+    if (DeltaLevel > 0)
+    {
+        int32 AttributePointReward = 0;
+        int32 SkillPointReward = 0;
+        for (int32 Level = OldLevel + 1; Level <= NewLevel; ++Level)
+        {
+            AttributePointReward += IPlayerInterface::Execute_PlayerGetAttributePointReward(SourceCharacter, Level);
+            SkillPointReward += IPlayerInterface::Execute_PlayerGetSkillPointReward(SourceCharacter, Level);
+        }
+        IPlayerInterface::Execute_PlayerAddAttributePoint(SourceCharacter, AttributePointReward);
+        IPlayerInterface::Execute_PlayerAddSkillPoint(SourceCharacter, SkillPointReward);
+        IPlayerInterface::Execute_PlayerAddLevel(SourceCharacter, DeltaLevel);
+
+        SetHealth(GetMaxHealth());
+        SetMana(GetMaxMana());
+
+        IPlayerInterface::Execute_PlayerOnLevelUp(Props.SourceCharacter);
+    }
+}
+
+void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props, float LocalIncomingDamage)
+{
+    if (LocalIncomingDamage > 0.f)
+    {
+        const float NewHealth = GetHealth() - LocalIncomingDamage;
+        SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+        // 处理目标受伤逻辑
+        const bool bIsDead = NewHealth <= 0.f;
+        if (bIsDead)
+        {
+            AActor* TargetAvatarActor = Props.TargetAvatarActor;
+            if (TargetAvatarActor->Implements<UCombatInterface>())
+            {
+                SendXpRewardEvent(Props);
+
+                const TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(TargetAvatarActor);
+                CombatInterface->Die();
+            }
+        }
+        else
+        {
+            FGameplayTagContainer TagContainer;
+            TagContainer.AddTag(AuraGameplayTags::GE::HitReact.GetTag());
+            Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+        }
+
+        // 在敌人身上显示伤害数字
+        if (Props.SourceCharacter != Props.TargetCharacter)
+        {
+            ShowDamageText(Props, LocalIncomingDamage);
+        }
     }
 }

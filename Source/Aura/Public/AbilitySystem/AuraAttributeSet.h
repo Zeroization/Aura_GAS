@@ -254,4 +254,6 @@ private:
     void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props);
     void ShowDamageText(const FEffectProperties& Props, float LocalIncomingDamage);
     void SendXpRewardEvent(const FEffectProperties& Props);
+    void HandleIncomingXp(const FEffectProperties& Props, float LocalIncomingXp);
+    void HandleIncomingDamage(const FEffectProperties& Props, float LocalIncomingDamage);
 };

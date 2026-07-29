@@ -5,9 +5,9 @@
 
 #include "Aura/Aura.h"
 
-int32 UCharacterLevelUpInfo::GetLevelByCurrentXP(int32 XP, bool bOutputLog) const
+int32 UCharacterLevelUpInfo::GetLevelByXP(int32 XP, bool bOutputLog) const
 {
-    const int32 LevelIdx = AuraLevelUpInfo.IndexOfByPredicate([XP, bOutputLog](const FAuraSingleLevelUpInfo& Info) -> bool
+    const int32 LevelIdx = LevelUpInfos.IndexOfByPredicate([XP, bOutputLog](const FAuraSingleLevelUpInfo& Info) -> bool
     {
         if (bOutputLog)
         {

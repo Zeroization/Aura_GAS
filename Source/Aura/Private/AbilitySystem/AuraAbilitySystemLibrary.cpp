@@ -101,9 +101,9 @@ void UAuraAbilitySystemLibrary::GrantEnemyStartupAbilities(const UObject* WorldC
     {
         // 职业GA
         const FCharacterClassDefaultInfo ClassDefaultInfo = EnemyClassInfo->CharacterClassInfoMap[CharacterClass];
-        if (TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(ASC->GetAvatarActor()))
+        if (ASC->GetAvatarActor()->Implements<UCombatInterface>())
         {
-            EnemyLevel = CombatInterface->GetActorLevel();
+            EnemyLevel = ICombatInterface::Execute_GetActorLevel(ASC->GetAvatarActor());
         }
         for (const auto& AbilityClass : ClassDefaultInfo.DefaultAbilities)
         {
@@ -260,4 +260,17 @@ void UAuraAbilitySystemLibrary::DrawDebugSector(const UObject* WorldContextObjec
     FVector RightStartPos = CenterPos + ForwardDir.RotateAngleAxis(ArcAngle / 2.0f, FVector::UpVector) * InnerRadius;
     FVector RightEndPos = CenterPos + ForwardDir.RotateAngleAxis(ArcAngle / 2.0f, FVector::UpVector) * OuterRadius;
     UKismetSystemLibrary::DrawDebugLine(WorldContextObject, RightStartPos, RightEndPos, Color, Duration, Thickness);
+}
+
+void UAuraAbilitySystemLibrary::Debug_ApplyEventBasedEffect(UAuraAbilitySystemComponent* ASC, TSubclassOf<UGameplayEffect> GEClass,
+                                                            const FGameplayTag& MagnitudeTag, float MagnitudeValue)
+{
+    checkf(ASC, TEXT("[%hs] Invalid ASC!"), __FUNCTION__);
+    checkf(GEClass, TEXT("[%hs] Invalid GEClass, please fill in GE_EventBasedEffect!"), __FUNCTION__);
+
+    FGameplayEffectContextHandle GEContextHandle = ASC->MakeEffectContext();
+    FGameplayEffectSpecHandle GESpecHandle = ASC->MakeOutgoingSpec(GEClass, 1.f, GEContextHandle);
+    GESpecHandle.Data->SetSetByCallerMagnitude(MagnitudeTag, MagnitudeValue);
+
+    ASC->ApplyGameplayEffectSpecToSelf(*GESpecHandle.Data);
 }
