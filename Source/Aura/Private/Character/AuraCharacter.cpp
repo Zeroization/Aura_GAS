@@ -69,9 +69,7 @@ void AAuraCharacter::OnRep_PlayerState()
 
 int32 AAuraCharacter::GetActorLevel_Implementation()
 {
-    AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-    checkf(AuraPlayerState, TEXT("[%hs] AuraPlayerState is nullptr!"), __FUNCTION__);
-    return AuraPlayerState->GetPlayerLevel();
+    return GetAuraPlayerState()->GetPlayerLevel();
 }
 
 ECharacterClass AAuraCharacter::GetCharacterClassEnum_Implementation()
@@ -82,60 +80,42 @@ ECharacterClass AAuraCharacter::GetCharacterClassEnum_Implementation()
 
 void AAuraCharacter::PlayerAddXp_Implementation(int32 InXp)
 {
-    AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-    checkf(IsValid(AuraPlayerState), TEXT("Can't get AuraPlayerState !!!"));
-
-    AuraPlayerState->AddXp(InXp);
+    return GetAuraPlayerState()->AddXp(InXp);
 }
 
 void AAuraCharacter::PlayerAddLevel_Implementation(int32 InLevel)
 {
-    AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-    checkf(IsValid(AuraPlayerState), TEXT("Can't get AuraPlayerState !!!"));
-
-    AuraPlayerState->AddLevel(InLevel);
+    return GetAuraPlayerState()->AddLevel(InLevel);
 }
 
 void AAuraCharacter::PlayerAddAttributePoint_Implementation(int32 InAttributePoint)
 {
-    // TODO
+    return GetAuraPlayerState()->AddAttributePoint(InAttributePoint);
 }
 
 void AAuraCharacter::PlayerAddSkillPoint_Implementation(int32 InSkillPoint)
 {
-    // TODO
+    return GetAuraPlayerState()->AddSkillPoint(InSkillPoint);
 }
 
 int32 AAuraCharacter::PlayerGetXp_Implementation() const
 {
-    AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-    checkf(IsValid(AuraPlayerState), TEXT("Can't get AuraPlayerState !!!"));
-
-    return AuraPlayerState->GetXp();
+    return GetAuraPlayerState()->GetXp();
 }
 
 int32 AAuraCharacter::PlayerGetLevelByXp_Implementation(int32 InXp) const
 {
-    AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-    checkf(IsValid(AuraPlayerState), TEXT("Can't get AuraPlayerState !!!"));
-
-    return AuraPlayerState->AuraLevelUpInfo->GetLevelByXP(InXp);
+    return GetAuraPlayerState()->AuraLevelUpInfo->GetLevelByXP(InXp);
 }
 
 int32 AAuraCharacter::PlayerGetAttributePointReward_Implementation(int32 InLevel) const
 {
-    AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-    checkf(IsValid(AuraPlayerState), TEXT("Can't get AuraPlayerState !!!"));
-
-    return AuraPlayerState->AuraLevelUpInfo->LevelUpInfos[InLevel].AttributePointReward;
+    return GetAuraPlayerState()->AuraLevelUpInfo->LevelUpInfos[InLevel].AttributePointReward;
 }
 
 int32 AAuraCharacter::PlayerGetSkillPointReward_Implementation(int32 InLevel) const
 {
-    AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-    checkf(IsValid(AuraPlayerState), TEXT("Can't get AuraPlayerState !!!"));
-
-    return AuraPlayerState->AuraLevelUpInfo->LevelUpInfos[InLevel].SkillPointReward;
+    return GetAuraPlayerState()->AuraLevelUpInfo->LevelUpInfos[InLevel].SkillPointReward;
 }
 
 void AAuraCharacter::PlayerOnLevelUp_Implementation()
@@ -174,6 +154,13 @@ void AAuraCharacter::InitPlayerHUD()
             AuraHUD->InitHUD(AuraPlayerController, AuraPlayerState, AuraAbilitySystemComponent, AuraAttributeSet);
         }
     }
+}
+
+AAuraPlayerState* AAuraCharacter::GetAuraPlayerState() const
+{
+    AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+    checkf(IsValid(AuraPlayerState), TEXT("Can't get AuraPlayerState !!!"));
+    return AuraPlayerState;
 }
 
 void AAuraCharacter::Multicast_PlayLevelUpVFX_Implementation() const

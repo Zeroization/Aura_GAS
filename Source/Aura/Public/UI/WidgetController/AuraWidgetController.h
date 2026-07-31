@@ -7,6 +7,8 @@
 #include "UObject/NoExportTypes.h"
 #include "AuraWidgetController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangedSignature, float, NewValue);
+
 class AAuraPlayerController;
 class AAuraPlayerState;
 class UAuraAbilitySystemComponent;
@@ -15,29 +17,29 @@ class UAuraAttributeSet;
 USTRUCT(BlueprintType)
 struct FAuraWidgetControllerParams
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-	FAuraWidgetControllerParams() = default;
+    FAuraWidgetControllerParams() = default;
 
-	FAuraWidgetControllerParams(AAuraPlayerController* InPlayerController, AAuraPlayerState* InPlayerState,
-	                            UAuraAbilitySystemComponent* InAbilitySystemComponent,
-	                            UAuraAttributeSet* InAttributeSet)
-		: PlayerController(InPlayerController), PlayerState(InPlayerState),
-		  AbilitySystemComponent(InAbilitySystemComponent), AttributeSet(InAttributeSet)
-	{
-	}
+    FAuraWidgetControllerParams(AAuraPlayerController* InPlayerController, AAuraPlayerState* InPlayerState,
+                                UAuraAbilitySystemComponent* InAbilitySystemComponent,
+                                UAuraAttributeSet* InAttributeSet)
+        : PlayerController(InPlayerController), PlayerState(InPlayerState),
+          AbilitySystemComponent(InAbilitySystemComponent), AttributeSet(InAttributeSet)
+    {
+    }
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<AAuraPlayerController> PlayerController = nullptr;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TObjectPtr<AAuraPlayerController> PlayerController = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<AAuraPlayerState> PlayerState = nullptr;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TObjectPtr<AAuraPlayerState> PlayerState = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UAuraAbilitySystemComponent> AbilitySystemComponent = nullptr;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TObjectPtr<UAuraAbilitySystemComponent> AbilitySystemComponent = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UAuraAttributeSet> AttributeSet = nullptr;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TObjectPtr<UAuraAttributeSet> AttributeSet = nullptr;
 };
 
 /**
@@ -47,28 +49,28 @@ struct FAuraWidgetControllerParams
 UCLASS()
 class AURA_API UAuraWidgetController : public UObject
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void SetWidgetControllerParams(const FAuraWidgetControllerParams& InParams);
+    UFUNCTION(BlueprintCallable)
+    void SetWidgetControllerParams(const FAuraWidgetControllerParams& InParams);
 
-	UFUNCTION(BlueprintCallable)
-	virtual void BroadcastInitialValues();
-	virtual void BindDelegateCallbackFunctions();
+    UFUNCTION(BlueprintCallable)
+    virtual void BroadcastInitialValues();
+    virtual void BindDelegateCallbackFunctions();
 
 protected:
-	/// Begin Category: Widget Controller >>>>>>>>>>>>>>>>>>>>>>>
-	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
-	TObjectPtr<AAuraPlayerController> AuraPlayerController;
+    /// Begin Category: Widget Controller >>>>>>>>>>>>>>>>>>>>>>>
+    UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
+    TObjectPtr<AAuraPlayerController> AuraPlayerController;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
-	TObjectPtr<AAuraPlayerState> AuraPlayerState;
+    UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
+    TObjectPtr<AAuraPlayerState> AuraPlayerState;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
-	TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
+    UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
+    TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
-	TObjectPtr<UAuraAttributeSet> AuraAttributeSet;
-	/// End Category: Widget Controller   >>>>>>>>>>>>>>>>>>>>>>>
+    UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
+    TObjectPtr<UAuraAttributeSet> AuraAttributeSet;
+    /// End Category: Widget Controller   >>>>>>>>>>>>>>>>>>>>>>>
 };

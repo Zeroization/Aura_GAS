@@ -10,67 +10,103 @@
 
 AAuraPlayerState::AAuraPlayerState()
 {
-	NetUpdateFrequency = 100.f;
+    NetUpdateFrequency = 100.f;
 
-	// 对于玩家, 需要将 AbilitySystem 和 AttributeSet 放到 PlayerState
-	AbilitySystemComponent = CreateDefaultSubobject<UAuraAbilitySystemComponent>("AbilitySystemComponent");
-	AbilitySystemComponent->SetIsReplicated(true);
-	/**
-	 * 有关ReplicationMode:
-	 *		1. Full:	适用于极少数玩家场景(单机/局域网), Gameplay Effects会被同步到所有客户端中;
-	 *		2. Mixed:	适用于多人游戏, 玩家控制的, Gameplay Effects只会被同步到玩家拥有的客户端中,
-	 *					Gameplay Cues 和 GameplayTags 会被同步到所有客户端中;
-	 *		3. Minimal:	适用于多人游戏, AI控制的, Gameplay Effects不会被同步, Gameplay Cues 和
-	 *					GameplayTags 会被同步到所有客户端中.
-	 */
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+    // 对于玩家, 需要将 AbilitySystem 和 AttributeSet 放到 PlayerState
+    AbilitySystemComponent = CreateDefaultSubobject<UAuraAbilitySystemComponent>("AbilitySystemComponent");
+    AbilitySystemComponent->SetIsReplicated(true);
+    /**
+     * 有关ReplicationMode:
+     *		1. Full:	适用于极少数玩家场景(单机/局域网), Gameplay Effects会被同步到所有客户端中;
+     *		2. Mixed:	适用于多人游戏, 玩家控制的, Gameplay Effects只会被同步到玩家拥有的客户端中,
+     *					Gameplay Cues 和 GameplayTags 会被同步到所有客户端中;
+     *		3. Minimal:	适用于多人游戏, AI控制的, Gameplay Effects不会被同步, Gameplay Cues 和
+     *					GameplayTags 会被同步到所有客户端中.
+     */
+    AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
-	AttributeSet = CreateDefaultSubobject<UAuraAttributeSet>("AttributeSet");
+    AttributeSet = CreateDefaultSubobject<UAuraAttributeSet>("AttributeSet");
 }
 
 UAbilitySystemComponent* AAuraPlayerState::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent;
+    return AbilitySystemComponent;
 }
 
 void AAuraPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AAuraPlayerState, Level);
-	DOREPLIFETIME(AAuraPlayerState, Xp);
+    DOREPLIFETIME(AAuraPlayerState, Level);
+    DOREPLIFETIME(AAuraPlayerState, Xp);
+    DOREPLIFETIME(AAuraPlayerState, AttributePoint);
+    DOREPLIFETIME(AAuraPlayerState, SkillPoint);
 }
 
 void AAuraPlayerState::AddLevel(int32 InLevel)
 {
-	Level += InLevel;
-	OnPlayerLevelChange.Broadcast(Level);
+    Level += InLevel;
+    OnPlayerLevelChange.Broadcast(Level);
 }
 
 void AAuraPlayerState::AddXp(int32 InXp)
 {
-	Xp += InXp;
-	OnPlayerXpChange.Broadcast(Xp);
+    Xp += InXp;
+    OnPlayerXpChange.Broadcast(Xp);
+}
+
+void AAuraPlayerState::AddAttributePoint(int32 InAttributePoint)
+{
+    AttributePoint += InAttributePoint;
+    OnPlayerAttributePointChange.Broadcast(AttributePoint);
+}
+
+void AAuraPlayerState::AddSkillPoint(int32 InSkillPoint)
+{
+    SkillPoint += InSkillPoint;
+    OnPlayerSkillPointChange.Broadcast(SkillPoint);
 }
 
 void AAuraPlayerState::SetLevel(int32 NewLevel)
 {
-	Level = NewLevel;
-	OnPlayerLevelChange.Broadcast(Level);
+    Level = NewLevel;
+    OnPlayerLevelChange.Broadcast(Level);
 }
 
 void AAuraPlayerState::SetXp(int32 NewXp)
 {
-	Xp = NewXp;
-	OnPlayerXpChange.Broadcast(Xp);
+    Xp = NewXp;
+    OnPlayerXpChange.Broadcast(Xp);
+}
+
+void AAuraPlayerState::SetAttributePoint(int32 NewAttributePoint)
+{
+    AttributePoint = NewAttributePoint;
+    OnPlayerAttributePointChange.Broadcast(AttributePoint);
+}
+
+void AAuraPlayerState::SetSkillPoint(int32 NewSkillPoint)
+{
+    SkillPoint = NewSkillPoint;
+    OnPlayerSkillPointChange.Broadcast(SkillPoint);
 }
 
 void AAuraPlayerState::OnRep_Level(int32 OldLevel)
 {
-	OnPlayerLevelChange.Broadcast(Level);
+    OnPlayerLevelChange.Broadcast(Level);
 }
 
 void AAuraPlayerState::OnRep_Xp(int32 OldXp)
 {
-	OnPlayerXpChange.Broadcast(Xp);
+    OnPlayerXpChange.Broadcast(Xp);
+}
+
+void AAuraPlayerState::OnRep_AttributePoint(int32 OldAttributePoint)
+{
+    OnPlayerAttributePointChange.Broadcast(AttributePoint);
+}
+
+void AAuraPlayerState::OnRep_SkillPoint(int32 OldSkillPoint)
+{
+    OnPlayerSkillPointChange.Broadcast(SkillPoint);
 }

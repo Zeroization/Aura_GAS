@@ -17,4 +17,10 @@ class AURA_API UAuraCheatManager : public UCheatManager
 public:
     UFUNCTION(Exec)
     void AddXp(int32 Amount);
+
+    UFUNCTION(Exec)
+    void AddAttributePoint(int32 Amount);
+
+    UFUNCTION(Exec)
+    void AddSkillPoint(int32 Amount);
 };

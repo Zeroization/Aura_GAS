@@ -14,6 +14,7 @@
 #include "GameFramework/Character.h"
 #include "Input/AuraInputComponent.h"
 #include "Interaction/Interface/Interactable.h"
+#include "Interaction/Interface/PlayerInterface.h"
 #include "Player/AuraPlayerState.h"
 #include "Tools/AuraCheatManager.h"
 #include "UI/Widget/DamageFloatingTextComponent.h"
@@ -41,6 +42,28 @@ void AAuraPlayerController::ShowDamageFloatingText_Implementation(ACharacter* Ta
         DamageTextComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
         DamageTextComp->SetDamageValue(Property);
     }
+}
+
+void AAuraPlayerController::Debug_ServerAddXp_Implementation(int32 Amount)
+{
+    UAuraAbilitySystemLibrary::Debug_ApplyEventBasedEffect(InitAndGetAuraASC(), GE_EventBasedEffect,
+                                                           AuraGameplayTags::Attribute::Meta::IncomingXp,
+                                                           Amount);
+}
+
+
+void AAuraPlayerController::Debug_ServerAddAttributePoint_Implementation(int32 Amount)
+{
+    checkf(GetCharacter()->Implements<UPlayerInterface>(), TEXT("[%hs]: Character %s doesn't implement UPlayerInterface!"), __FUNCTION__,
+           *GetNameSafe(GetCharacter()));
+    IPlayerInterface::Execute_PlayerAddAttributePoint(GetCharacter(), Amount);
+}
+
+void AAuraPlayerController::Debug_ServerAddSkillPoint_Implementation(int32 Amount)
+{
+    checkf(GetCharacter()->Implements<UPlayerInterface>(), TEXT("[%hs]: Character %s doesn't implement UPlayerInterface!"), __FUNCTION__,
+           *GetNameSafe(GetCharacter()));
+    IPlayerInterface::Execute_PlayerAddSkillPoint(GetCharacter(), Amount);
 }
 
 void AAuraPlayerController::PlayerTick(float DeltaTime)
@@ -273,11 +296,4 @@ void AAuraPlayerController::AbilityInputTagOnHeld(FGameplayTag InputTag)
 
     // 其他按键按住时的逻辑
     InitAndGetAuraASC()->AbilityInputTagOnHeld(InputTag);
-}
-
-void AAuraPlayerController::ServerAddXpForDebug_Implementation(int32 Amount)
-{
-    UAuraAbilitySystemLibrary::Debug_ApplyEventBasedEffect(InitAndGetAuraASC(), GE_EventBasedEffect,
-                                                           AuraGameplayTags::Attribute::Meta::IncomingXp,
-                                                           Amount);
 }

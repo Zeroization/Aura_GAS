@@ -8,6 +8,7 @@
 #include "Interaction/Interface/PlayerInterface.h"
 #include "AuraCharacter.generated.h"
 
+class AAuraPlayerState;
 class UNiagaraComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -60,6 +61,8 @@ private:
     virtual void InitAbilitySystem() override;
     void InitPlayerHUD();
     /// End: Init  <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    AAuraPlayerState* GetAuraPlayerState() const;
 
     UFUNCTION(NetMulticast, Reliable)
     void Multicast_PlayLevelUpVFX() const;
