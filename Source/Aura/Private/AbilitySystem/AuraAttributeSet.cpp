@@ -73,6 +73,22 @@ void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
     }
 }
 
+void UAuraAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+    Super::PostAttributeChange(Attribute, OldValue, NewValue);
+
+    if (Attribute == GetMaxHealthAttribute() && bMaxHealthWhenLevelUp)
+    {
+        SetHealth(GetMaxHealth());
+        bMaxHealthWhenLevelUp = false;
+    }
+    else if (Attribute == GetMaxManaAttribute() && bMaxManaWhenLevelUp)
+    {
+        SetMana(GetMaxMana());
+        bMaxManaWhenLevelUp = false;
+    }
+}
+
 void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
 {
     Super::PostGameplayEffectExecute(Data);
@@ -324,8 +340,8 @@ void UAuraAttributeSet::HandleIncomingXp(const FEffectProperties& Props, float L
         IPlayerInterface::Execute_PlayerAddSkillPoint(SourceCharacter, SkillPointReward);
         IPlayerInterface::Execute_PlayerAddLevel(SourceCharacter, DeltaLevel);
 
-        SetHealth(GetMaxHealth());
-        SetMana(GetMaxMana());
+        bMaxHealthWhenLevelUp = true;
+        bMaxManaWhenLevelUp = true;
 
         IPlayerInterface::Execute_PlayerOnLevelUp(Props.SourceCharacter);
     }

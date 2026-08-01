@@ -43,6 +43,11 @@ void UAuraAttributeMenuWidgetController::BroadcastInitialValues()
     PlayerAttributePointChangeDelegate.Broadcast(AuraPlayerState->GetAttributePoint());
 }
 
+void UAuraAttributeMenuWidgetController::UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint)
+{
+    AuraAbilitySystemComponent->UpgradePrimaryAttribute(PrimaryAttributeTag, CostAttributePoint);
+}
+
 void UAuraAttributeMenuWidgetController::BroadcastAttributeData(FAuraAttributeData& AttributeData) const
 {
     AttributeData.AttributeValue = AttributeData.Attribute.GetNumericValue(AuraAttributeSet);

@@ -7,6 +7,7 @@
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/DataAssets/CharacterClassInfo.h"
 #include "Game/AuraGameModeBase.h"
+#include "Game/AuraGameplayTags.h"
 #include "Interaction/Interface/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerController.h"
@@ -265,12 +266,33 @@ void UAuraAbilitySystemLibrary::DrawDebugSector(const UObject* WorldContextObjec
 void UAuraAbilitySystemLibrary::Debug_ApplyEventBasedEffect(UAuraAbilitySystemComponent* ASC, TSubclassOf<UGameplayEffect> GEClass,
                                                             const FGameplayTag& MagnitudeTag, float MagnitudeValue)
 {
+    static TArray<FGameplayTag> AvailableEventTags = {
+        AuraGameplayTags::Attribute::Meta::IncomingXp,
+        AuraGameplayTags::Attribute::Primary::Intelligence,
+        AuraGameplayTags::Attribute::Primary::Resilience,
+        AuraGameplayTags::Attribute::Primary::Strength,
+        AuraGameplayTags::Attribute::Primary::Vigor
+    };
+
+
     checkf(ASC, TEXT("[%hs] Invalid ASC!"), __FUNCTION__);
     checkf(GEClass, TEXT("[%hs] Invalid GEClass, please fill in GE_EventBasedEffect!"), __FUNCTION__);
 
     FGameplayEffectContextHandle GEContextHandle = ASC->MakeEffectContext();
     FGameplayEffectSpecHandle GESpecHandle = ASC->MakeOutgoingSpec(GEClass, 1.f, GEContextHandle);
-    GESpecHandle.Data->SetSetByCallerMagnitude(MagnitudeTag, MagnitudeValue);
+
+    // 防止蓝图侧的GetSetbyCallerMagnitude()报错, 得对所有的EventTag设初值
+    for (const FGameplayTag& EventTag : AvailableEventTags)
+    {
+        if (MagnitudeTag.MatchesTagExact(EventTag))
+        {
+            GESpecHandle.Data->SetSetByCallerMagnitude(MagnitudeTag, MagnitudeValue);
+        }
+        else
+        {
+            GESpecHandle.Data->SetSetByCallerMagnitude(EventTag, 0.f);
+        }
+    }
 
     ASC->ApplyGameplayEffectSpecToSelf(*GESpecHandle.Data);
 }

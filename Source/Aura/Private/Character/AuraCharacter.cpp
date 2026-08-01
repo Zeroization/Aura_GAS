@@ -118,6 +118,16 @@ int32 AAuraCharacter::PlayerGetSkillPointReward_Implementation(int32 InLevel) co
     return GetAuraPlayerState()->AuraLevelUpInfo->LevelUpInfos[InLevel].SkillPointReward;
 }
 
+int32 AAuraCharacter::PlayerGetAttributePointValue_Implementation() const
+{
+    return GetAuraPlayerState()->GetAttributePoint();
+}
+
+int32 AAuraCharacter::PlayerGetSkillPointValue_Implementation() const
+{
+    return GetAuraPlayerState()->GetSkillPoint();
+}
+
 void AAuraCharacter::PlayerOnLevelUp_Implementation()
 {
     Multicast_PlayLevelUpVFX();

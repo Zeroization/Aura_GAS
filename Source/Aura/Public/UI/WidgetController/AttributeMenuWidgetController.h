@@ -28,6 +28,9 @@ public:
     virtual void BindDelegateCallbackFunctions() override;
     virtual void BroadcastInitialValues() override;
 
+    UFUNCTION(BlueprintCallable)
+    void UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint = 1);
+
     /// 设置AttributeData中各属性的初值(只有Value无初值, 要向AttributeSet获取), 并将其通过委托广播给UI
     /// \param AttributeData 要广播的AttributeData
     void BroadcastAttributeData(FAuraAttributeData& AttributeData) const;
