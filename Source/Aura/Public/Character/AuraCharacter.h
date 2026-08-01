@@ -8,6 +8,7 @@
 #include "Interaction/Interface/PlayerInterface.h"
 #include "AuraCharacter.generated.h"
 
+class AAuraPlayerState;
 class UNiagaraComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -44,6 +45,8 @@ public:
     virtual int32 PlayerGetLevelByXp_Implementation(int32 InXp) const override;
     virtual int32 PlayerGetAttributePointReward_Implementation(int32 InLevel) const override;
     virtual int32 PlayerGetSkillPointReward_Implementation(int32 InLevel) const override;
+    virtual int32 PlayerGetAttributePointValue_Implementation() const override;
+    virtual int32 PlayerGetSkillPointValue_Implementation() const override;
     virtual void PlayerOnLevelUp_Implementation() override;
     /// End: Player Interface <<<<<<
 
@@ -60,6 +63,8 @@ private:
     virtual void InitAbilitySystem() override;
     void InitPlayerHUD();
     /// End: Init  <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    AAuraPlayerState* GetAuraPlayerState() const;
 
     UFUNCTION(NetMulticast, Reliable)
     void Multicast_PlayLevelUpVFX() const;

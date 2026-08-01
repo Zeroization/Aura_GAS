@@ -37,7 +37,13 @@ public:
     TSubclassOf<UGameplayEffect> GE_EventBasedEffect;
 
     UFUNCTION(Server, Reliable)
-    void ServerAddXpForDebug(int32 Amount);
+    void Debug_ServerAddXp(int32 Amount);
+
+    UFUNCTION(Server, Reliable)
+    void Debug_ServerAddAttributePoint(int32 Amount);
+
+    UFUNCTION(Server, Reliable)
+    void Debug_ServerAddSkillPoint(int32 Amount);
 #pragma endregion
 
     virtual void PlayerTick(float DeltaTime) override;

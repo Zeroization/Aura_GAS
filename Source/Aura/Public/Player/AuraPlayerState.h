@@ -26,6 +26,8 @@ public:
 
     FOnPlayerStatChangeDelegate OnPlayerXpChange;
     FOnPlayerStatChangeDelegate OnPlayerLevelChange;
+    FOnPlayerStatChangeDelegate OnPlayerAttributePointChange;
+    FOnPlayerStatChangeDelegate OnPlayerSkillPointChange;
 
     AAuraPlayerState();
 
@@ -34,12 +36,18 @@ public:
     FORCEINLINE UAttributeSet* GetAttributeSet() const { return AttributeSet; }
     FORCEINLINE int32 GetPlayerLevel() const { return Level; }
     FORCEINLINE int32 GetXp() const { return Xp; }
+    FORCEINLINE int32 GetAttributePoint() const { return AttributePoint; }
+    FORCEINLINE int32 GetSkillPoint() const { return SkillPoint; }
 
     void AddLevel(int32 InLevel);
     void AddXp(int32 InXp);
+    void AddAttributePoint(int32 InAttributePoint);
+    void AddSkillPoint(int32 InSkillPoint);
 
     void SetLevel(int32 NewLevel);
     void SetXp(int32 NewXp);
+    void SetAttributePoint(int32 NewAttributePoint);
+    void SetSkillPoint(int32 NewSkillPoint);
 
 protected:
     /// Begin: Ability System <<<<<<<<<<<<<<<
@@ -57,9 +65,21 @@ private:
     UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_Xp)
     int32 Xp = 0;
 
+    UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_AttributePoint)
+    int32 AttributePoint = 0;
+
+    UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_SkillPoint)
+    int32 SkillPoint = 0;
+
     UFUNCTION()
     void OnRep_Level(int32 OldLevel);
 
     UFUNCTION()
     void OnRep_Xp(int32 OldXp);
+
+    UFUNCTION()
+    void OnRep_AttributePoint(int32 OldAttributePoint);
+
+    UFUNCTION()
+    void OnRep_SkillPoint(int32 OldSkillPoint);
 };

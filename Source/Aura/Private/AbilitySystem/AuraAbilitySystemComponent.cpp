@@ -2,9 +2,12 @@
 
 
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/Abilities/AuraGameplayAbility.h"
 #include "Aura/Aura.h"
 #include "Game/AuraGameplayTags.h"
+#include "Interaction/Interface/PlayerInterface.h"
 
 void UAuraAbilitySystemComponent::OnAbilityActorInfoSet()
 {
@@ -119,6 +122,29 @@ FGameplayTag UAuraAbilitySystemComponent::GetInputTagByAbilitySpec(const FGamepl
 
     UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't get input tag in GA %s"), __FUNCTION__, *AbilitySpec.Ability.GetName());
     return {};
+}
+
+void UAuraAbilitySystemComponent::Server_UpgradePrimaryAttribute_Implementation(const FGameplayTag& PrimaryAttributeTag,
+                                                                                int32 CostAttributePoint)
+{
+    // 1. 升级对应属性
+    FGameplayEventData Payload;
+    Payload.EventTag = PrimaryAttributeTag;
+    Payload.EventMagnitude = CostAttributePoint;
+
+    UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActor(), PrimaryAttributeTag, Payload);
+
+    // 2. 减少属性点
+    IPlayerInterface::Execute_PlayerAddAttributePoint(GetAvatarActor(), -CostAttributePoint);
+}
+
+void UAuraAbilitySystemComponent::UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint)
+{
+    if (GetAvatarActor()->Implements<UPlayerInterface>() &&
+        IPlayerInterface::Execute_PlayerGetAttributePointValue(GetAvatarActor()) > 0)
+    {
+        Server_UpgradePrimaryAttribute(PrimaryAttributeTag, CostAttributePoint);
+    }
 }
 
 void UAuraAbilitySystemComponent::OnRep_ActivateAbilities()

@@ -9,8 +9,6 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangedSignature, float, NewValue);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FDisplayWidgetRow, Row);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAbilityInfoSetSignature, const FAuraAbilityData&, AbilityData);

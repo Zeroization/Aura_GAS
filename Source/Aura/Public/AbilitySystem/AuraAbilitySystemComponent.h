@@ -22,28 +22,33 @@ class AURA_API UAuraAbilitySystemComponent : public UAbilitySystemComponent
 
 public:
     FOnGetGEAssetTagDelegate OnGetGEAssetTag;
-    FOnAbilitiesGivenDelegate OnAbilitiesGiven;
 
+#pragma region GA
+    FOnAbilitiesGivenDelegate OnAbilitiesGiven;
     bool bStartupAbilitiesGiven = false;
 
     /// 在 ASC->InitAbilityActorInfo() 被调用后执行
     void OnAbilityActorInfoSet();
-
     /// 赋予Actor默认GA
     void GrantActorStartupGAs(const TArray<TSubclassOf<UAuraGameplayAbility>>& StartupAbilityClasses);
-
     /// 赋予Actor默认被动GA
     void GrantActorPassiveStartupGAs(const TArray<TSubclassOf<UAuraGameplayAbility>>& StartupPassiveAbilityClasses);
-
     /// 根据输入Tag触发的GA回调
     void AbilityInputTagOnHeld(const FGameplayTag& InputTag);
     void AbilityInputTagOnReleased(const FGameplayTag& InputTag);
-
     /// 让每个GA执行一次FForEachAbilityExecuteDelegate回调
     void ForEachAbility(const FForEachAbilityExecuteDelegate& DelegateToExecute);
 
     static FGameplayTag GetAbilityTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec);
     static FGameplayTag GetInputTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec);
+#pragma endregion
+
+#pragma region Attribute
+    UFUNCTION(Server, Reliable)
+    void Server_UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint);
+    
+    void UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint = 1);
+#pragma endregion
 
 protected:
     virtual void OnRep_ActivateAbilities() override;

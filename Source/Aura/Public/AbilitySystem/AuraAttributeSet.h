@@ -186,6 +186,7 @@ public:
 
     virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
     virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+    virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
     virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
     // Begin: OnRep_ Functions >>>>>>>>>>>>>>>>>>>>>>
@@ -251,6 +252,9 @@ public:
     // End: OnRep_ Functions   >>>>>>>>>>>>>>>>>>>>>>
 
 private:
+    bool bMaxHealthWhenLevelUp = false;
+    bool bMaxManaWhenLevelUp = false;
+
     void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props);
     void ShowDamageText(const FEffectProperties& Props, float LocalIncomingDamage);
     void SendXpRewardEvent(const FEffectProperties& Props);
