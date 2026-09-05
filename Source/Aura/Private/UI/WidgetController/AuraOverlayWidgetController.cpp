@@ -18,7 +18,7 @@ void UAuraOverlayWidgetController::BroadcastAbilityData()
     if (AuraAbilitySystemComponent->bStartupAbilitiesGiven)
     {
         // 如果在绑定委托前已经获取到初始GA, 直接执行对应逻辑
-        OnInitStartupAbilities();
+        BroadcastInitialAbilities();
     }
 }
 
@@ -88,33 +88,8 @@ void UAuraOverlayWidgetController::BindDelegateCallbackFunctions()
     });
 
     // UAuraAbilitySystemComponent::FOnAbilitiesGivenDelegate
-    AuraAbilitySystemComponent->OnAbilitiesGiven.AddUObject(this, &UAuraOverlayWidgetController::OnInitStartupAbilities);
+    AuraAbilitySystemComponent->OnAbilitiesGiven.AddUObject(this, &UAuraOverlayWidgetController::BroadcastInitialAbilities);
 #pragma endregion
-}
-
-void UAuraOverlayWidgetController::OnInitStartupAbilities()
-{
-    if (!AuraAbilitySystemComponent->bStartupAbilitiesGiven)
-    {
-        return;
-    }
-
-    // 给每个初始GA绑定UI相关回调, 让ASC执行回调
-    FForEachAbilityExecuteDelegate DelegateToExecute;
-    DelegateToExecute.BindLambda([this](const FGameplayAbilitySpec& AbilitySpec)
-    {
-        // 1. 在AbilityInfo中获取并补充Ability相关信息
-        FAuraAbilityData Data = AbilityInfo->FindAbilityDataByTag(AuraAbilitySystemComponent->GetAbilityTagByAbilitySpec(AbilitySpec));
-        if (Data.bIsHidden)
-        {
-            return;
-        }
-        Data.InputTag = AuraAbilitySystemComponent->GetInputTagByAbilitySpec(AbilitySpec);
-
-        // 2. 向UI组件广播相关信息
-        OnAbilityInfoSet.Broadcast(Data);
-    });
-    AuraAbilitySystemComponent->ForEachAbility(DelegateToExecute);
 }
 
 void UAuraOverlayWidgetController::OnXpChanged(int32 NewXp)

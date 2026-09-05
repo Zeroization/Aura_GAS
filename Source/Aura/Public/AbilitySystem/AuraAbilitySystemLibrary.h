@@ -23,14 +23,6 @@ class AURA_API UAuraAbilitySystemLibrary : public UBlueprintFunctionLibrary
     GENERATED_BODY()
 
 public:
-#pragma region Widget Controller
-    UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|WidgetController", meta = (WorldContext="WorldContextObject"))
-    static UAuraOverlayWidgetController* GetAuraOverlayWidgetController(const UObject* WorldContextObject);
-
-    UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|WidgetController", meta = (WorldContext="WorldContextObject"))
-    static UAuraAttributeMenuWidgetController* GetAuraAttributeMenuWidgetController(const UObject* WorldContextObject);
-#pragma endregion
-
 #pragma region Character Class Defaults
     UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults", meta = (WorldContext="WorldContextObject"))
     static UCharacterClassInfo* GetEnemyCharacterClassInfo(const UObject* WorldContextObject);

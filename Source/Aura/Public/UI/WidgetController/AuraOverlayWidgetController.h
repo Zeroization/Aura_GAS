@@ -11,8 +11,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float,
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FDisplayWidgetRow, Row);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAbilityInfoSetSignature, const FAuraAbilityData&, AbilityData);
-
 /**
  * 
  */
@@ -37,9 +35,6 @@ public:
     UPROPERTY(BlueprintAssignable, Category = "GAS|Messages")
     FMessageWidgetRowSignature OnDisplayMessageRowReceived;
 
-    UPROPERTY(BlueprintAssignable, Category = "GAS|Abilities")
-    FOnAbilityInfoSetSignature OnAbilityInfoSet;
-
     UPROPERTY(BlueprintAssignable, Category = "GAS|Stats")
     FOnPlayerStatChangedSignature OnXpPercentChanged;
 
@@ -52,14 +47,10 @@ public:
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
-    TObjectPtr<UAuraAbilityInfo> AbilityInfo;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
     TObjectPtr<UDataTable> MessageWidgetDataTable;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
     TObjectPtr<UDataTable> InputTagDisplayDataTable;
 
-    void OnInitStartupAbilities();
     void OnXpChanged(int32 NewXp);
 };
