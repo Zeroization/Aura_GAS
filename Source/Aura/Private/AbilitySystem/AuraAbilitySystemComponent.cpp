@@ -22,6 +22,7 @@ void UAuraAbilitySystemComponent::GrantActorStartupGAs(const TArray<TSubclassOf<
         if (const UAuraGameplayAbility* AuraGA = Cast<UAuraGameplayAbility>(GASpec.Ability))
         {
             GASpec.DynamicAbilityTags.AddTag(AuraGA->StartupInputTag);
+            GASpec.DynamicAbilityTags.AddTag(AuraGameplayTags::GA::SkillStatus::Equipped);
             GiveAbility(GASpec);
         }
     }
@@ -95,33 +96,17 @@ void UAuraAbilitySystemComponent::ForEachAbility(const FForEachAbilityExecuteDel
 
 FGameplayTag UAuraAbilitySystemComponent::GetAbilityTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec)
 {
-    if (IsValid(AbilitySpec.Ability))
-    {
-        for (FGameplayTag Tag : AbilitySpec.Ability->AbilityTags)
-        {
-            if (Tag.MatchesTag(AuraGameplayTags::GA::Root))
-            {
-                return Tag;
-            }
-        }
-    }
-
-    UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't get ability tag in GA %s"), __FUNCTION__, *AbilitySpec.Ability.GetName());
-    return {};
+    return GetTagFromAbilitySpec(AbilitySpec, AuraGameplayTags::GA::Skill::Root);
 }
 
 FGameplayTag UAuraAbilitySystemComponent::GetInputTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec)
 {
-    for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
-    {
-        if (Tag.MatchesTag(AuraGameplayTags::Input::Root))
-        {
-            return Tag;
-        }
-    }
+    return GetTagFromAbilitySpec(AbilitySpec, AuraGameplayTags::Input::Root);
+}
 
-    UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't get input tag in GA %s"), __FUNCTION__, *AbilitySpec.Ability.GetName());
-    return {};
+FGameplayTag UAuraAbilitySystemComponent::GetSkillStatusTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+    return GetTagFromAbilitySpec(AbilitySpec, AuraGameplayTags::GA::SkillStatus::Root);
 }
 
 void UAuraAbilitySystemComponent::Server_UpgradePrimaryAttribute_Implementation(const FGameplayTag& PrimaryAttributeTag,
@@ -167,4 +152,28 @@ void UAuraAbilitySystemComponent::OnGEApplied_Implementation(UAbilitySystemCompo
 
     // 广播获取的Tag到UIWidgetController
     OnGetGEAssetTag.Broadcast(TagContainer);
+}
+
+FGameplayTag UAuraAbilitySystemComponent::GetTagFromAbilitySpec(const FGameplayAbilitySpec& AbilitySpec,
+                                                                const FGameplayTag& CategoryRootTag)
+{
+    for (FGameplayTag Tag : AbilitySpec.Ability->AbilityTags)
+    {
+        if (Tag.MatchesTag(CategoryRootTag))
+        {
+            return Tag;
+        }
+    }
+    
+    for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
+    {
+        if (Tag.MatchesTag(CategoryRootTag))
+        {
+            return Tag;
+        }
+    }
+
+    UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't get tag in GA %s, CategoryRootTag: %s"), __FUNCTION__, *AbilitySpec.Ability.GetName(),
+           *CategoryRootTag.ToString());
+    return {};
 }

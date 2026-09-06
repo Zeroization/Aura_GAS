@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
+#include "Game/AuraGameplayTags.h"
 #include "AuraAbilityInfo.generated.h"
 
 USTRUCT(BlueprintType)
@@ -12,20 +13,20 @@ struct FAuraAbilityData
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability的GameplayTag"))
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="表示该GA的Tag"))
     FGameplayTag AbilityTag;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability的唯一冷却Tag"))
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA的唯一冷却Tag"))
     FGameplayTag CooldownTag;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA的技能类型Tag"))
+    FGameplayTag SkillTypeTag = AuraGameplayTags::GA::SkillType::None;
 
     UPROPERTY(BlueprintReadOnly)
     FGameplayTag InputTag;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability是否为被动类型"))
-    bool bIsPassive = false;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability是否该显示到技能球上(TODO: 教程还没讲到这里)"))
-    bool bIsHidden = false;
+    UPROPERTY(BlueprintReadOnly)
+    FGameplayTag SkillStatusTag = AuraGameplayTags::GA::SkillStatus::Locked;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="对应SpellGlobe上的技能图标"))
     TObjectPtr<UTexture2D> SkillIcon;

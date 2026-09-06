@@ -68,26 +68,47 @@ namespace AuraGameplayTags
 
     namespace GA
     {
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);   // "GA"
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack); // "GA.Attack"
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Summon); // "GA.Summon"
-
-        namespace Fire
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "GA"
+        namespace Skill
         {
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "GA.Fire"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(FireBolt); // "GA.Fire.FireBolt"
-        }
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);   // "GA.Skill"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack); // "GA.Skill.Attack"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Summon); // "GA.Skill.Summon"
 
-        namespace Passive
-        {
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);          // "GA.Passive"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(ListenForEvent) // "GA.Passive.ListenForEvent"
+            namespace Fire
+            {
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "GA.Skill.Fire"
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(FireBolt); // "GA.Skill.Fire.FireBolt"
+            }
+
+            namespace Passive
+            {
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);          // "GA.Skill.Passive"
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(ListenForEvent) // "GA.Skill.Passive.ListenForEvent"
+            }
         }
 
         namespace Cooldown
         {
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "GA.Cooldown"
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(FireBolt); // "GA.Cooldown.FireBolt"
+        }
+
+        namespace SkillStatus
+        {
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "GA.SkillStatus"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Locked);   // "GA.SkillStatus.Locked"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Eligible); // "GA.SkillStatus.Eligible"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Unlocked); // "GA.SkillStatus.Unlocked"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipped); // "GA.SkillStatus.Equipped"
+        }
+
+        namespace SkillType
+        {
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);      // "GA.SkillType"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Offensive); // "GA.SkillType.Offensive"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Passive);   // "GA.SkillType.Passive"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(None);      // "GA.SkillType.None"
         }
     }
 

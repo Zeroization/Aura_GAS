@@ -41,12 +41,13 @@ public:
 
     static FGameplayTag GetAbilityTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec);
     static FGameplayTag GetInputTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec);
+    static FGameplayTag GetSkillStatusTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec);
 #pragma endregion
 
 #pragma region Attribute
     UFUNCTION(Server, Reliable)
     void Server_UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint);
-    
+
     void UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint = 1);
 #pragma endregion
 
@@ -56,4 +57,7 @@ protected:
     UFUNCTION(Client, Reliable)
     void OnGEApplied(UAbilitySystemComponent* InASC, const FGameplayEffectSpec& InGESpec,
                      FActiveGameplayEffectHandle ActiveGEHandle);
+
+private:
+    static FGameplayTag GetTagFromAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& CategoryRootTag);
 };

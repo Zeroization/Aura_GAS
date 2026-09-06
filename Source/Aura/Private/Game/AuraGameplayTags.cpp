@@ -130,32 +130,39 @@ namespace AuraGameplayTags
     {
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
                                        "GA",
-                                       "实现的Gameplay Ability; 此Tag仅用于Tag相关操作(如Matches)");
-        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attack,
-                                       "GA.Attack",
-                                       "通过此Tag激活攻击类型的GA");
-        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Summon,
-                                       "GA.Summon",
-                                       "通过此Tag激活召唤类型的GA");
+                                       "Gameplay Ability类型Tag; 此Tag仅用于Tag相关操作(如Matches)");
 
-        namespace Fire
+        namespace Skill
         {
             UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
-                                           "GA.Fire",
-                                           "火属性攻击类型GA; 此Tag仅用于Tag相关操作(如Matches)");
-            UE_DEFINE_GAMEPLAY_TAG_COMMENT(FireBolt,
-                                           "GA.Fire.FireBolt",
-                                           "通过此Tag激活火球攻击");
-        }
+                                           "GA.Skill",
+                                           "实现的GA; 此Tag仅用于Tag相关操作(如Matches)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attack,
+                                           "GA.Skill.Attack",
+                                           "通过此Tag激活攻击类型的GA");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Summon,
+                                           "GA.Skill.Summon",
+                                           "通过此Tag激活召唤类型的GA");
 
-        namespace Passive
-        {
-            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
-                                           "GA.Passive",
-                                           "被动触发类型GA; 此Tag仅用于Tag相关操作(如Matches)");
-            UE_DEFINE_GAMEPLAY_TAG_COMMENT(ListenForEvent,
-                                           "GA.Passive.ListenForEvent",
-                                           "监听GameplayTagEvent的被动GA")
+            namespace Fire
+            {
+                UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                               "GA.Skill.Fire",
+                                               "火属性攻击类型GA; 此Tag仅用于Tag相关操作(如Matches)");
+                UE_DEFINE_GAMEPLAY_TAG_COMMENT(FireBolt,
+                                               "GA.Skill.Fire.FireBolt",
+                                               "通过此Tag激活火球攻击");
+            }
+
+            namespace Passive
+            {
+                UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                               "GA.Skill.Passive",
+                                               "被动触发类型GA; 此Tag仅用于Tag相关操作(如Matches)");
+                UE_DEFINE_GAMEPLAY_TAG_COMMENT(ListenForEvent,
+                                               "GA.Skill.Passive.ListenForEvent",
+                                               "监听GameplayTagEvent的被动GA")
+            }
         }
 
         namespace Cooldown
@@ -167,6 +174,41 @@ namespace AuraGameplayTags
             UE_DEFINE_GAMEPLAY_TAG_COMMENT(FireBolt,
                                            "GA.Cooldown.FireBolt",
                                            "火球攻击的冷却Tag");
+        }
+
+        namespace SkillStatus
+        {
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                           "GA.SkillStatus",
+                                           "表示该GA的当前状态, 用于技能树; 此Tag仅用于Tag相关操作(如Matches)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Locked,
+                                           "GA.SkillStatus.Locked",
+                                           "该技能目前被锁定");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Eligible,
+                                           "GA.SkillStatus.Eligible",
+                                           "该技能可以被解锁");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Unlocked,
+                                           "GA.SkillStatus.Unlocked",
+                                           "该技能已被解锁");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Equipped,
+                                           "GA.SkillStatus.Equipped",
+                                           "该技能已被装备");
+        }
+
+        namespace SkillType
+        {
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                           "GA.SkillType",
+                                           "表示该GA的技能类型; 此Tag仅用于Tag相关操作(如Matches)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Offensive,
+                                           "GA.SkillType.Offensive",
+                                           "主动技能");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Passive,
+                                           "GA.SkillType.Passive",
+                                           "被动技能");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(None,
+                                           "GA.SkillType.None",
+                                           "该GA不是技能");
         }
     }
 
