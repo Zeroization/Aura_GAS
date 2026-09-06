@@ -83,16 +83,11 @@ namespace AuraGameplayTags
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);          // "GA.Passive"
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(ListenForEvent) // "GA.Passive.ListenForEvent"
         }
-    }
 
-    namespace Cooldown
-    {
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "Cooldown"
-
-        namespace Fire
+        namespace Cooldown
         {
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "Cooldown.Fire"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(FireBolt); // "Cooldown.Fire.FireBolt"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "GA.Cooldown"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(FireBolt); // "GA.Cooldown.FireBolt"
         }
     }
 
@@ -173,6 +168,13 @@ namespace AuraGameplayTags
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_2); // "Input.Keyboard.2"
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_3); // "Input.Keyboard.3"
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_4); // "Input.Keyboard.4"
+        }
+
+        namespace Passive
+        {
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);  // "Input.Passive"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_1); // "Input.Passive.1"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_2); // "Input.Passive.2"
         }
     }
 }

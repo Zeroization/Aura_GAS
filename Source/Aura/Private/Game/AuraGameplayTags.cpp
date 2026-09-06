@@ -157,22 +157,16 @@ namespace AuraGameplayTags
                                            "GA.Passive.ListenForEvent",
                                            "监听GameplayTagEvent的被动GA")
         }
-    }
 
-    namespace Cooldown
-    {
-        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
-                                       "Cooldown",
-                                       "用于GA冷却相关的Tag; 此Tag仅用于Tag相关操作(如Matches)");
-
-        namespace Fire
+        namespace Cooldown
         {
             UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
-                                           "Cooldown.Fire",
-                                           "火属性攻击类型GA; 此Tag仅用于Tag相关操作(如Matches)");
+                                           "GA.Cooldown",
+                                           "用于GA冷却相关的Tag; 此Tag仅用于Tag相关操作(如Matches)");
+
             UE_DEFINE_GAMEPLAY_TAG_COMMENT(FireBolt,
-                                           "Cooldown.Fire.FireBolt",
-                                           "火球攻击");
+                                           "GA.Cooldown.FireBolt",
+                                           "火球攻击的冷却Tag");
         }
     }
 
@@ -332,6 +326,19 @@ namespace AuraGameplayTags
             UE_DEFINE_GAMEPLAY_TAG_COMMENT(Num_4,
                                            "Input.Keyboard.4",
                                            "4");
+        }
+
+        namespace Passive
+        {
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                           "Input.Passive",
+                                           "被动技能输入占位符; 此Tag仅用于Tag相关操作(如Matches)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Num_1,
+                                           "Input.Passive.1",
+                                           "被动技能槽1");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Num_2,
+                                           "Input.Passive.2",
+                                           "被动技能槽2");
         }
     }
 }

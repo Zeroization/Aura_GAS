@@ -71,7 +71,7 @@ void UAuraGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle
     {
         FGameplayEffectSpecHandle CooldownGESpecHandle = MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
         CooldownGESpecHandle.Data->DynamicGrantedTags.AppendTags(CooldownTag);
-        CooldownGESpecHandle.Data->SetSetByCallerMagnitude(AuraGameplayTags::Cooldown::Root,
+        CooldownGESpecHandle.Data->SetSetByCallerMagnitude(AuraGameplayTags::GA::Cooldown::Root,
                                                            CooldownDuration.GetValueAtLevel(GetAbilityLevel()));
         
         ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, CooldownGESpecHandle);
