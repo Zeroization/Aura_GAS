@@ -41,7 +41,8 @@ void UAuraWidgetController::BroadcastInitialAbilities()
             return;
         }
         Data.InputTag = AuraAbilitySystemComponent->GetInputTagByAbilitySpec(AbilitySpec);
-
+        Data.SkillStatusTag = AuraAbilitySystemComponent->GetSkillStatusTagByAbilitySpec(AbilitySpec);
+        
         // 2. 向UI组件广播相关信息
         OnAbilityInfoSet.Broadcast(Data);
     });
