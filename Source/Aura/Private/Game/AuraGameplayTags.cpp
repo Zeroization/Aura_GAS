@@ -154,6 +154,16 @@ namespace AuraGameplayTags
                                                "通过此Tag激活火球攻击");
             }
 
+            namespace Lightning
+            {
+                UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                               "GA.Skill.Lightning",
+                                               "电属性攻击类型GA; 此Tag仅用于Tag相关操作(如Matches)");
+                UE_DEFINE_GAMEPLAY_TAG_COMMENT(Electrocute,
+                                               "GA.Skill.Lightning.Electrocute",
+                                               "通过此Tag激活闪电攻击");
+            }
+
             namespace Passive
             {
                 UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,

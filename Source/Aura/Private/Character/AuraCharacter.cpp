@@ -80,22 +80,24 @@ ECharacterClass AAuraCharacter::GetCharacterClassEnum_Implementation()
 
 void AAuraCharacter::PlayerAddXp_Implementation(int32 InXp)
 {
-    return GetAuraPlayerState()->AddXp(InXp);
+    GetAuraPlayerState()->AddXp(InXp);
 }
 
 void AAuraCharacter::PlayerAddLevel_Implementation(int32 InLevel)
 {
-    return GetAuraPlayerState()->AddLevel(InLevel);
+    GetAuraPlayerState()->AddLevel(InLevel);
+
+    AuraAbilitySystemComponent->UpdateAbilityStatus(GetAuraPlayerState()->GetPlayerLevel());
 }
 
 void AAuraCharacter::PlayerAddAttributePoint_Implementation(int32 InAttributePoint)
 {
-    return GetAuraPlayerState()->AddAttributePoint(InAttributePoint);
+    GetAuraPlayerState()->AddAttributePoint(InAttributePoint);
 }
 
 void AAuraCharacter::PlayerAddSkillPoint_Implementation(int32 InSkillPoint)
 {
-    return GetAuraPlayerState()->AddSkillPoint(InSkillPoint);
+    GetAuraPlayerState()->AddSkillPoint(InSkillPoint);
 }
 
 int32 AAuraCharacter::PlayerGetXp_Implementation() const

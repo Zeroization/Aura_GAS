@@ -81,6 +81,12 @@ namespace AuraGameplayTags
                 UE_DECLARE_GAMEPLAY_TAG_EXTERN(FireBolt); // "GA.Skill.Fire.FireBolt"
             }
 
+            namespace Lightning
+            {
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);        // "GA.Skill.Lightning"
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Electrocute); // "GA.Skill.Lightning.Electrocute"
+            }
+
             namespace Passive
             {
                 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);          // "GA.Skill.Passive"

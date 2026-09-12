@@ -8,7 +8,9 @@
 
 class UAuraGameplayAbility;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnGetGEAssetTagDelegate, const FGameplayTagContainer&);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAbilityStatusChanged, const FGameplayTag& /* AbilityTag */,
+                                     const FGameplayTag& /* SkillStatusTag */);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGetGEAssetTagDelegate, const FGameplayTagContainer& /* AssetTags */);
 DECLARE_MULTICAST_DELEGATE(FOnAbilitiesGivenDelegate);
 DECLARE_DELEGATE_OneParam(FForEachAbilityExecuteDelegate, const FGameplayAbilitySpec&);
 
@@ -25,6 +27,7 @@ public:
 
 #pragma region GA
     FOnAbilitiesGivenDelegate OnAbilitiesGiven;
+    FOnAbilityStatusChanged OnAbilityStatusChanged;
     bool bStartupAbilitiesGiven = false;
 
     /// 在 ASC->InitAbilityActorInfo() 被调用后执行
@@ -38,10 +41,13 @@ public:
     void AbilityInputTagOnReleased(const FGameplayTag& InputTag);
     /// 让每个GA执行一次FForEachAbilityExecuteDelegate回调
     void ForEachAbility(const FForEachAbilityExecuteDelegate& DelegateToExecute);
+    /// 升级后检查并更新GA解锁信息
+    void UpdateAbilityStatus(int32 NewLevel);
 
-    static FGameplayTag GetAbilityTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec);
-    static FGameplayTag GetInputTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec);
-    static FGameplayTag GetSkillStatusTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec);
+    FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& AbilityTag, bool bDebugLog = false);
+    static FGameplayTag GetAbilityTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, bool bDebugLog = true);
+    static FGameplayTag GetInputTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, bool bDebugLog = true);
+    static FGameplayTag GetSkillStatusTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, bool bDebugLog = true);
 #pragma endregion
 
 #pragma region Attribute
@@ -58,6 +64,9 @@ protected:
     void OnGEApplied(UAbilitySystemComponent* InASC, const FGameplayEffectSpec& InGESpec,
                      FActiveGameplayEffectHandle ActiveGEHandle);
 
+    UFUNCTION(Client, Reliable)
+    void Client_UpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag);
+
 private:
-    static FGameplayTag GetTagFromAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& CategoryRootTag);
+    static FGameplayTag GetTagFromAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& CategoryRootTag, bool bDebugLog);
 };

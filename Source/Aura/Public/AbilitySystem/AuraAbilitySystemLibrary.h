@@ -7,6 +7,7 @@
 #include "UI/Widget/DamageFloatingTextComponent.h"
 #include "AuraAbilitySystemLibrary.generated.h"
 
+class UAuraAbilityInfo;
 class UGameplayEffect;
 struct FGameplayEffectContextHandle;
 class UCharacterClassInfo;
@@ -37,6 +38,11 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults", meta = (WorldContext="WorldContextObject"))
     static int32 GetEnemyXpRewardByClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 EnemyLevel = 1);
+#pragma endregion
+
+#pragma region Gameplay Ability
+    UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|GameplayAbility", meta = (WorldContext="WorldContextObject"))
+    static UAuraAbilityInfo* GetAbilityInfo(const UObject* WorldContextObject);
 #pragma endregion
 
 #pragma region Gameplay Effects

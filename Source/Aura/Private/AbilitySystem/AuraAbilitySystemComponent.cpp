@@ -4,7 +4,9 @@
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/Abilities/AuraGameplayAbility.h"
+#include "AbilitySystem/Data/DataAssets/AuraAbilityInfo.h"
 #include "Aura/Aura.h"
 #include "Game/AuraGameplayTags.h"
 #include "Interaction/Interface/PlayerInterface.h"
@@ -94,19 +96,65 @@ void UAuraAbilitySystemComponent::ForEachAbility(const FForEachAbilityExecuteDel
     }
 }
 
-FGameplayTag UAuraAbilitySystemComponent::GetAbilityTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec)
+void UAuraAbilitySystemComponent::UpdateAbilityStatus(int32 NewLevel)
 {
-    return GetTagFromAbilitySpec(AbilitySpec, AuraGameplayTags::GA::Skill::Root);
+    UAuraAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
+    for (const FAuraAbilityData& Data : AbilityInfo->AbilityInformation)
+    {
+        if (GetSpecFromAbilityTag(Data.AbilityTag) == nullptr)
+        {
+            // 解锁不在激活列表的GA
+            if (Data.AbilityTag.IsValid() &&
+                NewLevel >= Data.LevelRequirement &&
+                GetSpecFromAbilityTag(Data.AbilityTag) == nullptr)
+            {
+                FGameplayAbilitySpec GASpec = {Data.Ability, NewLevel};
+                GASpec.DynamicAbilityTags.AddTag(AuraGameplayTags::GA::SkillStatus::Eligible);
+                GiveAbility(GASpec);
+
+                // 标记此AbilitySpec为脏, 强制提前网络同步
+                MarkAbilitySpecDirty(GASpec);
+                Client_UpdateAbilityStatus(Data.AbilityTag, AuraGameplayTags::GA::SkillStatus::Eligible);
+            }
+        }
+    }
 }
 
-FGameplayTag UAuraAbilitySystemComponent::GetInputTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec)
+FGameplayAbilitySpec* UAuraAbilitySystemComponent::GetSpecFromAbilityTag(const FGameplayTag& AbilityTag, bool bDebugLog)
 {
-    return GetTagFromAbilitySpec(AbilitySpec, AuraGameplayTags::Input::Root);
+    FScopedAbilityListLock Lock(*this);
+    for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+    {
+        for (const FGameplayTag& Tag : AbilitySpec.Ability->AbilityTags)
+        {
+            if (Tag.MatchesTagExact(AbilityTag))
+            {
+                return &AbilitySpec;
+            }
+        }
+    }
+
+    if (bDebugLog)
+    {
+        UE_LOG(LogAuraGame, Warning, TEXT("[%hs]: Can't get ability by tag: %s"), __FUNCTION__, *AbilityTag.ToString());
+    }
+
+    return nullptr;
 }
 
-FGameplayTag UAuraAbilitySystemComponent::GetSkillStatusTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec)
+FGameplayTag UAuraAbilitySystemComponent::GetAbilityTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, bool bDebugLog)
 {
-    return GetTagFromAbilitySpec(AbilitySpec, AuraGameplayTags::GA::SkillStatus::Root);
+    return GetTagFromAbilitySpec(AbilitySpec, AuraGameplayTags::GA::Skill::Root, bDebugLog);
+}
+
+FGameplayTag UAuraAbilitySystemComponent::GetInputTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, bool bDebugLog)
+{
+    return GetTagFromAbilitySpec(AbilitySpec, AuraGameplayTags::Input::Root, bDebugLog);
+}
+
+FGameplayTag UAuraAbilitySystemComponent::GetSkillStatusTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, bool bDebugLog)
+{
+    return GetTagFromAbilitySpec(AbilitySpec, AuraGameplayTags::GA::SkillStatus::Root, bDebugLog);
 }
 
 void UAuraAbilitySystemComponent::Server_UpgradePrimaryAttribute_Implementation(const FGameplayTag& PrimaryAttributeTag,
@@ -154,8 +202,14 @@ void UAuraAbilitySystemComponent::OnGEApplied_Implementation(UAbilitySystemCompo
     OnGetGEAssetTag.Broadcast(TagContainer);
 }
 
+void UAuraAbilitySystemComponent::Client_UpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag,
+                                                                            const FGameplayTag& SkillStatusTag)
+{
+    OnAbilityStatusChanged.Broadcast(AbilityTag, SkillStatusTag);
+}
+
 FGameplayTag UAuraAbilitySystemComponent::GetTagFromAbilitySpec(const FGameplayAbilitySpec& AbilitySpec,
-                                                                const FGameplayTag& CategoryRootTag)
+                                                                const FGameplayTag& CategoryRootTag, bool bDebugLog)
 {
     for (FGameplayTag Tag : AbilitySpec.Ability->AbilityTags)
     {
@@ -164,7 +218,7 @@ FGameplayTag UAuraAbilitySystemComponent::GetTagFromAbilitySpec(const FGameplayA
             return Tag;
         }
     }
-    
+
     for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
     {
         if (Tag.MatchesTag(CategoryRootTag))
@@ -173,7 +227,11 @@ FGameplayTag UAuraAbilitySystemComponent::GetTagFromAbilitySpec(const FGameplayA
         }
     }
 
-    UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't get tag in GA %s, CategoryRootTag: %s"), __FUNCTION__, *AbilitySpec.Ability.GetName(),
-           *CategoryRootTag.ToString());
+    if (bDebugLog)
+    {
+        UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't get tag in GA %s, CategoryRootTag: %s"), __FUNCTION__, *AbilitySpec.Ability.GetName(),
+               *CategoryRootTag.ToString());
+    }
+
     return {};
 }

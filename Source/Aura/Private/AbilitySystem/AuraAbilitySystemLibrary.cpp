@@ -93,6 +93,16 @@ int32 UAuraAbilitySystemLibrary::GetEnemyXpRewardByClassAndLevel(const UObject* 
     return 0;
 }
 
+UAuraAbilityInfo* UAuraAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldContextObject)
+{
+    if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject)))
+    {
+        return AuraGameMode->AbilityInfo;
+    }
+
+    return nullptr;
+}
+
 bool UAuraAbilitySystemLibrary::GetIsBlockedHit(const FGameplayEffectContextHandle& GEContextHandle)
 {
     if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))

@@ -8,12 +8,14 @@
 #include "Game/AuraGameplayTags.h"
 #include "AuraAbilityInfo.generated.h"
 
+class UGameplayAbility;
+
 USTRUCT(BlueprintType)
 struct FAuraAbilityData
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="表示该GA的Tag"))
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA所属的GameplayTag"))
     FGameplayTag AbilityTag;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA的唯一冷却Tag"))
@@ -22,17 +24,23 @@ struct FAuraAbilityData
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA的技能类型Tag"))
     FGameplayTag SkillTypeTag = AuraGameplayTags::GA::SkillType::None;
 
-    UPROPERTY(BlueprintReadOnly)
-    FGameplayTag InputTag;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="解锁该GA的玩家等级"))
+    int32 LevelRequirement = 0;
 
-    UPROPERTY(BlueprintReadOnly)
-    FGameplayTag SkillStatusTag = AuraGameplayTags::GA::SkillStatus::Locked;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA的UGameplayAbility类"))
+    TSubclassOf<UGameplayAbility> Ability;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="对应SpellGlobe上的技能图标"))
     TObjectPtr<UTexture2D> SkillIcon;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="对应SpellGlobe上的技能背景"))
     TObjectPtr<UMaterialInterface> SkillBackground;
+
+    UPROPERTY(BlueprintReadOnly)
+    FGameplayTag InputTag;
+
+    UPROPERTY(BlueprintReadOnly)
+    FGameplayTag SkillStatusTag = AuraGameplayTags::GA::SkillStatus::Locked;
 };
 
 /**
