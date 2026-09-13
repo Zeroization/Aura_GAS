@@ -10,6 +10,7 @@
 #include "Aura/Aura.h"
 #include "Game/AuraGameplayTags.h"
 #include "Interaction/Interface/PlayerInterface.h"
+#include "Player/AuraPlayerState.h"
 
 void UAuraAbilitySystemComponent::OnAbilityActorInfoSet()
 {
@@ -98,6 +99,14 @@ void UAuraAbilitySystemComponent::ForEachAbility(const FForEachAbilityExecuteDel
 
 void UAuraAbilitySystemComponent::UpdateAbilityStatus(int32 NewLevel)
 {
+    // Ability specs must be created on the server. The spell menu can be
+    // initialized on a client, so forward the request when necessary.
+    if (GetOwner() && !GetOwner()->HasAuthority())
+    {
+        Server_UpdateAbilityStatus();
+        return;
+    }
+
     UAuraAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
     for (const FAuraAbilityData& Data : AbilityInfo->AbilityInformation)
     {
@@ -117,6 +126,14 @@ void UAuraAbilitySystemComponent::UpdateAbilityStatus(int32 NewLevel)
                 Client_UpdateAbilityStatus(Data.AbilityTag, AuraGameplayTags::GA::SkillStatus::Eligible);
             }
         }
+    }
+}
+
+void UAuraAbilitySystemComponent::Server_UpdateAbilityStatus_Implementation()
+{
+    if (const AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetOwner()))
+    {
+        UpdateAbilityStatus(AuraPlayerState->GetPlayerLevel());
     }
 }
 

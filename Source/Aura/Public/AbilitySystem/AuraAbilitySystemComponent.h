@@ -53,7 +53,7 @@ public:
 #pragma region Attribute
     UFUNCTION(Server, Reliable)
     void Server_UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint);
-
+    
     void UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint = 1);
 #pragma endregion
 
@@ -64,6 +64,9 @@ protected:
     void OnGEApplied(UAbilitySystemComponent* InASC, const FGameplayEffectSpec& InGESpec,
                      FActiveGameplayEffectHandle ActiveGEHandle);
 
+    UFUNCTION(Server, Reliable)
+    void Server_UpdateAbilityStatus();
+    
     UFUNCTION(Client, Reliable)
     void Client_UpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag);
 

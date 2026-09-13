@@ -5,10 +5,17 @@
 
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/Data/DataAssets/AuraAbilityInfo.h"
+#include "Player/AuraPlayerState.h"
 
 void UAuraSpellMenuWidgetController::BroadcastInitialValues()
 {
+    if (AuraAbilitySystemComponent && AuraPlayerState)
+    {
+        AuraAbilitySystemComponent->UpdateAbilityStatus(AuraPlayerState->GetPlayerLevel());
+    }
+
     BroadcastInitialAbilities();
+    OnSkillPointChange.Broadcast(AuraPlayerState->GetSkillPoint());
 }
 
 void UAuraSpellMenuWidgetController::BindDelegateCallbackFunctions()
@@ -22,6 +29,13 @@ void UAuraSpellMenuWidgetController::BindDelegateCallbackFunctions()
             Data.SkillStatusTag = SkillStatusTag;
             OnAbilityInfoSet.Broadcast(Data);
         }
+    });
+#pragma endregion
+    
+#pragma region AuraPS
+    AuraPlayerState->OnPlayerSkillPointChange.AddLambda([this](int32 SkillPoint)
+    {
+        OnSkillPointChange.Broadcast(SkillPoint);
     });
 #pragma endregion
 }
