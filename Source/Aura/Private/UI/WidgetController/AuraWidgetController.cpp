@@ -35,16 +35,16 @@ void UAuraWidgetController::BroadcastInitialAbilities()
     DelegateToExecute.BindLambda([this](const FGameplayAbilitySpec& AbilitySpec)
     {
         // 1. 在AbilityInfo中获取并补充Ability相关信息
-        FAuraAbilityData Data = AbilityInfo->FindAbilityDataByTag(AuraAbilitySystemComponent->GetAbilityTagByAbilitySpec(AbilitySpec));
-        if (Data.SkillTypeTag.MatchesTagExact(AuraGameplayTags::GA::SkillType::None))
+        FAuraAbilityData* Data = AbilityInfo->ModifyAbilityDataByTag(AuraAbilitySystemComponent->GetAbilityTagByAbilitySpec(AbilitySpec));
+        if (Data->SkillTypeTag.MatchesTagExact(AuraGameplayTags::GA::SkillType::None))
         {
             return;
         }
-        Data.InputTag = AuraAbilitySystemComponent->GetInputTagByAbilitySpec(AbilitySpec);
-        Data.SkillStatusTag = AuraAbilitySystemComponent->GetSkillStatusTagByAbilitySpec(AbilitySpec);
-        
+        Data->InputTag = AuraAbilitySystemComponent->GetInputTagByAbilitySpec(AbilitySpec);
+        Data->SkillStatusTag = AuraAbilitySystemComponent->GetSkillStatusTagByAbilitySpec(AbilitySpec);
+
         // 2. 向UI组件广播相关信息
-        OnAbilityInfoSet.Broadcast(Data);
+        OnAbilityInfoSet.Broadcast(*Data);
     });
     AuraAbilitySystemComponent->ForEachAbility(DelegateToExecute);
 }

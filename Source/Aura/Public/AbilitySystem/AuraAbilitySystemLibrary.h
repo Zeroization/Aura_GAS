@@ -41,7 +41,7 @@ public:
 #pragma endregion
 
 #pragma region Gameplay Ability
-    UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|GameplayAbility", meta = (WorldContext="WorldContextObject"))
+    UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayAbility", meta = (WorldContext="WorldContextObject"))
     static UAuraAbilityInfo* GetAbilityInfo(const UObject* WorldContextObject);
 #pragma endregion
 

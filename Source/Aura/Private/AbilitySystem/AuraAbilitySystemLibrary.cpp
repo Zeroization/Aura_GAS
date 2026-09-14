@@ -8,6 +8,7 @@
 #include "AbilitySystem/Data/DataAssets/CharacterClassInfo.h"
 #include "Game/AuraGameModeBase.h"
 #include "Game/AuraGameplayTags.h"
+#include "Game/AuraGameStateBase.h"
 #include "Interaction/Interface/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerController.h"
@@ -95,9 +96,9 @@ int32 UAuraAbilitySystemLibrary::GetEnemyXpRewardByClassAndLevel(const UObject* 
 
 UAuraAbilityInfo* UAuraAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldContextObject)
 {
-    if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject)))
+    if (AAuraGameStateBase* AuraGameState = Cast<AAuraGameStateBase>(UGameplayStatics::GetGameState(WorldContextObject)))
     {
-        return AuraGameMode->AbilityInfo;
+        return AuraGameState->AbilityInfo;
     }
 
     return nullptr;

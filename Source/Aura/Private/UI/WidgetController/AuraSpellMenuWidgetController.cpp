@@ -30,13 +30,13 @@ void UAuraSpellMenuWidgetController::BindDelegateCallbackFunctions()
     {
         if (AbilityInfo)
         {
-            FAuraAbilityData Data = AbilityInfo->FindAbilityDataByTag(AbilityTag);
-            Data.SkillStatusTag = SkillStatusTag;
-            OnAbilityInfoSet.Broadcast(Data);
+            FAuraAbilityData* Data = AbilityInfo->ModifyAbilityDataByTag(AbilityTag);
+            Data->SkillStatusTag = SkillStatusTag;
+            OnAbilityInfoSet.Broadcast(*Data);
         }
     });
 #pragma endregion
-    
+
 #pragma region AuraPS
     AuraPlayerState->OnPlayerSkillPointChange.AddLambda([this](int32 SkillPoint)
     {

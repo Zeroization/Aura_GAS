@@ -19,7 +19,4 @@ class AURA_API AAuraGameModeBase : public AGameModeBase
 public:
     UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
     TObjectPtr<UCharacterClassInfo> EnemyCharacterClassInfo;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Ability Info")
-    TObjectPtr<UAuraAbilityInfo> AbilityInfo;
 };

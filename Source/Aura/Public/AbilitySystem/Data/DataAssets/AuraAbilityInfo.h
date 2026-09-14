@@ -55,5 +55,8 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TArray<FAuraAbilityData> AbilityInformation;
 
-    FAuraAbilityData FindAbilityDataByTag(const FGameplayTag& AbilityTag, bool bLogNotFound = true) const;
+    UFUNCTION(BlueprintCallable)
+    bool FindAbilityDataByTag(FAuraAbilityData& OutAbilityData, const FGameplayTag& AbilityTag, bool bLogNotFound = true);
+    
+    FAuraAbilityData* ModifyAbilityDataByTag(const FGameplayTag& AbilityTag, bool bLogNotFound = true);
 };
