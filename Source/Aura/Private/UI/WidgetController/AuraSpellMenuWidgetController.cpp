@@ -7,6 +7,11 @@
 #include "AbilitySystem/Data/DataAssets/AuraAbilityInfo.h"
 #include "Player/AuraPlayerState.h"
 
+void UAuraSpellMenuWidgetController::Controller_SelectSpellButton(UAuraUserWidget* SpellButton)
+{
+    OnSkillBtnSelected.Broadcast(SpellButton);
+}
+
 void UAuraSpellMenuWidgetController::BroadcastInitialValues()
 {
     if (AuraAbilitySystemComponent && AuraPlayerState)

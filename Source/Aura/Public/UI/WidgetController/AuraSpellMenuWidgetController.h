@@ -6,6 +6,9 @@
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "AuraSpellMenuWidgetController.generated.h"
 
+class UAuraUserWidget;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSkillBtnSelectedSignature, UAuraUserWidget*, SpellGlobeButton);
+
 /**
  * 
  */
@@ -17,6 +20,12 @@ class AURA_API UAuraSpellMenuWidgetController : public UAuraWidgetController
 public:
     UPROPERTY(BlueprintAssignable)
     FOnPlayerStatChangedSignature OnSkillPointChange;
+    
+    UPROPERTY(BlueprintAssignable)
+    FOnSkillBtnSelectedSignature OnSkillBtnSelected;
+    
+    UFUNCTION(BlueprintCallable)
+    void Controller_SelectSpellButton(UAuraUserWidget* SpellButton);
     
     virtual void BroadcastInitialValues() override;
     virtual void BindDelegateCallbackFunctions() override;
