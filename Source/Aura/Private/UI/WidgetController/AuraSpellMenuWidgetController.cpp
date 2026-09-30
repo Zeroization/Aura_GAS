@@ -12,6 +12,14 @@ void UAuraSpellMenuWidgetController::Controller_SelectSpellButton(UAuraUserWidge
     OnSkillBtnSelected.Broadcast(SpellButton);
 }
 
+void UAuraSpellMenuWidgetController::Controller_OnSpendSkillPointPressed(const FGameplayTag& AbilityTag)
+{
+    if (AuraAbilitySystemComponent)
+    {
+        AuraAbilitySystemComponent->Server_SpendSkillPoint(AbilityTag);
+    }
+}
+
 void UAuraSpellMenuWidgetController::BroadcastInitialValues()
 {
     if (AuraAbilitySystemComponent && AuraPlayerState)
@@ -26,21 +34,27 @@ void UAuraSpellMenuWidgetController::BroadcastInitialValues()
 void UAuraSpellMenuWidgetController::BindDelegateCallbackFunctions()
 {
 #pragma region AuraASC
-    AuraAbilitySystemComponent->OnAbilityStatusChanged.AddLambda([this](const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag)
-    {
-        if (AbilityInfo)
+    AuraAbilitySystemComponent->OnAbilityStatusChanged.AddLambda(
+        [this](const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag, int32 AbilityLevel)
         {
-            FAuraAbilityData* Data = AbilityInfo->ModifyAbilityDataByTag(AbilityTag);
-            Data->SkillStatusTag = SkillStatusTag;
-            OnAbilityInfoSet.Broadcast(*Data);
-        }
-    });
+            if (AbilityInfo)
+            {
+                FAuraAbilityData* Data = AbilityInfo->ModifyAbilityDataByTag(AbilityTag);
+                Data->SkillStatusTag = SkillStatusTag;
+                // 看情况添加: Data->Level = AbilityLevel;
+                OnAbilityInfoSet.Broadcast(*Data);
+            }
+        });
 #pragma endregion
 
 #pragma region AuraPS
     AuraPlayerState->OnPlayerSkillPointChange.AddLambda([this](int32 SkillPoint)
     {
         OnSkillPointChange.Broadcast(SkillPoint);
+    });
+    AuraPlayerState->OnPlayerLevelChange.AddLambda([this](int32 Level)
+    {
+        OnLevelNumberChanged.Broadcast(Level);
     });
 #pragma endregion
 }

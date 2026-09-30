@@ -12,6 +12,37 @@
 #include "Interaction/Interface/PlayerInterface.h"
 #include "Player/AuraPlayerState.h"
 
+void UAuraAbilitySystemComponent::Server_SpendSkillPoint_Implementation(const FGameplayTag& AbilityTag)
+{
+    // 花费技能点
+    if (GetAvatarActor()->Implements<UPlayerInterface>())
+    {
+        IPlayerInterface::Execute_PlayerAddSkillPoint(GetAvatarActor(), -1);
+    }
+
+    // 改变对应技能的状态
+    if (FGameplayAbilitySpec* GASpec = GetSpecFromAbilityTag(AbilityTag))
+    {
+        FGameplayTag StatusTag = GetSkillStatusTagByAbilitySpec(*GASpec);
+        if (StatusTag.MatchesTagExact(AuraGameplayTags::GA::SkillStatus::Eligible))
+        {
+            // 解锁GA
+            GASpec->DynamicAbilityTags.RemoveTag(AuraGameplayTags::GA::SkillStatus::Eligible);
+            GASpec->DynamicAbilityTags.AddTag(AuraGameplayTags::GA::SkillStatus::Unlocked);
+            StatusTag = AuraGameplayTags::GA::SkillStatus::Unlocked;
+        }
+        else if (StatusTag.MatchesTagExact(AuraGameplayTags::GA::SkillStatus::Equipped) ||
+            StatusTag.MatchesTagExact(AuraGameplayTags::GA::SkillStatus::Unlocked))
+        {
+            // 升级GA
+            GASpec->Level += 1;
+        }
+
+        MarkAbilitySpecDirty(*GASpec);
+        Client_UpdateAbilityStatus(AbilityTag, StatusTag, GASpec->Level);
+    }
+}
+
 void UAuraAbilitySystemComponent::OnAbilityActorInfoSet()
 {
     OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UAuraAbilitySystemComponent::OnGEApplied);
@@ -117,13 +148,13 @@ void UAuraAbilitySystemComponent::UpdateAbilityStatus(int32 NewLevel)
                 NewLevel >= Data.LevelRequirement &&
                 GetSpecFromAbilityTag(Data.AbilityTag) == nullptr)
             {
-                FGameplayAbilitySpec GASpec = {Data.Ability, NewLevel};
+                FGameplayAbilitySpec GASpec = {Data.Ability, 1};
                 GASpec.DynamicAbilityTags.AddTag(AuraGameplayTags::GA::SkillStatus::Eligible);
                 GiveAbility(GASpec);
 
                 // 标记此AbilitySpec为脏, 强制提前网络同步
                 MarkAbilitySpecDirty(GASpec);
-                Client_UpdateAbilityStatus(Data.AbilityTag, AuraGameplayTags::GA::SkillStatus::Eligible);
+                Client_UpdateAbilityStatus(Data.AbilityTag, AuraGameplayTags::GA::SkillStatus::Eligible, GASpec.Level);
             }
         }
     }
@@ -220,9 +251,10 @@ void UAuraAbilitySystemComponent::OnGEApplied_Implementation(UAbilitySystemCompo
 }
 
 void UAuraAbilitySystemComponent::Client_UpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag,
-                                                                            const FGameplayTag& SkillStatusTag)
+                                                                            const FGameplayTag& SkillStatusTag,
+                                                                            int32 AbilityLevel)
 {
-    OnAbilityStatusChanged.Broadcast(AbilityTag, SkillStatusTag);
+    OnAbilityStatusChanged.Broadcast(AbilityTag, SkillStatusTag, AbilityLevel);
 }
 
 FGameplayTag UAuraAbilitySystemComponent::GetTagFromAbilitySpec(const FGameplayAbilitySpec& AbilitySpec,

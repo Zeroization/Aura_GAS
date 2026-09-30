@@ -18,15 +18,21 @@ class AURA_API UAuraSpellMenuWidgetController : public UAuraWidgetController
     GENERATED_BODY()
 
 public:
-    UPROPERTY(BlueprintAssignable)
+    UPROPERTY(BlueprintAssignable, Category = "GAS|Stats")
     FOnPlayerStatChangedSignature OnSkillPointChange;
+
+    UPROPERTY(BlueprintAssignable, Category = "GAS|Stats")
+    FOnPlayerStatChangedSignature OnLevelNumberChanged;
     
-    UPROPERTY(BlueprintAssignable)
+    UPROPERTY(BlueprintAssignable, Category = "GAS|UI")
     FOnSkillBtnSelectedSignature OnSkillBtnSelected;
-    
+
     UFUNCTION(BlueprintCallable)
     void Controller_SelectSpellButton(UAuraUserWidget* SpellButton);
-    
+
+    UFUNCTION(BlueprintCallable)
+    void Controller_OnSpendSkillPointPressed(const FGameplayTag& AbilityTag);
+
     virtual void BroadcastInitialValues() override;
     virtual void BindDelegateCallbackFunctions() override;
 };

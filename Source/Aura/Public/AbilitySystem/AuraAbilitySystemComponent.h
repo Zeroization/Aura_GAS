@@ -8,8 +8,8 @@
 
 class UAuraGameplayAbility;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAbilityStatusChanged, const FGameplayTag& /* AbilityTag */,
-                                     const FGameplayTag& /* SkillStatusTag */);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnAbilityStatusChanged, const FGameplayTag& /* AbilityTag */,
+                                       const FGameplayTag& /* SkillStatusTag */, int32 /* AbilityLevel */);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGetGEAssetTagDelegate, const FGameplayTagContainer& /* AssetTags */);
 DECLARE_MULTICAST_DELEGATE(FOnAbilitiesGivenDelegate);
 DECLARE_DELEGATE_OneParam(FForEachAbilityExecuteDelegate, const FGameplayAbilitySpec&);
@@ -29,6 +29,9 @@ public:
     FOnAbilitiesGivenDelegate OnAbilitiesGiven;
     FOnAbilityStatusChanged OnAbilityStatusChanged;
     bool bStartupAbilitiesGiven = false;
+
+    UFUNCTION(Server, Reliable)
+    void Server_SpendSkillPoint(const FGameplayTag& AbilityTag);
 
     /// 在 ASC->InitAbilityActorInfo() 被调用后执行
     void OnAbilityActorInfoSet();
@@ -53,7 +56,7 @@ public:
 #pragma region Attribute
     UFUNCTION(Server, Reliable)
     void Server_UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint);
-    
+
     void UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint = 1);
 #pragma endregion
 
@@ -66,9 +69,9 @@ protected:
 
     UFUNCTION(Server, Reliable)
     void Server_UpdateAbilityStatus();
-    
+
     UFUNCTION(Client, Reliable)
-    void Client_UpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag);
+    void Client_UpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag, int32 AbilityLevel);
 
 private:
     static FGameplayTag GetTagFromAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& CategoryRootTag, bool bDebugLog);
