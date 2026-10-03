@@ -43,6 +43,31 @@ void UAuraAbilitySystemComponent::Server_SpendSkillPoint_Implementation(const FG
     }
 }
 
+bool UAuraAbilitySystemComponent::GetAbilityDescription(const FGameplayTag& AbilityTag, FString& OutDesc, FString& OutNextLevelDesc)
+{
+    if (FGameplayAbilitySpec* GASpec = GetSpecFromAbilityTag(AbilityTag))
+    {
+        if (UAuraGameplayAbility* GA = Cast<UAuraGameplayAbility>(GASpec->Ability))
+        {
+            OutDesc = GA->GetDescription(GASpec->Level, GetAvatarActor());
+            OutNextLevelDesc = GA->GetNextLevelDescription(GASpec->Level + 1, GetAvatarActor());
+            return true;
+        }
+    }
+    else if (UAuraAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor()))
+    {
+        FAuraAbilityData Data;
+        AbilityInfo->FindAbilityDataByTag(Data, AbilityTag);
+        OutDesc = UAuraGameplayAbility::GetLockedDescription(Data.LevelRequirement);
+        OutNextLevelDesc = FString();
+        return false;
+    }
+
+    UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't find GA by tag: %s , also can't load AbilityInfo."), __FUNCTION__,
+           *AbilityTag.ToString());
+    return false;
+}
+
 void UAuraAbilitySystemComponent::OnAbilityActorInfoSet()
 {
     OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UAuraAbilitySystemComponent::OnGEApplied);

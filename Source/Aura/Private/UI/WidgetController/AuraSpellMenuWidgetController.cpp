@@ -7,17 +7,26 @@
 #include "AbilitySystem/Data/DataAssets/AuraAbilityInfo.h"
 #include "Player/AuraPlayerState.h"
 
-void UAuraSpellMenuWidgetController::Controller_SelectSpellButton(UAuraUserWidget* SpellButton)
+void UAuraSpellMenuWidgetController::Controller_SelectSpellButton(UAuraUserWidget* SpellButton, const FGameplayTag& AbilityTag)
 {
+    FSelectedBtnData Data;
+    if (AuraAbilitySystemComponent)
+    {
+        AuraAbilitySystemComponent->GetAbilityDescription(AbilityTag, Data.SkillDesc, Data.NextLevelSkillDesc);
+    }
+    OnUpdateSkillDesc.Broadcast(Data, AbilityTag);
     OnSkillBtnSelected.Broadcast(SpellButton);
 }
 
 void UAuraSpellMenuWidgetController::Controller_OnSpendSkillPointPressed(const FGameplayTag& AbilityTag)
 {
+    FSelectedBtnData Data;
     if (AuraAbilitySystemComponent)
     {
         AuraAbilitySystemComponent->Server_SpendSkillPoint(AbilityTag);
+        AuraAbilitySystemComponent->GetAbilityDescription(AbilityTag, Data.SkillDesc, Data.NextLevelSkillDesc);
     }
+    OnUpdateSkillDesc.Broadcast(Data, AbilityTag);
 }
 
 void UAuraSpellMenuWidgetController::BroadcastInitialValues()

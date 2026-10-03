@@ -5,10 +5,42 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "AbilitySystem/Data/DataAssets/AuraAbilityInfo.h"
 #include "Interaction/Actor/AuraProjectile.h"
 #include "Interaction/Interface/CombatInterface.h"
 #include "Game/AuraGameplayTags.h"
 
+
+FString UAuraProjectileSpell::GetDescription(int32 AbilityLevel, UObject* WorldContextObject)
+{
+    if (UAuraAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(WorldContextObject))
+    {
+        FAuraAbilityData Data;
+        FStringFormatNamedArguments Args;
+        if (AbilityInfo->FindAbilityDataByTag(Data, AbilityTags.GetByIndex(0)) &&
+            GetDescFormatArgs(Args, AbilityLevel))
+        {
+            return FString::Format(*Data.DescTemplate, Args);
+        }
+    }
+    return TEXT("如果你看到这串字符, 说明UAuraProjectileSpell::GetDescription中出现了错误.");
+}
+
+FString UAuraProjectileSpell::GetNextLevelDescription(int32 NextLevel, UObject* WorldContextObject)
+{
+    if (UAuraAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(WorldContextObject))
+    {
+        FAuraAbilityData Data;
+        FStringFormatNamedArguments Args;
+        if (AbilityInfo->FindAbilityDataByTag(Data, AbilityTags.GetByIndex(0)) &&
+            GetDescFormatArgs(Args, NextLevel))
+        {
+            return FString::Format(*Data.NextLvlDescTemplate, Args);
+        }
+    }
+    return TEXT("如果你看到这串字符, 说明UAuraProjectileSpell::GetDescription中出现了错误.");
+}
 
 void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation, const FGameplayTag& SocketTag)
 {
@@ -55,4 +87,13 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
                                            const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
     Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
+bool UAuraProjectileSpell::GetDescFormatArgs(FStringFormatNamedArguments& Args, int32 AbilityLevel)
+{
+    if (Super::GetDescFormatArgs(Args, AbilityLevel))
+    {
+        Args.Add(TEXT("_ProjectileNum"), FMath::Min(AbilityLevel, ProjectileMaxSpawnNum));
+    }
+    return true;
 }

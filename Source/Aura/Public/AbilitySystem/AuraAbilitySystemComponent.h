@@ -33,6 +33,9 @@ public:
     UFUNCTION(Server, Reliable)
     void Server_SpendSkillPoint(const FGameplayTag& AbilityTag);
 
+    /// 根据AbilityTag返回对应GA的描述, 找不到返回默认描述以及false 
+    bool GetAbilityDescription(const FGameplayTag& AbilityTag, FString& OutDesc, FString& OutNextLevelDesc);
+
     /// 在 ASC->InitAbilityActorInfo() 被调用后执行
     void OnAbilityActorInfoSet();
     /// 赋予Actor默认GA

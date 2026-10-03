@@ -5,6 +5,8 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "Aura/Aura.h"
+#include "Game/AuraGameplayTags.h"
 
 void UAuraDamageGA::CauseDamage(AActor* TargetActor)
 {
@@ -17,4 +19,38 @@ void UAuraDamageGA::CauseDamage(AActor* TargetActor)
     GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageGESpecHandle.Data,
                                                                               UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(
                                                                                   TargetActor));
+}
+
+bool UAuraDamageGA::GetDescFormatArgs(FStringFormatNamedArguments& Args, int32 AbilityLevel)
+{
+    if (Super::GetDescFormatArgs(Args, AbilityLevel))
+    {
+        for (auto& [DamageTypeTag, DamageScaledValue] : DamageElemToValue)
+        {
+            int32 DamageValue = DamageScaledValue.GetValueAtLevel(AbilityLevel);
+            if (DamageTypeTag.MatchesTagExact(AuraGameplayTags::Damage::ElemType::Physical))
+            {
+                Args.Add(TEXT("_PhysicalDamage"), DamageValue);
+            }
+            else if (DamageTypeTag.MatchesTagExact(AuraGameplayTags::Damage::ElemType::Fire))
+            {
+                Args.Add(TEXT("_FireDamage"), DamageValue);
+            }
+            else if (DamageTypeTag.MatchesTagExact(AuraGameplayTags::Damage::ElemType::Lightning))
+            {
+                Args.Add(TEXT("_LightningDamage"), DamageValue);
+            }
+            else if (DamageTypeTag.MatchesTagExact(AuraGameplayTags::Damage::ElemType::Arcane))
+            {
+                Args.Add(TEXT("_ArcaneDamage"), DamageValue);
+            }
+            else
+            {
+                UE_LOG(LogAuraGame, Warning, TEXT("[%hs]: Unknown damage tag %s with damage value %d"), __FUNCTION__,
+                       *DamageTypeTag.ToString(), DamageValue);
+                return false;
+            }
+        }
+    }
+    return true;
 }

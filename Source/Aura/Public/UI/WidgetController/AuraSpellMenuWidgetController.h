@@ -7,7 +7,22 @@
 #include "AuraSpellMenuWidgetController.generated.h"
 
 class UAuraUserWidget;
+
+USTRUCT(BlueprintType)
+struct FSelectedBtnData
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly)
+    FString SkillDesc;
+
+    UPROPERTY(BlueprintReadOnly)
+    FString NextLevelSkillDesc;
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSkillBtnSelectedSignature, UAuraUserWidget*, SpellGlobeButton);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateSkillDescSignature, FSelectedBtnData, Data, const FGameplayTag&, AbilityTag);
 
 /**
  * 
@@ -23,12 +38,15 @@ public:
 
     UPROPERTY(BlueprintAssignable, Category = "GAS|Stats")
     FOnPlayerStatChangedSignature OnLevelNumberChanged;
-    
+
     UPROPERTY(BlueprintAssignable, Category = "GAS|UI")
     FOnSkillBtnSelectedSignature OnSkillBtnSelected;
 
+    UPROPERTY(BlueprintAssignable, Category = "GAS|UI")
+    FOnUpdateSkillDescSignature OnUpdateSkillDesc;
+
     UFUNCTION(BlueprintCallable)
-    void Controller_SelectSpellButton(UAuraUserWidget* SpellButton);
+    void Controller_SelectSpellButton(UAuraUserWidget* SpellButton, const FGameplayTag& AbilityTag);
 
     UFUNCTION(BlueprintCallable)
     void Controller_OnSpendSkillPointPressed(const FGameplayTag& AbilityTag);

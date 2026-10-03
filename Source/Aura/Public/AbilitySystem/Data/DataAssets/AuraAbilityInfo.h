@@ -36,6 +36,12 @@ struct FAuraAbilityData
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="对应SpellGlobe上的技能背景"))
     TObjectPtr<UMaterialInterface> SkillBackground;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA的当前等级描述模板", MultiLine=true))
+    FString DescTemplate;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA的下一等级描述模板", MultiLine=true))
+    FString NextLvlDescTemplate;
+
     UPROPERTY(BlueprintReadOnly)
     FGameplayTag InputTag;
 
@@ -57,6 +63,6 @@ public:
 
     UFUNCTION(BlueprintCallable)
     bool FindAbilityDataByTag(FAuraAbilityData& OutAbilityData, const FGameplayTag& AbilityTag, bool bLogNotFound = true);
-    
+
     FAuraAbilityData* ModifyAbilityDataByTag(const FGameplayTag& AbilityTag, bool bLogNotFound = true);
 };
