@@ -18,6 +18,11 @@ void UAuraSpellMenuWidgetController::Controller_SelectSpellButton(UAuraUserWidge
     OnSkillBtnSelected.Broadcast(SpellButton);
 }
 
+void UAuraSpellMenuWidgetController::Controller_DiselectSpellButton(UAuraUserWidget* SpellButton)
+{
+    OnSkillBtnDisSelected.Broadcast(SpellButton);
+}
+
 void UAuraSpellMenuWidgetController::Controller_OnSpendSkillPointPressed(const FGameplayTag& AbilityTag)
 {
     FSelectedBtnData Data;

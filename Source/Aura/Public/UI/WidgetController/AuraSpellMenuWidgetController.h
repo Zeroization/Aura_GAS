@@ -13,10 +13,10 @@ struct FSelectedBtnData
 {
     GENERATED_BODY()
 
-    UPROPERTY(BlueprintReadOnly)
+    UPROPERTY(BlueprintReadWrite)
     FString SkillDesc;
 
-    UPROPERTY(BlueprintReadOnly)
+    UPROPERTY(BlueprintReadWrite)
     FString NextLevelSkillDesc;
 };
 
@@ -43,10 +43,16 @@ public:
     FOnSkillBtnSelectedSignature OnSkillBtnSelected;
 
     UPROPERTY(BlueprintAssignable, Category = "GAS|UI")
+    FOnSkillBtnSelectedSignature OnSkillBtnDisSelected;
+
+    UPROPERTY(BlueprintAssignable, Category = "GAS|UI")
     FOnUpdateSkillDescSignature OnUpdateSkillDesc;
 
     UFUNCTION(BlueprintCallable)
     void Controller_SelectSpellButton(UAuraUserWidget* SpellButton, const FGameplayTag& AbilityTag);
+
+    UFUNCTION(BlueprintCallable)
+    void Controller_DiselectSpellButton(UAuraUserWidget* SpellButton);
 
     UFUNCTION(BlueprintCallable)
     void Controller_OnSpendSkillPointPressed(const FGameplayTag& AbilityTag);
