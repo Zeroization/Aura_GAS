@@ -18,7 +18,7 @@ void UAuraSpellMenuWidgetController::Controller_SelectSpellButton(UAuraUserWidge
     OnSkillBtnSelected.Broadcast(SpellButton);
 }
 
-void UAuraSpellMenuWidgetController::Controller_DiselectSpellButton(UAuraUserWidget* SpellButton)
+void UAuraSpellMenuWidgetController::Controller_DeselectSpellButton(UAuraUserWidget* SpellButton)
 {
     OnSkillBtnDisSelected.Broadcast(SpellButton);
 }

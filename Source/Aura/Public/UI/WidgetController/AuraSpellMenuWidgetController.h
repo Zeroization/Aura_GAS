@@ -52,7 +52,7 @@ public:
     void Controller_SelectSpellButton(UAuraUserWidget* SpellButton, const FGameplayTag& AbilityTag);
 
     UFUNCTION(BlueprintCallable)
-    void Controller_DiselectSpellButton(UAuraUserWidget* SpellButton);
+    void Controller_DeselectSpellButton(UAuraUserWidget* SpellButton);
 
     UFUNCTION(BlueprintCallable)
     void Controller_OnSpendSkillPointPressed(const FGameplayTag& AbilityTag);
