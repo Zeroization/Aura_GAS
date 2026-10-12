@@ -6,9 +6,9 @@
 #include "Aura/Aura.h"
 
 
-FAuraAbilityData UAuraAbilityInfo::FindAbilityDataByTag(const FGameplayTag& AbilityTag, bool bLogNotFound) const
+bool UAuraAbilityInfo::FindAbilityDataByTag(FAuraAbilityData& OutAbilityData, const FGameplayTag& AbilityTag, bool bLogNotFound)
 {
-    auto* RetVal = AbilityInformation.FindByPredicate([&AbilityTag](const FAuraAbilityData& Data) -> bool
+    const FAuraAbilityData* RetVal = AbilityInformation.FindByPredicate([&AbilityTag](const FAuraAbilityData& Data) -> bool
     {
         return Data.AbilityTag == AbilityTag;
     });
@@ -22,7 +22,31 @@ FAuraAbilityData UAuraAbilityInfo::FindAbilityDataByTag(const FGameplayTag& Abil
                    *AbilityTag.ToString(),
                    *GetNameSafe(this));
         }
-        return {};
+        OutAbilityData = {};
+        return false;
     }
-    return *RetVal;
+
+    OutAbilityData = *RetVal;
+    return true;
+}
+
+FAuraAbilityData* UAuraAbilityInfo::ModifyAbilityDataByTag(const FGameplayTag& AbilityTag, bool bLogNotFound)
+{
+    FAuraAbilityData* RetVal = AbilityInformation.FindByPredicate([&AbilityTag](const FAuraAbilityData& Data) -> bool
+    {
+        return Data.AbilityTag == AbilityTag;
+    });
+
+    if (RetVal == nullptr)
+    {
+        if (bLogNotFound)
+        {
+            UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't find data for AbilityTag [ %s ] on AuraAbilityInfo [ %s ]"),
+                   __FUNCTION__,
+                   *AbilityTag.ToString(),
+                   *GetNameSafe(this));
+        }
+    }
+
+    return RetVal;
 }

@@ -24,4 +24,6 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraGA|Properties|Damage")
     TSubclassOf<UGameplayEffect> DamageEffectClass;
+
+    virtual bool GetDescFormatArgs(FStringFormatNamedArguments& Args, int32 AbilityLevel) override;
 };

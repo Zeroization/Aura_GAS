@@ -25,6 +25,9 @@ DECLARE_LOG_CATEGORY_EXTERN(LogAuraGame, Log, All);
 #define AURA_ACTOR_FNAME_TAG_PLAYER "Player"
 #define AURA_ACTOR_FNAME_TAG_ENEMY "Enemy"
 
+// AttributeName
+#define AURA_ATTRIBUTE_NAME_MANA TEXT("Mana")
+
 UENUM(BlueprintType, meta=(Bitflags))
 enum class EAuraDamageType : uint8
 {

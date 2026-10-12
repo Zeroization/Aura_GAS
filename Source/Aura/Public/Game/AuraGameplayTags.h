@@ -68,31 +68,53 @@ namespace AuraGameplayTags
 
     namespace GA
     {
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);   // "GA"
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack); // "GA.Attack"
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Summon); // "GA.Summon"
-
-        namespace Fire
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "GA"
+        namespace Skill
         {
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "GA.Fire"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(FireBolt); // "GA.Fire.FireBolt"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);   // "GA.Skill"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack); // "GA.Skill.Attack"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Summon); // "GA.Skill.Summon"
+
+            namespace Fire
+            {
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "GA.Skill.Fire"
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(FireBolt); // "GA.Skill.Fire.FireBolt"
+            }
+
+            namespace Lightning
+            {
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);        // "GA.Skill.Lightning"
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Electrocute); // "GA.Skill.Lightning.Electrocute"
+            }
+
+            namespace Passive
+            {
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);          // "GA.Skill.Passive"
+                UE_DECLARE_GAMEPLAY_TAG_EXTERN(ListenForEvent) // "GA.Skill.Passive.ListenForEvent"
+            }
         }
 
-        namespace Passive
+        namespace Cooldown
         {
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);          // "GA.Passive"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(ListenForEvent) // "GA.Passive.ListenForEvent"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "GA.Cooldown"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(FireBolt); // "GA.Cooldown.FireBolt"
         }
-    }
 
-    namespace Cooldown
-    {
-        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root); // "Cooldown"
-
-        namespace Fire
+        namespace SkillStatus
         {
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "Cooldown.Fire"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(FireBolt); // "Cooldown.Fire.FireBolt"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);     // "GA.SkillStatus"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Locked);   // "GA.SkillStatus.Locked"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Eligible); // "GA.SkillStatus.Eligible"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Unlocked); // "GA.SkillStatus.Unlocked"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipped); // "GA.SkillStatus.Equipped"
+        }
+
+        namespace SkillType
+        {
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);      // "GA.SkillType"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Offensive); // "GA.SkillType.Offensive"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Passive);   // "GA.SkillType.Passive"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(None);      // "GA.SkillType.None"
         }
     }
 
@@ -173,6 +195,13 @@ namespace AuraGameplayTags
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_2); // "Input.Keyboard.2"
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_3); // "Input.Keyboard.3"
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_4); // "Input.Keyboard.4"
+        }
+
+        namespace Passive
+        {
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);  // "Input.Passive"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_1); // "Input.Passive.1"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Num_2); // "Input.Passive.2"
         }
     }
 }

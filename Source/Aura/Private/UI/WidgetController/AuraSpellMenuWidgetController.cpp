@@ -1,0 +1,90 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "UI/WidgetController/AuraSpellMenuWidgetController.h"
+
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/Data/DataAssets/AuraAbilityInfo.h"
+#include "Player/AuraPlayerState.h"
+
+void UAuraSpellMenuWidgetController::Controller_SelectSpellButton(UAuraUserWidget* SpellButton, const FGameplayTag& AbilityTag)
+{
+    FSelectedBtnData SelectedBtnData(AuraAbilitySystemComponent, AbilityTag);
+    OnUpdateSkillDesc.Broadcast(SelectedBtnData, AbilityTag);
+    OnSkillBtnSelected.Broadcast(SpellButton);
+}
+
+void UAuraSpellMenuWidgetController::Controller_DeselectSpellButton(UAuraUserWidget* SpellButton)
+{
+    OnSkillBtnDisSelected.Broadcast(SpellButton);
+}
+
+void UAuraSpellMenuWidgetController::Controller_OnSpendSkillPointPressed(const FGameplayTag& AbilityTag)
+{
+    FSelectedBtnData SelectedBtnData(AuraAbilitySystemComponent, AbilityTag);
+    if (AuraAbilitySystemComponent)
+    {
+        AuraAbilitySystemComponent->Server_SpendSkillPoint(AbilityTag);
+    }
+    OnUpdateSkillDesc.Broadcast(SelectedBtnData, AbilityTag);
+}
+
+void UAuraSpellMenuWidgetController::OnSkillEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag,
+                                                     const FGameplayTag& NewInputTag, const FGameplayTag& PrevInputTag)
+{
+    // 在UI层面清空输入为PrevInputTag的技能们
+    FAuraAbilityData PrevAbilityData;
+    PrevAbilityData.SkillStatusTag = SkillStatusTag;
+    PrevAbilityData.InputTag = PrevInputTag;
+    PrevAbilityData.AbilityTag = FGameplayTag::EmptyTag;
+    OnAbilityInfoSet.Broadcast(PrevAbilityData);
+
+    // 在UI层面广播装备好的技能
+    FAuraAbilityData* CurData = AbilityInfo->ModifyAbilityDataByTag(AbilityTag);
+    CurData->SkillStatusTag = SkillStatusTag;
+    CurData->InputTag = NewInputTag;
+    OnAbilityInfoSet.Broadcast(*CurData);
+
+    // 停止播放动画
+    OnStopWaitingForEquipSkill.Broadcast();
+}
+
+void UAuraSpellMenuWidgetController::BroadcastInitialValues()
+{
+    if (AuraAbilitySystemComponent && AuraPlayerState)
+    {
+        AuraAbilitySystemComponent->UpdateAbilityStatus(AuraPlayerState->GetPlayerLevel());
+    }
+
+    BroadcastInitialAbilities();
+    OnSkillPointChange.Broadcast(AuraPlayerState->GetSkillPoint());
+}
+
+void UAuraSpellMenuWidgetController::BindDelegateCallbackFunctions()
+{
+#pragma region AuraASC
+    AuraAbilitySystemComponent->OnAbilityStatusChanged.AddLambda(
+        [this](const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag, int32 AbilityLevel)
+        {
+            if (AbilityInfo)
+            {
+                FAuraAbilityData* Data = AbilityInfo->ModifyAbilityDataByTag(AbilityTag);
+                Data->SkillStatusTag = SkillStatusTag;
+                // 看情况添加: Data->Level = AbilityLevel;
+                OnAbilityInfoSet.Broadcast(*Data);
+            }
+        });
+    AuraAbilitySystemComponent->OnAbilityEquipped.AddUObject(this, &UAuraSpellMenuWidgetController::OnSkillEquipped);
+#pragma endregion
+
+#pragma region AuraPS
+    AuraPlayerState->OnPlayerSkillPointChange.AddLambda([this](int32 SkillPoint)
+    {
+        OnSkillPointChange.Broadcast(SkillPoint);
+    });
+    AuraPlayerState->OnPlayerLevelChange.AddLambda([this](int32 Level)
+    {
+        OnLevelNumberChanged.Broadcast(Level);
+    });
+#pragma endregion
+}

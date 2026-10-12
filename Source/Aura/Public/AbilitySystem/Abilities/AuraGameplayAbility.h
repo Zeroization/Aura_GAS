@@ -31,6 +31,10 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "AuraGA|Properties|Input")
     FGameplayTag StartupInputTag;
 
+    virtual FString GetDescription(int32 AbilityLevel, UObject* WorldContextObject);
+    virtual FString GetNextLevelDescription(int32 NextLevel, UObject* WorldContextObject);
+    static FString GetLockedDescription(int32 LevelRequirement);
+
 #pragma region Cost
     UPROPERTY(EditDefaultsOnly, Category = "AuraGA|Properties|Cost")
     TArray<FAbilityCost> Costs;
@@ -54,4 +58,7 @@ public:
     virtual void ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
                                const FGameplayAbilityActivationInfo ActivationInfo) const override;
 #pragma endregion
+
+protected:
+    virtual bool GetDescFormatArgs(FStringFormatNamedArguments& Args, int32 AbilityLevel);
 };

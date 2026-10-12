@@ -5,33 +5,48 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
+#include "Game/AuraGameplayTags.h"
 #include "AuraAbilityInfo.generated.h"
+
+class UGameplayAbility;
 
 USTRUCT(BlueprintType)
 struct FAuraAbilityData
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability的GameplayTag"))
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA所属的GameplayTag"))
     FGameplayTag AbilityTag;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability的唯一冷却Tag"))
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA的唯一冷却Tag"))
     FGameplayTag CooldownTag;
 
-    UPROPERTY(BlueprintReadOnly)
-    FGameplayTag InputTag;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA的技能类型Tag"))
+    FGameplayTag SkillTypeTag = AuraGameplayTags::GA::SkillType::None;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability是否为被动类型"))
-    bool bIsPassive = false;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="解锁该GA的玩家等级"))
+    int32 LevelRequirement = 0;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="Ability是否该显示到技能球上(TODO: 教程还没讲到这里)"))
-    bool bIsHidden = false;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA的UGameplayAbility类"))
+    TSubclassOf<UGameplayAbility> Ability;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="对应SpellGlobe上的技能图标"))
     TObjectPtr<UTexture2D> SkillIcon;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="对应SpellGlobe上的技能背景"))
     TObjectPtr<UMaterialInterface> SkillBackground;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA的当前等级描述模板", MultiLine=true))
+    FString DescTemplate;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该GA的下一等级描述模板", MultiLine=true))
+    FString NextLvlDescTemplate;
+
+    UPROPERTY(BlueprintReadOnly)
+    FGameplayTag InputTag;
+
+    UPROPERTY(BlueprintReadOnly)
+    FGameplayTag SkillStatusTag = AuraGameplayTags::GA::SkillStatus::Locked;
 };
 
 /**
@@ -46,5 +61,8 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TArray<FAuraAbilityData> AbilityInformation;
 
-    FAuraAbilityData FindAbilityDataByTag(const FGameplayTag& AbilityTag, bool bLogNotFound = true) const;
+    UFUNCTION(BlueprintCallable)
+    bool FindAbilityDataByTag(FAuraAbilityData& OutAbilityData, const FGameplayTag& AbilityTag, bool bLogNotFound = true);
+
+    FAuraAbilityData* ModifyAbilityDataByTag(const FGameplayTag& AbilityTag, bool bLogNotFound = true);
 };

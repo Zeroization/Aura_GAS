@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "AuraHUD.generated.h"
 
+class UAuraSpellMenuWidgetController;
 class UAuraAttributeMenuWidgetController;
 class UAuraAttributeSet;
 class UAuraAbilitySystemComponent;
@@ -20,49 +21,54 @@ class UAuraUserWidget;
 UCLASS()
 class AURA_API AAuraHUD : public AHUD
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void InitHUD(AAuraPlayerController* InPlayerController, AAuraPlayerState* InPlayerState,
-						   UAuraAbilitySystemComponent* InAbilitySystemComponent,
-						   UAuraAttributeSet* InAttributeSet);
+    UFUNCTION(BlueprintCallable)
+    void InitHUD(AAuraPlayerController* InPlayerController, AAuraPlayerState* InPlayerState,
+                 UAuraAbilitySystemComponent* InAbilitySystemComponent,
+                 UAuraAttributeSet* InAttributeSet);
 
-	UFUNCTION(BlueprintPure)
-	UAuraOverlayWidgetController* GetAuraOverlayWidgetController(const FAuraWidgetControllerParams& InParams);
+    UFUNCTION(BlueprintPure)
+    UAuraOverlayWidgetController* GetAuraOverlayWidgetController(const FAuraWidgetControllerParams& InParams);
 
-	UFUNCTION(BlueprintPure)
-	UAuraAttributeMenuWidgetController* GetAuraAttributeMenuWidgetController(const FAuraWidgetControllerParams& InParams);
+    UFUNCTION(BlueprintPure)
+    UAuraAttributeMenuWidgetController* GetAuraAttributeMenuWidgetController(const FAuraWidgetControllerParams& InParams);
+
+    UFUNCTION(BlueprintPure)
+    UAuraSpellMenuWidgetController* GetAuraSpellMenuWidgetController(const FAuraWidgetControllerParams& InParams);
 
 protected:
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
 private:
-	/// Begin Category: Widget Overlay>>>>>>>>>>>>>>>>>>>>>>>
-	UPROPERTY(EditAnywhere, Category = "Widget|Overlay")
-	TSubclassOf<UAuraUserWidget> OverlayWidgetClass;
+    /// Begin Category: Widget Overlay>>>>>>>>>>>>>>>>>>>>>>>
+    UPROPERTY(EditAnywhere, Category = "Aura HUD|Overlay")
+    TSubclassOf<UAuraUserWidget> OverlayWidgetClass;
 
-	UPROPERTY(EditAnywhere, Category = "Widget|Overlay")
-	TSubclassOf<UAuraOverlayWidgetController> OverlayWidgetControllerClass;
+    UPROPERTY(EditAnywhere, Category = "Aura HUD|Overlay")
+    TSubclassOf<UAuraOverlayWidgetController> OverlayWidgetControllerClass;
 
-	UPROPERTY()
-	TObjectPtr<UAuraUserWidget> OverlayWidget;
+    UPROPERTY()
+    TObjectPtr<UAuraUserWidget> OverlayWidget;
 
-	UPROPERTY()
-	TObjectPtr<UAuraOverlayWidgetController> OverlayWidgetController;
-	/// End Category: Widget Overlay>>>>>>>>>>>>>>>>>>>>>>>>>
+    UPROPERTY()
+    TObjectPtr<UAuraOverlayWidgetController> OverlayWidgetController;
+    /// End Category: Widget Overlay>>>>>>>>>>>>>>>>>>>>>>>>>
 
-	/// Begin Category: Widget Attribute Menu >>>>>>>>>>>>>>>
-	UPROPERTY(EditAnywhere, Category = "Widget|Attribute Menu")
-	TSubclassOf<UAuraUserWidget> AttributeMenuWidgetClass;
+    /// Begin Category: Widget Attribute Menu >>>>>>>>>>>>>>>
+    UPROPERTY(EditAnywhere, Category = "Aura HUD|Attribute Menu")
+    TSubclassOf<UAuraAttributeMenuWidgetController> AttributeMenuWidgetControllerClass;
 
-	UPROPERTY(EditAnywhere, Category = "Widget|Attribute Menu")
-	TSubclassOf<UAuraAttributeMenuWidgetController> AttributeMenuWidgetControllerClass;
+    UPROPERTY()
+    TObjectPtr<UAuraAttributeMenuWidgetController> AttributeMenuWidgetController;
+    /// End Category: Widget Attribute Menu >>>>>>>>>>>>>>>>>
 
-	UPROPERTY()
-	TObjectPtr<UAuraUserWidget> AttributeMenuWidget;
+    /// Begin Category: Widget Spell Menu >>>>>>>>>>>>>>>
+    UPROPERTY(EditAnywhere, Category = "Aura HUD|Spell Menu")
+    TSubclassOf<UAuraSpellMenuWidgetController> SpellMenuWidgetControllerClass;
 
-	UPROPERTY()
-	TObjectPtr<UAuraAttributeMenuWidgetController> AttributeMenuWidgetController;
-	/// End Category: Widget Attribute Menu >>>>>>>>>>>>>>>>>
+    UPROPERTY()
+    TObjectPtr<UAuraSpellMenuWidgetController> SpellMenuWidgetController;
+    /// End Category: Widget Spell Menu >>>>>>>>>>>>>>>>>
 };

@@ -7,7 +7,9 @@
 #include "UObject/NoExportTypes.h"
 #include "AuraWidgetController.generated.h"
 
+class UAuraAbilityInfo;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangedSignature, float, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAbilityInfoSetSignature, const FAuraAbilityData&, AbilityData);
 
 class AAuraPlayerController;
 class AAuraPlayerState;
@@ -52,12 +54,17 @@ class AURA_API UAuraWidgetController : public UObject
     GENERATED_BODY()
 
 public:
+    UPROPERTY(BlueprintAssignable, Category = "GAS|Abilities")
+    FOnAbilityInfoSetSignature OnAbilityInfoSet;
+    
     UFUNCTION(BlueprintCallable)
     void SetWidgetControllerParams(const FAuraWidgetControllerParams& InParams);
-
+    
     UFUNCTION(BlueprintCallable)
     virtual void BroadcastInitialValues();
     virtual void BindDelegateCallbackFunctions();
+    
+    void BroadcastInitialAbilities();
 
 protected:
     /// Begin Category: Widget Controller >>>>>>>>>>>>>>>>>>>>>>>
@@ -73,4 +80,7 @@ protected:
     UPROPERTY(BlueprintReadOnly, Category = "Widget Controller")
     TObjectPtr<UAuraAttributeSet> AuraAttributeSet;
     /// End Category: Widget Controller   >>>>>>>>>>>>>>>>>>>>>>>
+    
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
+    TObjectPtr<UAuraAbilityInfo> AbilityInfo;
 };

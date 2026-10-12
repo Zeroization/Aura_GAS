@@ -8,8 +8,13 @@
 
 class UAuraGameplayAbility;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnGetGEAssetTagDelegate, const FGameplayTagContainer&);
+
 DECLARE_MULTICAST_DELEGATE(FOnAbilitiesGivenDelegate);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGetGEAssetTagDelegate, const FGameplayTagContainer& /* AssetTags */);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnAbilityStatusChanged, const FGameplayTag& /* AbilityTag */,
+                                       const FGameplayTag& /* SkillStatusTag */, int32 /* AbilityLevel */);
+DECLARE_MULTICAST_DELEGATE_FourParams(FOnAbilityEquipped, const FGameplayTag& /* AbilityTag */, const FGameplayTag& /* SkillStatusTag */,
+                                      const FGameplayTag& /* NewInputTag */, const FGameplayTag& /* PrevInputTag */);
 DECLARE_DELEGATE_OneParam(FForEachAbilityExecuteDelegate, const FGameplayAbilitySpec&);
 
 /**
@@ -25,7 +30,28 @@ public:
 
 #pragma region GA
     FOnAbilitiesGivenDelegate OnAbilitiesGiven;
+    FOnAbilityStatusChanged OnAbilityStatusChanged;
+    FOnAbilityEquipped OnAbilityEquipped;
     bool bStartupAbilitiesGiven = false;
+
+    UFUNCTION(Server, Reliable)
+    void Server_SpendSkillPoint(const FGameplayTag& AbilityTag);
+
+    UFUNCTION(Server, Reliable, BlueprintCallable)
+    void Server_EquipSkill(const FGameplayTag& AbilityTag, const FGameplayTag& NewInputTag);
+
+    UFUNCTION(Client, Reliable)
+    void Client_EquipSkill(const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag, const FGameplayTag& NewInputTag,
+                           const FGameplayTag& PrevInputTag);
+
+    UFUNCTION(BlueprintCallable)
+    FGameplayTag GetSkillStatusTagByAbilityTag(const FGameplayTag& AbilityTag, bool bDebugLog = false);
+
+    UFUNCTION(BlueprintCallable)
+    FGameplayTag GetInputTagByAbilityTag(const FGameplayTag& AbilityTag, bool bDebugLog = true);
+
+    /// 根据AbilityTag返回对应GA的描述, 找不到返回默认描述以及false 
+    bool GetAbilityDescription(const FGameplayTag& AbilityTag, FString& OutDesc, FString& OutNextLevelDesc);
 
     /// 在 ASC->InitAbilityActorInfo() 被调用后执行
     void OnAbilityActorInfoSet();
@@ -36,17 +62,25 @@ public:
     /// 根据输入Tag触发的GA回调
     void AbilityInputTagOnHeld(const FGameplayTag& InputTag);
     void AbilityInputTagOnReleased(const FGameplayTag& InputTag);
+    /// 清除指定GA的InputTag
+    void ClearGAInputByAbilitySpec(FGameplayAbilitySpec& AbilitySpec);
+    /// 清除所有包含指定InputTag的GA中的InputTag
+    void ClearAllGAsInputBySpecificInputTag(const FGameplayTag& InputTag);
     /// 让每个GA执行一次FForEachAbilityExecuteDelegate回调
     void ForEachAbility(const FForEachAbilityExecuteDelegate& DelegateToExecute);
+    /// 升级后检查并更新GA解锁信息
+    void UpdateAbilityStatus(int32 NewLevel);
 
-    static FGameplayTag GetAbilityTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec);
-    static FGameplayTag GetInputTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec);
+    FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& AbilityTag, bool bDebugLog = false);
+    static FGameplayTag GetAbilityTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, bool bDebugLog = true);
+    static FGameplayTag GetInputTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, bool bDebugLog = true);
+    static FGameplayTag GetSkillStatusTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, bool bDebugLog = true);
 #pragma endregion
 
 #pragma region Attribute
     UFUNCTION(Server, Reliable)
     void Server_UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint);
-    
+
     void UpgradePrimaryAttribute(const FGameplayTag& PrimaryAttributeTag, int32 CostAttributePoint = 1);
 #pragma endregion
 
@@ -56,4 +90,13 @@ protected:
     UFUNCTION(Client, Reliable)
     void OnGEApplied(UAbilitySystemComponent* InASC, const FGameplayEffectSpec& InGESpec,
                      FActiveGameplayEffectHandle ActiveGEHandle);
+
+    UFUNCTION(Server, Reliable)
+    void Server_UpdateAbilityStatus();
+
+    UFUNCTION(Client, Reliable)
+    void Client_UpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag, int32 AbilityLevel);
+
+private:
+    static FGameplayTag GetTagFromAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& CategoryRootTag, bool bDebugLog);
 };

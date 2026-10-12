@@ -7,24 +7,9 @@
 #include "UI/Widget/AuraUserWidget.h"
 #include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "UI/WidgetController/AuraOverlayWidgetController.h"
+#include "UI/WidgetController/AuraSpellMenuWidgetController.h"
 #include "UI/WidgetController/AuraWidgetController.h"
 
-
-UAuraOverlayWidgetController* AAuraHUD::GetAuraOverlayWidgetController(const FAuraWidgetControllerParams& InParams)
-{
-    if (OverlayWidgetController == nullptr)
-    {
-        OverlayWidgetController = NewObject<UAuraOverlayWidgetController>(this, OverlayWidgetControllerClass);
-        OverlayWidgetController->SetWidgetControllerParams(InParams);
-        OverlayWidgetController->BindDelegateCallbackFunctions();
-    }
-    // else
-    // {
-    // 	OverlayWidgetController->SetWidgetControllerParams(InParams);
-    // }
-
-    return OverlayWidgetController;
-}
 
 void AAuraHUD::InitHUD(AAuraPlayerController* InPlayerController, AAuraPlayerState* InPlayerState,
                        UAuraAbilitySystemComponent* InAbilitySystemComponent,
@@ -47,13 +32,25 @@ void AAuraHUD::InitHUD(AAuraPlayerController* InPlayerController, AAuraPlayerSta
     /// 注: 这里和教程不一样, 3和4对调了, 原因是我在初始化技能图标时服务器没有，客户端有，问AI好像是UI生命周期的问题,
     ///     Slate Widget未完全建立时进行数据的多播, 导致无效多播.
     /// UE版本5.4.4
-    
+
     // 3. 添加到角色视口中
     OverlayWidget->AddToViewport();
-    
+
     // 4. 通过WidgetController初始化UI数据
     WidgetController->BroadcastInitialValues();
     WidgetController->BroadcastAbilityData();
+}
+
+UAuraOverlayWidgetController* AAuraHUD::GetAuraOverlayWidgetController(const FAuraWidgetControllerParams& InParams)
+{
+    if (OverlayWidgetController == nullptr)
+    {
+        OverlayWidgetController = NewObject<UAuraOverlayWidgetController>(this, OverlayWidgetControllerClass);
+        OverlayWidgetController->SetWidgetControllerParams(InParams);
+        OverlayWidgetController->BindDelegateCallbackFunctions();
+    }
+
+    return OverlayWidgetController;
 }
 
 UAuraAttributeMenuWidgetController* AAuraHUD::GetAuraAttributeMenuWidgetController(const FAuraWidgetControllerParams& InParams)
@@ -64,12 +61,20 @@ UAuraAttributeMenuWidgetController* AAuraHUD::GetAuraAttributeMenuWidgetControll
         AttributeMenuWidgetController->SetWidgetControllerParams(InParams);
         AttributeMenuWidgetController->BindDelegateCallbackFunctions();
     }
-    // else
-    // {
-    // 	AttributeMenuWidgetController->SetWidgetControllerParams(InParams);
-    // }
 
     return AttributeMenuWidgetController;
+}
+
+UAuraSpellMenuWidgetController* AAuraHUD::GetAuraSpellMenuWidgetController(const FAuraWidgetControllerParams& InParams)
+{
+    if (SpellMenuWidgetController == nullptr)
+    {
+        SpellMenuWidgetController = NewObject<UAuraSpellMenuWidgetController>(this, SpellMenuWidgetControllerClass);
+        SpellMenuWidgetController->SetWidgetControllerParams(InParams);
+        SpellMenuWidgetController->BindDelegateCallbackFunctions();
+    }
+
+    return SpellMenuWidgetController;
 }
 
 void AAuraHUD::BeginPlay()
