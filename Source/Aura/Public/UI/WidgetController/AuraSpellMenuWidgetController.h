@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "AuraSpellMenuWidgetController.generated.h"
 
@@ -18,7 +19,23 @@ struct FSelectedBtnData
 
     UPROPERTY(BlueprintReadWrite)
     FString NextLevelSkillDesc;
+
+    UPROPERTY(BlueprintReadWrite)
+    FGameplayTag SkillStatusTag;
+
+    FSelectedBtnData() = default;
+
+    FSelectedBtnData(UAuraAbilitySystemComponent* AuraASC, const FGameplayTag& SelectedAbilityTag)
+    {
+        if (AuraASC)
+        {
+            AuraASC->GetAbilityDescription(SelectedAbilityTag, this->SkillDesc, this->NextLevelSkillDesc);
+            this->SkillStatusTag = AuraASC->GetSkillStatusTagByAbilityTag(SelectedAbilityTag);
+        }
+    }
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopWaitingForEquipSkillSignature);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSkillBtnSelectedSignature, UAuraUserWidget*, SpellGlobeButton);
 
@@ -48,6 +65,9 @@ public:
     UPROPERTY(BlueprintAssignable, Category = "GAS|UI")
     FOnUpdateSkillDescSignature OnUpdateSkillDesc;
 
+    UPROPERTY(BlueprintAssignable, Category = "GAS|UI")
+    FOnStopWaitingForEquipSkillSignature OnStopWaitingForEquipSkill;
+
     UFUNCTION(BlueprintCallable)
     void Controller_SelectSpellButton(UAuraUserWidget* SpellButton, const FGameplayTag& AbilityTag);
 
@@ -56,6 +76,9 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void Controller_OnSpendSkillPointPressed(const FGameplayTag& AbilityTag);
+
+    void OnSkillEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag,
+                         const FGameplayTag& NewInputTag, const FGameplayTag& PrevInputTag);
 
     virtual void BroadcastInitialValues() override;
     virtual void BindDelegateCallbackFunctions() override;

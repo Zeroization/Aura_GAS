@@ -9,12 +9,8 @@
 
 void UAuraSpellMenuWidgetController::Controller_SelectSpellButton(UAuraUserWidget* SpellButton, const FGameplayTag& AbilityTag)
 {
-    FSelectedBtnData Data;
-    if (AuraAbilitySystemComponent)
-    {
-        AuraAbilitySystemComponent->GetAbilityDescription(AbilityTag, Data.SkillDesc, Data.NextLevelSkillDesc);
-    }
-    OnUpdateSkillDesc.Broadcast(Data, AbilityTag);
+    FSelectedBtnData SelectedBtnData(AuraAbilitySystemComponent, AbilityTag);
+    OnUpdateSkillDesc.Broadcast(SelectedBtnData, AbilityTag);
     OnSkillBtnSelected.Broadcast(SpellButton);
 }
 
@@ -25,13 +21,32 @@ void UAuraSpellMenuWidgetController::Controller_DeselectSpellButton(UAuraUserWid
 
 void UAuraSpellMenuWidgetController::Controller_OnSpendSkillPointPressed(const FGameplayTag& AbilityTag)
 {
-    FSelectedBtnData Data;
+    FSelectedBtnData SelectedBtnData(AuraAbilitySystemComponent, AbilityTag);
     if (AuraAbilitySystemComponent)
     {
         AuraAbilitySystemComponent->Server_SpendSkillPoint(AbilityTag);
-        AuraAbilitySystemComponent->GetAbilityDescription(AbilityTag, Data.SkillDesc, Data.NextLevelSkillDesc);
     }
-    OnUpdateSkillDesc.Broadcast(Data, AbilityTag);
+    OnUpdateSkillDesc.Broadcast(SelectedBtnData, AbilityTag);
+}
+
+void UAuraSpellMenuWidgetController::OnSkillEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag,
+                                                     const FGameplayTag& NewInputTag, const FGameplayTag& PrevInputTag)
+{
+    // 在UI层面清空输入为PrevInputTag的技能们
+    FAuraAbilityData PrevAbilityData;
+    PrevAbilityData.SkillStatusTag = SkillStatusTag;
+    PrevAbilityData.InputTag = PrevInputTag;
+    PrevAbilityData.AbilityTag = FGameplayTag::EmptyTag;
+    OnAbilityInfoSet.Broadcast(PrevAbilityData);
+
+    // 在UI层面广播装备好的技能
+    FAuraAbilityData* CurData = AbilityInfo->ModifyAbilityDataByTag(AbilityTag);
+    CurData->SkillStatusTag = SkillStatusTag;
+    CurData->InputTag = NewInputTag;
+    OnAbilityInfoSet.Broadcast(*CurData);
+
+    // 停止播放动画
+    OnStopWaitingForEquipSkill.Broadcast();
 }
 
 void UAuraSpellMenuWidgetController::BroadcastInitialValues()
@@ -59,6 +74,7 @@ void UAuraSpellMenuWidgetController::BindDelegateCallbackFunctions()
                 OnAbilityInfoSet.Broadcast(*Data);
             }
         });
+    AuraAbilitySystemComponent->OnAbilityEquipped.AddUObject(this, &UAuraSpellMenuWidgetController::OnSkillEquipped);
 #pragma endregion
 
 #pragma region AuraPS

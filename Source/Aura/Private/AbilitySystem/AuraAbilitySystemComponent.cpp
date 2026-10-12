@@ -140,6 +140,25 @@ void UAuraAbilitySystemComponent::AbilityInputTagOnReleased(const FGameplayTag& 
     }
 }
 
+void UAuraAbilitySystemComponent::ClearGAInputByAbilitySpec(FGameplayAbilitySpec& AbilitySpec)
+{
+    FGameplayTag InputTag = GetInputTagByAbilitySpec(AbilitySpec);
+    AbilitySpec.DynamicAbilityTags.RemoveTag(InputTag);
+    MarkAbilitySpecDirty(AbilitySpec);
+}
+
+void UAuraAbilitySystemComponent::ClearAllGAsInputBySpecificInputTag(const FGameplayTag& InputTag)
+{
+    FScopedAbilityListLock ScopedAbilityListLock(*this);
+    for (auto& AbilitySpec : GetActivatableAbilities())
+    {
+        if (GetInputTagByAbilitySpec(AbilitySpec).MatchesTagExact(InputTag))
+        {
+            ClearGAInputByAbilitySpec(AbilitySpec);
+        }
+    }
+}
+
 void UAuraAbilitySystemComponent::ForEachAbility(const FForEachAbilityExecuteDelegate& DelegateToExecute)
 {
     // 该锁可以防止遍历GA过程中部分GA的状态发生变化
@@ -213,6 +232,63 @@ FGameplayAbilitySpec* UAuraAbilitySystemComponent::GetSpecFromAbilityTag(const F
     }
 
     return nullptr;
+}
+
+void UAuraAbilitySystemComponent::Server_EquipSkill_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& NewInputTag)
+{
+    if (FGameplayAbilitySpec* GASpec = GetSpecFromAbilityTag(AbilityTag))
+    {
+        FGameplayTag PrevInputTag = GetInputTagByAbilitySpec(*GASpec);
+        FGameplayTag SkillStatusTag = GetSkillStatusTagByAbilitySpec(*GASpec);
+
+        // 只能装备 "已解锁/已装备" 的技能
+        if (SkillStatusTag.MatchesTagExact(AuraGameplayTags::GA::SkillStatus::Unlocked) ||
+            SkillStatusTag.MatchesTagExact(AuraGameplayTags::GA::SkillStatus::Equipped))
+        {
+            // 1. 先清除已占用NewInputTag的其他GA的输入
+            ClearAllGAsInputBySpecificInputTag(NewInputTag);
+            // 2. 清除要装备GA的输入
+            ClearGAInputByAbilitySpec(*GASpec);
+            // 3. 分配NewInputTag给要装备的GA
+            GASpec->DynamicAbilityTags.AddTag(NewInputTag);
+            // 3.1 对于"已解锁"的技能, 需要更改状态为"已装备"
+            if (SkillStatusTag.MatchesTagExact(AuraGameplayTags::GA::SkillStatus::Unlocked))
+            {
+                GASpec->DynamicAbilityTags.RemoveTag(AuraGameplayTags::GA::SkillStatus::Unlocked);
+                GASpec->DynamicAbilityTags.AddTag(AuraGameplayTags::GA::SkillStatus::Equipped);
+            }
+            MarkAbilitySpecDirty(*GASpec);
+
+            // 4. 客户端同步相关信息
+            Client_EquipSkill(AbilityTag, AuraGameplayTags::GA::SkillStatus::Equipped, NewInputTag, PrevInputTag);
+        }
+    }
+}
+
+void UAuraAbilitySystemComponent::Client_EquipSkill_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag,
+                                                                   const FGameplayTag& NewInputTag, const FGameplayTag& PrevInputTag)
+{
+    OnAbilityEquipped.Broadcast(AbilityTag, SkillStatusTag, NewInputTag, PrevInputTag);
+}
+
+FGameplayTag UAuraAbilitySystemComponent::GetSkillStatusTagByAbilityTag(const FGameplayTag& AbilityTag, bool bDebugLog)
+{
+    if (FGameplayAbilitySpec* GASpec = GetSpecFromAbilityTag(AbilityTag, bDebugLog))
+    {
+        return GetSkillStatusTagByAbilitySpec(*GASpec);
+    }
+
+    return FGameplayTag::EmptyTag;
+}
+
+FGameplayTag UAuraAbilitySystemComponent::GetInputTagByAbilityTag(const FGameplayTag& AbilityTag, bool bDebugLog)
+{
+    if (FGameplayAbilitySpec* GASpec = GetSpecFromAbilityTag(AbilityTag, bDebugLog))
+    {
+        return GetInputTagByAbilitySpec(*GASpec);
+    }
+
+    return FGameplayTag::EmptyTag;
 }
 
 FGameplayTag UAuraAbilitySystemComponent::GetAbilityTagByAbilitySpec(const FGameplayAbilitySpec& AbilitySpec, bool bDebugLog)

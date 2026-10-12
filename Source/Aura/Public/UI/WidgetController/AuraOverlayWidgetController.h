@@ -41,6 +41,9 @@ public:
     UPROPERTY(BlueprintAssignable, Category = "GAS|Stats")
     FOnPlayerStatChangedSignature OnLevelNumberChanged;
 
+    void OnSkillEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag,
+                         const FGameplayTag& NewInputTag, const FGameplayTag& PrevInputTag);
+
     void BroadcastAbilityData();
     virtual void BroadcastInitialValues() override;
     virtual void BindDelegateCallbackFunctions() override;

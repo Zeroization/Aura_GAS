@@ -13,6 +13,23 @@
 #include "Tools/AuraDataTableFunctionLibrary.h"
 
 
+void UAuraOverlayWidgetController::OnSkillEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& SkillStatusTag,
+                                                   const FGameplayTag& NewInputTag, const FGameplayTag& PrevInputTag)
+{
+    // 在UI层面清空输入为PrevInputTag的技能们
+    FAuraAbilityData PrevAbilityData;
+    PrevAbilityData.SkillStatusTag = SkillStatusTag;
+    PrevAbilityData.InputTag = PrevInputTag;
+    PrevAbilityData.AbilityTag = FGameplayTag::EmptyTag;
+    OnAbilityInfoSet.Broadcast(PrevAbilityData);
+
+    // 在UI层面广播装备好的技能
+    FAuraAbilityData* CurData = AbilityInfo->ModifyAbilityDataByTag(AbilityTag);
+    CurData->SkillStatusTag = SkillStatusTag;
+    CurData->InputTag = NewInputTag;
+    OnAbilityInfoSet.Broadcast(*CurData);
+}
+
 void UAuraOverlayWidgetController::BroadcastAbilityData()
 {
     if (AuraAbilitySystemComponent->bStartupAbilitiesGiven)
@@ -89,6 +106,9 @@ void UAuraOverlayWidgetController::BindDelegateCallbackFunctions()
 
     // UAuraAbilitySystemComponent::FOnAbilitiesGivenDelegate
     AuraAbilitySystemComponent->OnAbilitiesGiven.AddUObject(this, &UAuraOverlayWidgetController::BroadcastInitialAbilities);
+
+    // UAuraAbilitySystemComponent::FOnAbilityEquipped
+    AuraAbilitySystemComponent->OnAbilityEquipped.AddUObject(this, &UAuraOverlayWidgetController::OnSkillEquipped);
 #pragma endregion
 }
 
