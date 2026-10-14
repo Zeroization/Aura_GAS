@@ -130,8 +130,30 @@ namespace AuraGameplayTags
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Arcane);    // "Damage.ElemType.Arcane"
             UE_DECLARE_GAMEPLAY_TAG_EXTERN(Physical);  // "Damage.ElemType.Physical"
 
+            // 元素伤害类型Tag <-> 元素抵抗类型Tag
             const TMap<FGameplayTag, FGameplayTag>& GetElemTypeToResistanceMap();
         }
+    }
+
+    namespace Debuff
+    {
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);                // "Debuff"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Burn);                // "Debuff.Burn"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(Stun);                // "Debuff.Stun"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(ArcanePlaceholder);   // "Debuff.ArcanePlaceholder"
+        UE_DECLARE_GAMEPLAY_TAG_EXTERN(PhysicalPlaceholder); // "Debuff.PhysicalPlaceholder"
+
+        namespace Param
+        {
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);      // "Debuff.Param"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Chance);    // "Debuff.Param.Chance"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(PerDamage); // "Debuff.Param.PerDamage"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Frequency); // "Debuff.Param.Frequency"
+            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Duration);  // "Debuff.Param.Duration"
+        }
+
+        // 元素伤害类型Tag <-> 对应元素DebuffTag
+        const TMap<FGameplayTag, FGameplayTag>& GetElemTypeToDebuffMap();
     }
 
     namespace CombatSocket

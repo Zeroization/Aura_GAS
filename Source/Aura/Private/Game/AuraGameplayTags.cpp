@@ -261,6 +261,57 @@ namespace AuraGameplayTags
         }
     }
 
+    namespace Debuff
+    {
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                       "Debuff",
+                                       "Debuff类型的Tag; 此Tag仅用于Tag相关操作(如Matches)");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Burn,
+                                       "Debuff.Burn",
+                                       "火元素伤害对应的燃烧Debuff");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Stun,
+                                       "Debuff.Stun",
+                                       "电元素伤害对应的眩晕Debuff");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(ArcanePlaceholder,
+                                       "Debuff.ArcanePlaceholder",
+                                       "奥术元素伤害对应的Debuff, TODO");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(PhysicalPlaceholder,
+                                       "Debuff.PhysicalPlaceholder",
+                                       "物理伤害对应的Debuff, TODO");
+
+        namespace Param
+        {
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                           "Debuff.Param",
+                                           "Debuff相关参数; 此Tag仅用于Tag相关操作(如Matches)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Chance,
+                                           "Debuff.Param.Chance",
+                                           "触发该Debuff的概率");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(PerDamage,
+                                           "Debuff.Param.PerDamage",
+                                           "每次触发该Debuff造成的伤害");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Frequency,
+                                           "Debuff.Param.Frequency",
+                                           "每次触发该Debuff的间隔(秒)");
+            UE_DEFINE_GAMEPLAY_TAG_COMMENT(Duration,
+                                           "Debuff.Param.Duration",
+                                           "该Debuff的持续时间(秒)");
+        }
+
+        const TMap<FGameplayTag, FGameplayTag>& GetElemTypeToDebuffMap()
+        {
+            static const TMap<FGameplayTag, FGameplayTag> Map =
+            {
+                {Damage::ElemType::Fire, Burn},
+                {Damage::ElemType::Lightning, Stun},
+                {Damage::ElemType::Arcane, ArcanePlaceholder},
+                {Damage::ElemType::Physical, PhysicalPlaceholder}
+            };
+
+            return Map;
+        }
+    }
+
     namespace CombatSocket
     {
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
