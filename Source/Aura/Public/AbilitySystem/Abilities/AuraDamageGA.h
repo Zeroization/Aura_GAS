@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AuraGameplayAbility.h"
+#include "AbilitySystem/AuraAbilityTypes.h"
 #include "AuraDamageGA.generated.h"
 
 /**
@@ -18,12 +19,20 @@ public:
     UFUNCTION(BlueprintCallable)
     void CauseDamage(AActor* TargetActor);
 
+    /// 封装伤害计算(Damage + Debuff)相关的数据绑定逻辑, 方便给其他代码使用
+    /// @param TargetActor GE的TargetActor
+    /// @return 封装好的参数
+    FAuraDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr);
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AuraGA|Properties|Damage")
     TMap<FGameplayTag, FScalableFloat> DamageElemToValue;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraGA|Properties|Damage")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AuraGA|Properties|Damage")
     TSubclassOf<UGameplayEffect> DamageEffectClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AuraGA|Properties|Damage")
+    TMap<FGameplayTag, FAuraDebuffParams> DamageElemToDebuffParam;
 
     virtual bool GetDescFormatArgs(FStringFormatNamedArguments& Args, int32 AbilityLevel) override;
 };

@@ -2,6 +2,8 @@
 
 
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilityTypes.h"
 #include "AbilitySystem/AuraAttributeSet.h"
@@ -136,6 +138,30 @@ void UAuraAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& G
     {
         GEContext->SetIsCriticalHit(InIsCriticalHit);
     }
+}
+
+FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyAuraDamageGE(const FAuraDamageEffectParams& Params)
+{
+    AActor* SourceAvatarActor = Params.SourceASC->GetAvatarActor();
+
+    FGameplayEffectContextHandle ContextHandle = Params.SourceASC->MakeEffectContext();
+    ContextHandle.AddSourceObject(SourceAvatarActor);
+    FGameplayEffectSpecHandle SpecHandle = Params.SourceASC->MakeOutgoingSpec(Params.DamageEffectClass, Params.AbilityLevel, ContextHandle);
+    for (auto& [DamageElemTypeTag, BaseDamage] : Params.DamageElemTypeToBaseDamage)
+    {
+        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, DamageElemTypeTag, BaseDamage);
+    }
+    for (auto& [DamageElemTypeTag, DebuffParams] : Params.DamageElemTypeToDebuffParams)
+    {
+        // TODO: 可能要拓展到AuraGameplayEffectContext, 这里先按错误的来, 只能生效一个Debuff
+        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AuraGameplayTags::Debuff::Param::Chance, DebuffParams.Chance);
+        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AuraGameplayTags::Debuff::Param::Duration, DebuffParams.Duration);
+        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AuraGameplayTags::Debuff::Param::Frequency, DebuffParams.Frequency);
+        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AuraGameplayTags::Debuff::Param::PerDamage, DebuffParams.PerDamage);
+    }
+    
+    Params.TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+    return ContextHandle;
 }
 
 bool UAuraAbilitySystemLibrary::ContainsDamageTypeByProperty(const FDamageFloatingTextProperty& Property,

@@ -7,6 +7,7 @@
 #include "UI/Widget/DamageFloatingTextComponent.h"
 #include "AuraAbilitySystemLibrary.generated.h"
 
+struct FAuraDamageEffectParams;
 class UAuraAbilityInfo;
 class UGameplayEffect;
 struct FGameplayEffectContextHandle;
@@ -57,6 +58,9 @@ public:
 
     UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
     static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& GEContextHandle, bool InIsCriticalHit);
+
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static FGameplayEffectContextHandle ApplyAuraDamageGE(const FAuraDamageEffectParams& Params);
 #pragma endregion
 
 #pragma region Damage

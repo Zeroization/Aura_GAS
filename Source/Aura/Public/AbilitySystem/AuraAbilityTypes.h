@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
+#include "ScalableFloat.h"
 #include "AuraAbilityTypes.generated.h"
+
+class UGameplayEffect;
 
 USTRUCT(BlueprintType)
 struct FAuraGameplayEffectContext : public FGameplayEffectContext
@@ -40,4 +43,54 @@ struct TStructOpsTypeTraits<FAuraGameplayEffectContext> : TStructOpsTypeTraitsBa
         WithNetSerializer = true,
         WithCopy = true // Necessary so that TSharedPtr<FHitResult> Data is copied around
     };
+};
+
+USTRUCT(BlueprintType)
+struct FAuraDebuffParams
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="描述该Debuff的GameplayTag"))
+    FGameplayTag DebuffTag;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="触发该Debuff的概率", ClampMin=0.f, ClampMax=100.f))
+    float Chance;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="每次触发该Debuff造成的伤害"))
+    float PerDamage;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="每次触发该Debuff的间隔(秒), 0.f为只触发一次", ClampMin=0.f))
+    float Frequency;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip="该Debuff的持续时间(秒)", ClampMin=0.f))
+    float Duration;
+};
+
+USTRUCT(BlueprintType)
+struct FAuraDamageEffectParams
+{
+    GENERATED_BODY()
+
+    FAuraDamageEffectParams() = default;
+
+    UPROPERTY()
+    TObjectPtr<UObject> WorldContextObject;
+
+    UPROPERTY()
+    TObjectPtr<UAbilitySystemComponent> SourceASC;
+
+    UPROPERTY()
+    TObjectPtr<UAbilitySystemComponent> TargetASC;
+
+    UPROPERTY()
+    TSubclassOf<UGameplayEffect> DamageEffectClass;
+
+    UPROPERTY()
+    TMap<FGameplayTag, float> DamageElemTypeToBaseDamage;
+
+    UPROPERTY()
+    TMap<FGameplayTag, FAuraDebuffParams> DamageElemTypeToDebuffParams;
+
+    UPROPERTY()
+    float AbilityLevel = 1.f;
 };

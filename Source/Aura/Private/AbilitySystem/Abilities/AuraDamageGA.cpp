@@ -21,6 +21,26 @@ void UAuraDamageGA::CauseDamage(AActor* TargetActor)
                                                                                   TargetActor));
 }
 
+FAuraDamageEffectParams UAuraDamageGA::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor)
+{
+    FAuraDamageEffectParams Params;
+    Params.WorldContextObject = GetAvatarActorFromActorInfo();
+    Params.DamageEffectClass = DamageEffectClass;
+    Params.SourceASC = GetAbilitySystemComponentFromActorInfo();
+    Params.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+    for (auto& [DamageElemTypeTag, DamageScalableFloat] : DamageElemToValue)
+    {
+        Params.DamageElemTypeToBaseDamage.Add(DamageElemTypeTag, DamageScalableFloat.GetValueAtLevel(GetAbilityLevel()));
+    }
+    for (auto& [DamageElemTypeTag, DebuffParams] : DamageElemToDebuffParam)
+    {
+        Params.DamageElemTypeToDebuffParams.Add(DamageElemTypeTag, DebuffParams);
+    }
+    Params.AbilityLevel = GetAbilityLevel();
+
+    return Params;
+}
+
 bool UAuraDamageGA::GetDescFormatArgs(FStringFormatNamedArguments& Args, int32 AbilityLevel)
 {
     if (Super::GetDescFormatArgs(Args, AbilityLevel))

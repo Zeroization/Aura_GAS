@@ -89,7 +89,9 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, 
         // 服务器逻辑
         if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
         {
-            TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data);
+            // 在UAuraProjectileSpell::SpawnProjectile()中, 没有为投射物的Params指定TargetASC
+            DamageEffectParams.TargetASC = TargetASC;
+            UAuraAbilitySystemLibrary::ApplyAuraDamageGE(DamageEffectParams);
         }
 
         Destroy();
