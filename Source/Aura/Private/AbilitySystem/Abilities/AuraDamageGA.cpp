@@ -32,9 +32,10 @@ FAuraDamageEffectParams UAuraDamageGA::MakeDamageEffectParamsFromClassDefaults(A
     {
         Params.DamageElemTypeToBaseDamage.Add(DamageElemTypeTag, DamageScalableFloat.GetValueAtLevel(GetAbilityLevel()));
     }
-    for (auto& [DamageElemTypeTag, DebuffParams] : DamageElemToDebuffParam)
+    for (auto& [DebuffTag, DebuffParams] : DebuffTagToParams)
     {
-        Params.DamageElemTypeToDebuffParams.Add(DamageElemTypeTag, DebuffParams);
+        DebuffParams.DebuffTag = DebuffTag;
+        Params.Debuffs.Add(DebuffParams);
     }
     Params.AbilityLevel = GetAbilityLevel();
 

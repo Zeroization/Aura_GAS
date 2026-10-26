@@ -6,8 +6,10 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayEffectExtension.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "AbilitySystem/AuraAbilityTypes.h"
 #include "Game/AuraGameplayTags.h"
 #include "GameFramework/Character.h"
+#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Interaction/Interface/CombatInterface.h"
 #include "Interaction/Interface/PlayerInterface.h"
 #include "Net/UnrealNetwork.h"
@@ -21,6 +23,26 @@ UAuraAttributeSet::UAuraAttributeSet()
     InitHealth(50.f);
     InitMana(25.f);
     /// End Category: Vital Attributes   >>>>>>>>>>
+
+    // 绑定Buff GE模板
+    static ConstructorHelpers::FClassFinder<UGameplayEffect> InstantBuffClassFinder(
+        TEXT("/Game/Blueprints/Game/GAS/GameplayEffects/Buff/GE_GenericBuff_Instant"));
+    if (InstantBuffClassFinder.Succeeded())
+    {
+        GenericBuffInstantClass = InstantBuffClassFinder.Class;
+    }
+    static ConstructorHelpers::FClassFinder<UGameplayEffect> DurationBuffClassFinder(
+        TEXT("/Game/Blueprints/Game/GAS/GameplayEffects/Buff/GE_GenericBuff_Duration"));
+    if (DurationBuffClassFinder.Succeeded())
+    {
+        GenericBuffDurationClass = DurationBuffClassFinder.Class;
+    }
+    static ConstructorHelpers::FClassFinder<UGameplayEffect> InfiniteBuffClassFinder(
+        TEXT("/Game/Blueprints/Game/GAS/GameplayEffects/Buff/GE_GenericBuff_Infinite"));
+    if (InfiniteBuffClassFinder.Succeeded())
+    {
+        GenericBuffInfiniteClass = InfiniteBuffClassFinder.Class;
+    }
 }
 
 void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -97,6 +119,13 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
     FEffectProperties EffectProperties;
     SetEffectProperties(Data, EffectProperties);
 
+    // TargetCharacter死亡后无需处理和它相关的GE
+    if (EffectProperties.TargetCharacter->Implements<UCombatInterface>() &&
+        ICombatInterface::Execute_IsDead(EffectProperties.TargetCharacter))
+    {
+        return;
+    }
+
     // 处理Health和Mana
     // 在GE之后对Current Value再次Clamp, 防止在PreAttributeChange()中Clamp错误的NewValue
     if (Data.EvaluatedData.Attribute == GetHealthAttribute())
@@ -108,13 +137,14 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
         SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
     }
 
-    // 处理IncomingDamage
+    // 处理IncomingDamage和Debuff
     if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
     {
         const float LocalIncomingDamage = GetIncomingDamage();
         SetIncomingDamage(0.f);
 
         HandleIncomingDamage(EffectProperties, LocalIncomingDamage);
+        HandleDebuffs(EffectProperties);
     }
 
     // 处理IncomingXp
@@ -378,6 +408,87 @@ void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props, flo
         if (Props.SourceCharacter != Props.TargetCharacter)
         {
             ShowDamageText(Props, LocalIncomingDamage);
+        }
+    }
+}
+
+void UAuraAttributeSet::HandleDebuffs(const FEffectProperties& Props)
+{
+    TArray<FAuraDebuffParams> Debuffs;
+    if (!UAuraAbilitySystemLibrary::GetDebuffs(Props.EffectContextHandle, Debuffs))
+    {
+        return;
+    }
+    if (!IsValid(GenericBuffInstantClass) || !IsValid(GenericBuffDurationClass) || !IsValid(GenericBuffInfiniteClass))
+    {
+        UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't get Generic Buff GE template."), __FUNCTION__);
+        return;
+    }
+
+    for (const auto& DebuffParams : Debuffs)
+    {
+        if (DebuffParams.bIsSucceeded)
+        {
+            // 根据模板创建DebuffGE
+            FString DebuffGEName = FString::Printf(TEXT("GE_Debuff_%s"), *DebuffParams.DebuffTag.ToString());
+            UGameplayEffect* DebuffGE;
+            if (DebuffParams.Frequency == 0.f)
+            {
+                // Instant Debuff
+                DebuffGE = NewObject<UGameplayEffect>(GetTransientPackage(), GenericBuffInstantClass, FName(DebuffGEName));
+            }
+            else if (DebuffParams.Duration < 0.f)
+            {
+                // Infinite Debuff
+                DebuffGE = NewObject<UGameplayEffect>(GetTransientPackage(), GenericBuffInfiniteClass, FName(DebuffGEName));
+                DebuffGE->Period = DebuffParams.Frequency;
+            }
+            else
+            {
+                // Duration Debuff
+                DebuffGE = NewObject<UGameplayEffect>(GetTransientPackage(), GenericBuffDurationClass, FName(DebuffGEName));
+                DebuffGE->Period = DebuffParams.Frequency;
+                DebuffGE->DurationMagnitude = FScalableFloat(DebuffParams.Duration);
+            }
+
+            // 设置Stacking属性
+            DebuffGE->StackingType = EGameplayEffectStackingType::AggregateBySource;
+            DebuffGE->StackLimitCount = 1;
+
+            // 设置给Target施加的Tag
+            FInheritedTagContainer InheritedTagContainer;
+            InheritedTagContainer.AddTag(DebuffParams.DebuffTag);
+            // UE5.3后被弃用:
+            // DebuffGE->InheritableGameplayEffectTags = InheritedTagContainer;
+            // 新版API: 
+            UTargetTagsGameplayEffectComponent& Component = DebuffGE->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+            Component.SetAndApplyTargetTagChanges(InheritedTagContainer);
+
+            // 设置Modifiers
+            if (DebuffParams.PerDamage > 0.f)
+            {
+                FGameplayModifierInfo IncomingDamageModifier;
+                IncomingDamageModifier.Attribute = GetIncomingDamageAttribute();
+                IncomingDamageModifier.ModifierOp = EGameplayModOp::Additive;
+                IncomingDamageModifier.ModifierMagnitude = FScalableFloat(DebuffParams.PerDamage);
+                DebuffGE->Modifiers.Add(IncomingDamageModifier);
+            }
+
+            // 防止和造成该Debuff的GE同时计算伤害, 导致数字重叠
+            DebuffGE->bExecutePeriodicEffectOnApplication = false;
+
+            // 生效对应DebuffGE
+            FGameplayEffectContextHandle DebuffGEContextHandle = Props.SourceASC->MakeEffectContext();
+            DebuffGEContextHandle.AddSourceObject(Props.SourceAvatarActor);
+            if (FAuraGameplayEffectContext* AuraGEContext = static_cast<FAuraGameplayEffectContext*>(DebuffGEContextHandle.Get()))
+            {
+                // 给DebuffGEContext添加自定义信息
+                FAuraDebuffParams DebuffData;
+                DebuffData.DebuffTag = DebuffParams.DebuffTag;
+                AuraGEContext->AddDebuff(DebuffData);
+            }
+            FGameplayEffectSpec GESpec(DebuffGE, DebuffGEContextHandle, 1.f /* TODO: Buff等级 */);
+            Props.TargetASC->ApplyGameplayEffectSpecToSelf(GESpec);
         }
     }
 }

@@ -182,6 +182,10 @@ public:
     AURA_ATTRIBUTE_ACCESSORS(UAuraAttributeSet, IncomingXp);
 #pragma endregion
 
+    TSubclassOf<UGameplayEffect> GenericBuffInstantClass;
+    TSubclassOf<UGameplayEffect> GenericBuffDurationClass;
+    TSubclassOf<UGameplayEffect> GenericBuffInfiniteClass;
+
     UAuraAttributeSet();
 
     virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
@@ -260,4 +264,5 @@ private:
     void SendXpRewardEvent(const FEffectProperties& Props);
     void HandleIncomingXp(const FEffectProperties& Props, float LocalIncomingXp);
     void HandleIncomingDamage(const FEffectProperties& Props, float LocalIncomingDamage);
+    void HandleDebuffs(const FEffectProperties& Props);
 };

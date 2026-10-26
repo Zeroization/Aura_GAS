@@ -13,10 +13,6 @@
 #include "Game/AuraGameStateBase.h"
 #include "Interaction/Interface/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/AuraPlayerController.h"
-#include "Player/AuraPlayerState.h"
-#include "UI/HUD/AuraHUD.h"
-#include "UI/WidgetController/AuraWidgetController.h"
 
 UCharacterClassInfo* UAuraAbilitySystemLibrary::GetEnemyCharacterClassInfo(const UObject* WorldContextObject)
 {
@@ -144,24 +140,54 @@ FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyAuraDamageGE(const 
 {
     AActor* SourceAvatarActor = Params.SourceASC->GetAvatarActor();
 
+    // 创建GEContext, 并添加自定义信息
     FGameplayEffectContextHandle ContextHandle = Params.SourceASC->MakeEffectContext();
     ContextHandle.AddSourceObject(SourceAvatarActor);
+    if (FAuraGameplayEffectContext* GEContext = static_cast<FAuraGameplayEffectContext*>(ContextHandle.Get()))
+    {
+        GEContext->ResetDebuffs();
+
+        for (auto& DebuffParams : Params.Debuffs)
+        {
+            GEContext->AddDebuff(DebuffParams);
+        }
+    }
+    else
+    {
+        UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't convert to FAuraGameplayEffectContext."), __FUNCTION__);
+        return ContextHandle;
+    }
+
+    // 将GEContext关联至新建的GESpec, 并绑定伤害相关信息
     FGameplayEffectSpecHandle SpecHandle = Params.SourceASC->MakeOutgoingSpec(Params.DamageEffectClass, Params.AbilityLevel, ContextHandle);
     for (auto& [DamageElemTypeTag, BaseDamage] : Params.DamageElemTypeToBaseDamage)
     {
         UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, DamageElemTypeTag, BaseDamage);
     }
-    for (auto& [DamageElemTypeTag, DebuffParams] : Params.DamageElemTypeToDebuffParams)
-    {
-        // TODO: 可能要拓展到AuraGameplayEffectContext, 这里先按错误的来, 只能生效一个Debuff
-        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AuraGameplayTags::Debuff::Param::Chance, DebuffParams.Chance);
-        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AuraGameplayTags::Debuff::Param::Duration, DebuffParams.Duration);
-        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AuraGameplayTags::Debuff::Param::Frequency, DebuffParams.Frequency);
-        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AuraGameplayTags::Debuff::Param::PerDamage, DebuffParams.PerDamage);
-    }
-    
+
     Params.TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
     return ContextHandle;
+}
+
+bool UAuraAbilitySystemLibrary::TryGetDebuffByTag(const FGameplayEffectContextHandle& GEContextHandle, FAuraDebuffParams& OutDebuffParams,
+                                                  const FGameplayTag& DebuffTag)
+{
+    if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        return GEContext->TryGetDebuffParams(DebuffTag, OutDebuffParams);
+    }
+
+    return false;
+}
+
+bool UAuraAbilitySystemLibrary::GetDebuffs(const FGameplayEffectContextHandle& GEContextHandle, TArray<FAuraDebuffParams>& OutDebuffs)
+{
+    if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        OutDebuffs = GEContext->GetDebuffs();
+        return true;
+    }
+    return false;
 }
 
 bool UAuraAbilitySystemLibrary::ContainsDamageTypeByProperty(const FDamageFloatingTextProperty& Property,

@@ -7,6 +7,8 @@
 #include "UI/Widget/DamageFloatingTextComponent.h"
 #include "AuraAbilitySystemLibrary.generated.h"
 
+struct FGameplayTag;
+struct FAuraDebuffParams;
 struct FAuraDamageEffectParams;
 class UAuraAbilityInfo;
 class UGameplayEffect;
@@ -61,6 +63,12 @@ public:
 
     UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
     static FGameplayEffectContextHandle ApplyAuraDamageGE(const FAuraDamageEffectParams& Params);
+
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static bool TryGetDebuffByTag(const FGameplayEffectContextHandle& GEContextHandle, FAuraDebuffParams& OutDebuffParams,
+                                  const FGameplayTag& DebuffTag);
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static bool GetDebuffs(const FGameplayEffectContextHandle& GEContextHandle, TArray<FAuraDebuffParams>& OutDebuffs);
 #pragma endregion
 
 #pragma region Damage

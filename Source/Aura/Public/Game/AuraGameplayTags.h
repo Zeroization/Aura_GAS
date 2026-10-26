@@ -143,17 +143,10 @@ namespace AuraGameplayTags
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(ArcanePlaceholder);   // "Debuff.ArcanePlaceholder"
         UE_DECLARE_GAMEPLAY_TAG_EXTERN(PhysicalPlaceholder); // "Debuff.PhysicalPlaceholder"
 
-        namespace Param
-        {
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Root);      // "Debuff.Param"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Chance);    // "Debuff.Param.Chance"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(PerDamage); // "Debuff.Param.PerDamage"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Frequency); // "Debuff.Param.Frequency"
-            UE_DECLARE_GAMEPLAY_TAG_EXTERN(Duration);  // "Debuff.Param.Duration"
-        }
-
-        // 元素伤害类型Tag <-> 对应元素DebuffTag
-        const TMap<FGameplayTag, FGameplayTag>& GetElemTypeToDebuffMap();
+        // Debuff总个数
+        constexpr int8 MaxDebuffNum = 4;
+        // DebuffTag <-> 和它强相关的元素伤害类型Tag
+        const TMap<FGameplayTag, FGameplayTag>& GetDebuffToElemTypeMap();
     }
 
     namespace CombatSocket
