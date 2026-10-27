@@ -8,6 +8,7 @@
 #include "Interaction/Interface/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UDeBuffNiagaraComponent;
 class UNiagaraSystem;
 class UMotionWarpingComponent;
 class UAuraGameplayAbility;
@@ -50,11 +51,16 @@ protected:
     int32 MinionCount = 0;
     /* 随从 */
 
+    FOnASCInitialized OnAscInitialized;
+    FOnCharacterDied OnCharacterDied;
+
     /// 所有客户端: 该角色死亡的逻辑(例如播放动画等)
     UFUNCTION(NetMulticast, Reliable)
     virtual void MulticastOnCharacterDeath();
     /// 服务器: 该角色死亡的逻辑
     virtual void Die() override;
+    virtual FOnASCInitialized GetOnASCInitializedDelegate() override;
+    virtual FOnCharacterDied GetOnCharacterDiedDelegate() override;
     virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& SocketTag) override;
     virtual FAuraTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
     virtual TArray<FAuraTaggedMontage> GetTaggedAttackMontages_Implementation() override;
@@ -96,7 +102,7 @@ protected:
     bool CheckMotionWarpTargetExists(const FName& WarpTargetName);
     /// End:   Animation <<<<<<<<<<<<<<<<<<<<
 
-    /* Begin: SFX */
+    /// Begin: VFX <<<<<<<<<<<<<<<<<<<<
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|SFX")
     TObjectPtr<UMaterialInstance> CharacterDissolveMaterialInstance;
 
@@ -109,7 +115,12 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AuraCharacter|SFX")
     TObjectPtr<USoundBase> DeathSound;
 
+    UPROPERTY(EditDefaultsOnly)
+    TObjectPtr<UDeBuffNiagaraComponent> DebuffNiagaraComponent;
+
     virtual UNiagaraSystem* GetImpactBloodEffect_Implementation() override;
+
+    TObjectPtr<UDeBuffNiagaraComponent> GetDebuffNiagaraComponent();
 
     /// 在角色死亡时替换溶解材质
     void Dissolve();
@@ -117,7 +128,7 @@ protected:
     /// 在蓝图中实现角色慢慢溶解的效果
     UFUNCTION(BlueprintImplementableEvent)
     void StartDissolveTimeline(const TArray<UMaterialInstanceDynamic*>& DynamicMIs);
-    /* End: SFX */
+    /// End:   VFX <<<<<<<<<<<<<<<<<<<<<
 
     virtual void BeginPlay() override;
 

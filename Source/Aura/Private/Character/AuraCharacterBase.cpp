@@ -9,6 +9,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Game/AuraGameplayTags.h"
 #include "Kismet/GameplayStatics.h"
+#include "VFX/Buff/DeBuffNiagaraComponent.h"
 
 
 AAuraCharacterBase::AAuraCharacterBase()
@@ -29,6 +30,11 @@ AAuraCharacterBase::AAuraCharacterBase()
     /// Begin: Animation
     MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>("Motion Warping");
     /// End: Animation 
+
+    /// Begin: VFX
+    DebuffNiagaraComponent = CreateDefaultSubobject<UDeBuffNiagaraComponent>("Debuff Niagara Component");
+    DebuffNiagaraComponent->SetupAttachment(GetRootComponent());
+    /// End: VFX
 }
 
 UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
@@ -57,6 +63,8 @@ void AAuraCharacterBase::MulticastOnCharacterDeath_Implementation()
 
     // 角色和武器溶解
     Dissolve();
+
+    OnCharacterDied.Broadcast(this);
 }
 
 void AAuraCharacterBase::Die()
@@ -65,6 +73,16 @@ void AAuraCharacterBase::Die()
     Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 
     MulticastOnCharacterDeath();
+}
+
+FOnASCInitialized AAuraCharacterBase::GetOnASCInitializedDelegate()
+{
+    return OnAscInitialized;
+}
+
+FOnCharacterDied AAuraCharacterBase::GetOnCharacterDiedDelegate()
+{
+    return OnCharacterDied;
 }
 
 FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& SocketTag)
@@ -169,6 +187,11 @@ bool AAuraCharacterBase::CheckMotionWarpTargetExists(const FName& WarpTargetName
 UNiagaraSystem* AAuraCharacterBase::GetImpactBloodEffect_Implementation()
 {
     return BloodImpactEffect;
+}
+
+TObjectPtr<UDeBuffNiagaraComponent> AAuraCharacterBase::GetDebuffNiagaraComponent()
+{
+    return DebuffNiagaraComponent;
 }
 
 void AAuraCharacterBase::Dissolve()

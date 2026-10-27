@@ -8,7 +8,11 @@
 
 #include "CombatInterface.generated.h"
 
+class UAbilitySystemComponent;
 class UNiagaraSystem;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnASCInitialized, UAbilitySystemComponent* /* ASC */);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterDied, AActor*, DiedActor);
 
 USTRUCT(BlueprintType)
 struct FAuraTaggedMontageAttachment
@@ -56,6 +60,8 @@ class AURA_API ICombatInterface
 public:
 #pragma region 通用
     virtual void Die() = 0;
+    virtual FOnASCInitialized GetOnASCInitializedDelegate() = 0;
+    virtual FOnCharacterDied GetOnCharacterDiedDelegate() = 0;
 
     UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
     int32 GetActorLevel();
