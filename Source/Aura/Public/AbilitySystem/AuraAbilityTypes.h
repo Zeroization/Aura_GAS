@@ -53,12 +53,17 @@ struct FAuraGameplayEffectContext : public FGameplayEffectContext
     bool GetIsBlockedHit() const;
     void SetIsCriticalHit(bool bInIsCriticalHit);
     bool GetIsCriticalHit() const;
+    void SetIsDoTDamage(bool bInIsDoTDamage);
+    bool GetIsDoTDamage() const;
 
     void ResetDebuffs(int32 NewSize = 0);
     void AddDebuff(const FAuraDebuffParams& DebuffParams);
     void SetDebuffSuccessful(const FGameplayTag& DebuffTag, bool bSuccessful = true);
     TArray<FAuraDebuffParams> GetDebuffs() const;
     bool TryGetDebuffParams(const FGameplayTag& DebuffTag, FAuraDebuffParams& OutDebuffParams) const;
+
+    void SetDeathImpulse(const FVector& InDeathImpulse);
+    FVector GetDeathImpulse() const;
 
     // 必须重写此方法, 用于为反射系统提供数据
     virtual UScriptStruct* GetScriptStruct() const override;
@@ -75,7 +80,13 @@ protected:
     bool bIsCriticalHit = false;
 
     UPROPERTY()
+    bool bIsDoTDamage = false;
+
+    UPROPERTY()
     TArray<FAuraDebuffParams> Debuffs;
+
+    UPROPERTY()
+    FVector DeathImpulse = FVector::ZeroVector;
 };
 
 // 必须定义的结构体: 用于告诉引擎该结构体支持哪些底层行为(例如网络序列化, 拷贝等), 进而让引擎调用相关逻辑 
@@ -116,4 +127,10 @@ struct FAuraDamageEffectParams
 
     UPROPERTY()
     float AbilityLevel = 1.f;
+
+    UPROPERTY()
+    float DeathImpulseMagnitude = 0.f;
+
+    UPROPERTY()
+    FVector DeathImpulse = FVector::ZeroVector;
 };

@@ -38,6 +38,7 @@ FAuraDamageEffectParams UAuraDamageGA::MakeDamageEffectParamsFromClassDefaults(A
         Params.Debuffs.Add(DebuffParams);
     }
     Params.AbilityLevel = GetAbilityLevel();
+    Params.DeathImpulseMagnitude = DeathImpulseMagnitude;
 
     return Params;
 }

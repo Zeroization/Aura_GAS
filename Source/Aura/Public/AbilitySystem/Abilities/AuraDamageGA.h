@@ -34,5 +34,8 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AuraGA|Properties|Damage")
     TMap<FGameplayTag, FAuraDebuffParams> DebuffTagToParams;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AuraGA|Properties|Damage")
+    float DeathImpulseMagnitude = 60.f;
+
     virtual bool GetDescFormatArgs(FStringFormatNamedArguments& Args, int32 AbilityLevel) override;
 };

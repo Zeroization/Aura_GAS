@@ -56,9 +56,9 @@ protected:
 
     /// 所有客户端: 该角色死亡的逻辑(例如播放动画等)
     UFUNCTION(NetMulticast, Reliable)
-    virtual void MulticastOnCharacterDeath();
+    virtual void MulticastOnCharacterDeath(const FVector& DeathImpulse);
     /// 服务器: 该角色死亡的逻辑
-    virtual void Die() override;
+    virtual void Die(const FVector& DeathImpulse) override;
     virtual FOnASCInitialized GetOnASCInitializedDelegate() override;
     virtual FOnCharacterDied GetOnCharacterDiedDelegate() override;
     virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& SocketTag) override;

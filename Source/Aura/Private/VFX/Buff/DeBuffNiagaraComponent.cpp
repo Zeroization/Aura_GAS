@@ -49,7 +49,10 @@ void UDeBuffNiagaraComponent::BeginPlay()
 
 void UDeBuffNiagaraComponent::OnDebuffTagChanged(const FGameplayTag DebuffTag, int32 NewCount)
 {
-    if (NewCount > 0)
+    bool bCanActivate = IsValid(GetOwner()) && GetOwner()->Implements<UCombatInterface>() &&
+        !ICombatInterface::Execute_IsDead(GetOwner());
+
+    if (NewCount > 0 && bCanActivate)
     {
         CurDebuffTag = DebuffTag;
         SetupAssetByCurDebuffTag();

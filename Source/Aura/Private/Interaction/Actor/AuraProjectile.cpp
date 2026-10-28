@@ -89,8 +89,9 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, 
         // 服务器逻辑
         if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
         {
-            // 在UAuraProjectileSpell::SpawnProjectile()中, 没有为投射物的Params指定TargetASC
+            // 继续补充相关信息
             DamageEffectParams.TargetASC = TargetASC;
+            DamageEffectParams.DeathImpulse = GetActorForwardVector() * DamageEffectParams.DeathImpulseMagnitude;
             UAuraAbilitySystemLibrary::ApplyAuraDamageGE(DamageEffectParams);
         }
 

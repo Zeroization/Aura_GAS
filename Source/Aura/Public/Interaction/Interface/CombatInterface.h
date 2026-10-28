@@ -59,7 +59,7 @@ class AURA_API ICombatInterface
     // Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 #pragma region 通用
-    virtual void Die() = 0;
+    virtual void Die(const FVector& DeathImpulse) = 0;
     virtual FOnASCInitialized GetOnASCInitializedDelegate() = 0;
     virtual FOnCharacterDied GetOnCharacterDiedDelegate() = 0;
 

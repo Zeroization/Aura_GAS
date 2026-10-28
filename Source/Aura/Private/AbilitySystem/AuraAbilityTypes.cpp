@@ -26,6 +26,16 @@ bool FAuraGameplayEffectContext::GetIsCriticalHit() const
     return bIsCriticalHit;
 }
 
+void FAuraGameplayEffectContext::SetIsDoTDamage(bool bInIsDoTDamage)
+{
+    bIsDoTDamage = bInIsDoTDamage;
+}
+
+bool FAuraGameplayEffectContext::GetIsDoTDamage() const
+{
+    return bIsDoTDamage;
+}
+
 void FAuraGameplayEffectContext::ResetDebuffs(int32 NewSize)
 {
     Debuffs.Reset(NewSize);
@@ -66,6 +76,16 @@ bool FAuraGameplayEffectContext::TryGetDebuffParams(const FGameplayTag& DebuffTa
         }
     }
     return false;
+}
+
+void FAuraGameplayEffectContext::SetDeathImpulse(const FVector& InDeathImpulse)
+{
+    DeathImpulse = InDeathImpulse;
+}
+
+FVector FAuraGameplayEffectContext::GetDeathImpulse() const
+{
+    return DeathImpulse;
 }
 
 UScriptStruct* FAuraGameplayEffectContext::GetScriptStruct() const
@@ -118,13 +138,21 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, class UPackageMap* M
         {
             RepBits |= 1 << 8;
         }
-        if (Debuffs.Num() > 0)
+        if (bIsDoTDamage)
         {
             RepBits |= 1 << 9;
         }
+        if (Debuffs.Num() > 0)
+        {
+            RepBits |= 1 << 10;
+        }
+        if (!DeathImpulse.IsZero())
+        {
+            RepBits |= 1 << 11;
+        }
     }
     // 让Archive知道要存储多少数据
-    Ar.SerializeBits(&RepBits, 10);
+    Ar.SerializeBits(&RepBits, 12);
 
     // 序列化/反序列化阶段: 通过按位与的结果存储/读取相应数据
 #pragma region FGameplayEffectContext
@@ -182,11 +210,19 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, class UPackageMap* M
     }
     if (RepBits & (1 << 9))
     {
+        Ar << bIsDoTDamage;
+    }
+    if (RepBits & (1 << 10))
+    {
         SafeNetSerializeTArray_WithNetSerialize<AuraGameplayTags::Debuff::MaxDebuffNum>(Ar, Debuffs, Map);
     }
     else if (Ar.IsLoading())
     {
         Debuffs.Reset();
+    }
+    if (RepBits & (1 << 11))
+    {
+        DeathImpulse.NetSerialize(Ar, Map, bOutSuccess);
     }
 
 

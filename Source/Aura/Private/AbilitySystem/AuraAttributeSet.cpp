@@ -300,6 +300,7 @@ void UAuraAttributeSet::ShowDamageText(const FEffectProperties& Props, float Loc
 {
     const bool bBlockedHit = UAuraAbilitySystemLibrary::GetIsBlockedHit(Props.EffectContextHandle);
     const bool bCriticalHit = UAuraAbilitySystemLibrary::GetIsCriticalHit(Props.EffectContextHandle);
+    const bool bIsDoTDamage = UAuraAbilitySystemLibrary::GetIsDoTDamage(Props.EffectContextHandle);
 
     FDamageFloatingTextProperty DamageFloatingTextProperty;
     DamageFloatingTextProperty.Damage = LocalIncomingDamage;
@@ -310,6 +311,10 @@ void UAuraAttributeSet::ShowDamageText(const FEffectProperties& Props, float Loc
     if (bCriticalHit)
     {
         DamageFloatingTextProperty.DamageTypeFlags |= static_cast<uint8>(EAuraDamageType::Critical);
+    }
+    if (bIsDoTDamage)
+    {
+        DamageFloatingTextProperty.DamageTypeFlags |= static_cast<uint8>(EAuraDamageType::DoT);
     }
 
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
@@ -388,20 +393,32 @@ void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props, flo
         const bool bIsDead = NewHealth <= 0.f;
         if (bIsDead)
         {
+            // 致命一击相关逻辑:
             AActor* TargetAvatarActor = Props.TargetAvatarActor;
             if (TargetAvatarActor->Implements<UCombatInterface>())
             {
                 SendXpRewardEvent(Props);
 
-                const TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(TargetAvatarActor);
-                CombatInterface->Die();
+                const TScriptInterface<ICombatInterface> CombatInterface(TargetAvatarActor);
+                FVector DeathImpulse = FVector::ZeroVector;
+                if (!UAuraAbilitySystemLibrary::GetDeathImpulse(Props.EffectContextHandle, DeathImpulse))
+                {
+                    UE_LOG(LogAuraGame, Warning, TEXT("[%hs]: Can't get death impulse!"), __FUNCTION__);
+                }
+                CombatInterface->Die(DeathImpulse);
             }
         }
         else
         {
-            FGameplayTagContainer TagContainer;
-            TagContainer.AddTag(AuraGameplayTags::GE::HitReact.GetTag());
-            Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+            // 非致命一击相关逻辑:
+            if (bool bIsDoTDamage = UAuraAbilitySystemLibrary::GetIsDoTDamage(Props.EffectContextHandle);
+                !bIsDoTDamage)
+            {
+                // 非DoT类型伤害才会执行受击动画, 不然敌人玩不了
+                FGameplayTagContainer TagContainer;
+                TagContainer.AddTag(AuraGameplayTags::GE::HitReact.GetTag());
+                Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+            }
         }
 
         // 在敌人身上显示伤害数字
@@ -486,6 +503,11 @@ void UAuraAttributeSet::HandleDebuffs(const FEffectProperties& Props)
                 FAuraDebuffParams DebuffData;
                 DebuffData.DebuffTag = DebuffParams.DebuffTag;
                 AuraGEContext->AddDebuff(DebuffData);
+
+                if (DebuffParams.PerDamage > 0.f)
+                {
+                    AuraGEContext->SetIsDoTDamage(true);
+                }
             }
             FGameplayEffectSpec GESpec(DebuffGE, DebuffGEContextHandle, 1.f /* TODO: Buff等级 */);
             Props.TargetASC->ApplyGameplayEffectSpecToSelf(GESpec);
