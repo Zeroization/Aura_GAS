@@ -145,6 +145,7 @@ void AAuraCharacter::InitAbilitySystem()
     AuraAbilitySystemComponent = CastChecked<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent());
     AuraAbilitySystemComponent->InitAbilityActorInfo(AuraPlayerState, this);
     AuraAbilitySystemComponent->OnAbilityActorInfoSet();
+    OnAscInitialized.Broadcast(AuraAbilitySystemComponent);
 
     // 2. 初始化AttributeSet和Attributes
     AuraAttributeSet = CastChecked<UAuraAttributeSet>(AuraPlayerState->GetAttributeSet());

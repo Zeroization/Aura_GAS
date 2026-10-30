@@ -2,6 +2,8 @@
 
 
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilityTypes.h"
 #include "AbilitySystem/AuraAttributeSet.h"
@@ -11,10 +13,6 @@
 #include "Game/AuraGameStateBase.h"
 #include "Interaction/Interface/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/AuraPlayerController.h"
-#include "Player/AuraPlayerState.h"
-#include "UI/HUD/AuraHUD.h"
-#include "UI/WidgetController/AuraWidgetController.h"
 
 UCharacterClassInfo* UAuraAbilitySystemLibrary::GetEnemyCharacterClassInfo(const UObject* WorldContextObject)
 {
@@ -122,6 +120,15 @@ bool UAuraAbilitySystemLibrary::GetIsCriticalHit(const FGameplayEffectContextHan
     return false;
 }
 
+bool UAuraAbilitySystemLibrary::GetIsDoTDamage(const FGameplayEffectContextHandle& GEContextHandle)
+{
+    if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        return GEContext->GetIsDoTDamage();
+    }
+    return false;
+}
+
 void UAuraAbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& GEContextHandle, bool InIsBlockedHit)
 {
     if (FAuraGameplayEffectContext* GEContext = static_cast<FAuraGameplayEffectContext*>(GEContextHandle.Get()))
@@ -136,6 +143,98 @@ void UAuraAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& G
     {
         GEContext->SetIsCriticalHit(InIsCriticalHit);
     }
+}
+
+void UAuraAbilitySystemLibrary::SetIsDoTDamage(FGameplayEffectContextHandle& GEContextHandle, bool InIsDoTDamage)
+{
+    if (FAuraGameplayEffectContext* GEContext = static_cast<FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        GEContext->SetIsDoTDamage(InIsDoTDamage);
+    }
+}
+
+FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyAuraDamageGE(const FAuraDamageEffectParams& Params)
+{
+    AActor* SourceAvatarActor = Params.SourceASC->GetAvatarActor();
+
+    // 创建GEContext, 并添加自定义信息
+    FGameplayEffectContextHandle ContextHandle = Params.SourceASC->MakeEffectContext();
+    ContextHandle.AddSourceObject(SourceAvatarActor);
+    if (FAuraGameplayEffectContext* GEContext = static_cast<FAuraGameplayEffectContext*>(ContextHandle.Get()))
+    {
+        // Debuffs
+        GEContext->ResetDebuffs();
+        for (auto& DebuffParams : Params.Debuffs)
+        {
+            GEContext->AddDebuff(DebuffParams);
+        }
+
+        // DeathImpulse
+        GEContext->SetDeathImpulse(Params.DeathImpulse);
+
+        // KnockbackForce
+        GEContext->SetKnockbackForce(Params.KnockbackForce);
+    }
+    else
+    {
+        UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't convert to FAuraGameplayEffectContext."), __FUNCTION__);
+        return ContextHandle;
+    }
+
+    // 将GEContext关联至新建的GESpec, 并绑定伤害相关信息
+    FGameplayEffectSpecHandle SpecHandle = Params.SourceASC->MakeOutgoingSpec(Params.DamageEffectClass, Params.AbilityLevel, ContextHandle);
+    for (auto& [DamageElemTypeTag, BaseDamage] : Params.DamageElemTypeToBaseDamage)
+    {
+        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, DamageElemTypeTag, BaseDamage);
+    }
+
+    Params.TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+    return ContextHandle;
+}
+
+bool UAuraAbilitySystemLibrary::TryGetDebuffByTag(const FGameplayEffectContextHandle& GEContextHandle, FAuraDebuffParams& OutDebuffParams,
+                                                  const FGameplayTag& DebuffTag)
+{
+    if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        return GEContext->TryGetDebuffParams(DebuffTag, OutDebuffParams);
+    }
+
+    return false;
+}
+
+bool UAuraAbilitySystemLibrary::GetDebuffs(const FGameplayEffectContextHandle& GEContextHandle, TArray<FAuraDebuffParams>& OutDebuffs)
+{
+    if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        OutDebuffs = GEContext->GetDebuffs();
+        return true;
+    }
+    return false;
+}
+
+bool UAuraAbilitySystemLibrary::GetDeathImpulse(const FGameplayEffectContextHandle& GEContextHandle, FVector& OutDeathImpulse)
+{
+    if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        OutDeathImpulse = GEContext->GetDeathImpulse();
+        return true;
+    }
+
+    OutDeathImpulse = FVector::ZeroVector;
+    return false;
+}
+
+bool UAuraAbilitySystemLibrary::GetKnockbackForce(const FGameplayEffectContextHandle& GEContextHandle, FVector& OutKnockbackForce)
+{
+    if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        OutKnockbackForce = GEContext->GetKnockbackForce();
+        return true;
+    }
+
+    OutKnockbackForce = FVector::ZeroVector;
+    return false;
 }
 
 bool UAuraAbilitySystemLibrary::ContainsDamageTypeByProperty(const FDamageFloatingTextProperty& Property,

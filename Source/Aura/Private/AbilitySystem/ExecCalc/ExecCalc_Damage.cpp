@@ -61,10 +61,45 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
         }
     }
 
+#pragma region Debuff
+    if (FAuraGameplayEffectContext* GEContext = static_cast<FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        TArray<FAuraDebuffParams> Debuffs = GEContext->GetDebuffs();
+        for (auto& DebuffParams : Debuffs)
+        {
+            // 逐一计算Debuff是否生效: 根据自身Debuff触发率和目标对应元素抗性计算Debuff最终触发率
+            float SrcDebuffChance = DebuffParams.Chance;
+            float TargetElemResistance = 0.f;
+            if (AuraGameplayTags::Debuff::GetDebuffToElemTypeMap().Contains(DebuffParams.DebuffTag))
+            {
+                FGameplayTag DamageElemTypeTag = AuraGameplayTags::Debuff::GetDebuffToElemTypeMap()[DebuffParams.DebuffTag];
+                FGameplayTag ResistanceTypeTag = AuraGameplayTags::Damage::ElemType::GetElemTypeToResistanceMap()[DamageElemTypeTag];
+                FGameplayEffectAttributeCaptureDefinition ResistanceDef = AuraDamageAttributeStatics::Get()
+                    .TagToCaptureDefs[ResistanceTypeTag];
+                ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(ResistanceDef, EvaluateParameters, TargetElemResistance);
+                TargetElemResistance = FMath::Clamp(TargetElemResistance, 0.f, 100.f);
+            }
+
+            float DebuffSuccessChance = SrcDebuffChance * (100.f - TargetElemResistance) / 100.f;
+            DebuffSuccessChance = FMath::Clamp(DebuffSuccessChance, 0.f, 100.f);
+            if (FMath::RandRange(1, 100) <= DebuffSuccessChance)
+            {
+                GEContext->SetDebuffSuccessful(DebuffParams.DebuffTag, true);
+                UE_LOG(LogAuraGame, Warning, TEXT("[%hs]: Enable debuff: %s"), __FUNCTION__, *DebuffParams.DebuffTag.ToString());
+            }
+        }
+    }
+    else
+    {
+        UE_LOG(LogAuraGame, Warning, TEXT("[%hs]: Can't convert to FAuraGameplayEffectContext, skip calc debuff..."), __FUNCTION__);
+    }
+#pragma endregion
+
     // 通过SetByCaller获取Damage
     float Damage = 0.f;
     for (const auto& [ElemType, ResistanceType] : AuraGameplayTags::Damage::ElemType::GetElemTypeToResistanceMap())
     {
+        // 先获取对应元素抗性, 再根据抗性计算伤害
         float ElemResistance = 0.f;
         FGameplayEffectAttributeCaptureDefinition ResistanceDef = AuraDamageAttributeStatics::Get().TagToCaptureDefs[ResistanceType];
         ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(ResistanceDef, EvaluateParameters, ElemResistance);

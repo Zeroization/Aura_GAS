@@ -64,21 +64,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation, const 
         AAuraProjectile* Projectile = GetWorld()->SpawnActorDeferred<AAuraProjectile>(
             ProjectileClass, SpawnTransform, Owner, Cast<APawn>(Owner),
             ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-
-        // 赋予投射物相关GE
-        const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Owner);
-        FGameplayEffectContextHandle GEContextHandle = SourceASC->MakeEffectContext();
-        GEContextHandle.SetAbility(this);
-        GEContextHandle.AddSourceObject(Projectile);
-        const FGameplayEffectSpecHandle GESpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(),
-                                                                                   GEContextHandle);
-        for (const auto& [DamageElemType, DamageValueTable] : DamageElemToValue)
-        {
-            const float ScaledDamage = DamageValueTable.GetValueAtLevel(GetAbilityLevel());
-            GESpecHandle.Data->SetSetByCallerMagnitude(DamageElemType, ScaledDamage);
-        }
-
-        Projectile->DamageEffectSpecHandle = GESpecHandle;
+        Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
         Projectile->FinishSpawning(SpawnTransform);
     }
 }

@@ -21,6 +21,42 @@ void UAuraDamageGA::CauseDamage(AActor* TargetActor)
                                                                                   TargetActor));
 }
 
+FAuraDamageEffectParams UAuraDamageGA::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor)
+{
+    FAuraDamageEffectParams Params;
+    Params.WorldContextObject = GetAvatarActorFromActorInfo();
+    Params.DamageEffectClass = DamageEffectClass;
+    Params.SourceASC = GetAbilitySystemComponentFromActorInfo();
+    Params.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+    for (auto& [DamageElemTypeTag, DamageScalableFloat] : DamageElemToValue)
+    {
+        Params.DamageElemTypeToBaseDamage.Add(DamageElemTypeTag, DamageScalableFloat.GetValueAtLevel(GetAbilityLevel()));
+    }
+    for (auto& [DebuffTag, DebuffParams] : DebuffTagToParams)
+    {
+        DebuffParams.DebuffTag = DebuffTag;
+        Params.Debuffs.Add(DebuffParams);
+    }
+    Params.AbilityLevel = GetAbilityLevel();
+    Params.DeathImpulseMagnitude = DeathImpulseMagnitude;
+    Params.KnockbackForceChance = KnockbackForceChance;
+    Params.KnockbackForceMagnitude = KnockbackForceMagnitude;
+
+    if (IsValid(TargetActor))
+    {
+        FVector TargetDir = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation())
+            .GetSafeNormal();
+        TargetDir.Z = 0.f;
+        Params.DeathImpulse = TargetDir * DeathImpulseMagnitude;
+        if (FMath::RandRange(1.f, 100.f) <= KnockbackForceChance)
+        {
+            Params.KnockbackForce = TargetDir * KnockbackForceMagnitude;
+        }
+    }
+
+    return Params;
+}
+
 bool UAuraDamageGA::GetDescFormatArgs(FStringFormatNamedArguments& Args, int32 AbilityLevel)
 {
     if (Super::GetDescFormatArgs(Args, AbilityLevel))

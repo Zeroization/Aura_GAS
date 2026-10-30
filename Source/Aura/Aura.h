@@ -35,5 +35,6 @@ enum class EAuraDamageType : uint8
     Normal = 1 << 0,   // 0b00000001
     Blocked = 1 << 1,  // 0b00000010
     Critical = 1 << 2, // 0b00000100
+    DoT = 1 << 3,      // 0b00001000
 };
 #pragma endregion

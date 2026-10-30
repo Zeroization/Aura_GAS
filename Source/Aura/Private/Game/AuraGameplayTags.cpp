@@ -261,6 +261,38 @@ namespace AuraGameplayTags
         }
     }
 
+    namespace Debuff
+    {
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,
+                                       "Debuff",
+                                       "Debuff类型的Tag; 此Tag仅用于Tag相关操作(如Matches)");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Burn,
+                                       "Debuff.Burn",
+                                       "燃烧Debuff");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(Stun,
+                                       "Debuff.Stun",
+                                       "眩晕Debuff");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(ArcanePlaceholder,
+                                       "Debuff.ArcanePlaceholder",
+                                       "奥术强相关Debuff, TODO");
+        UE_DEFINE_GAMEPLAY_TAG_COMMENT(PhysicalPlaceholder,
+                                       "Debuff.PhysicalPlaceholder",
+                                       "物理强相关Debuff, TODO");
+
+        const TMap<FGameplayTag, FGameplayTag>& GetDebuffToElemTypeMap()
+        {
+            static const TMap<FGameplayTag, FGameplayTag> Map =
+            {
+                {Burn, Damage::ElemType::Fire},
+                {Stun, Damage::ElemType::Lightning},
+                {ArcanePlaceholder, Damage::ElemType::Arcane},
+                {PhysicalPlaceholder, Damage::ElemType::Physical}
+            };
+
+            return Map;
+        }
+    }
+
     namespace CombatSocket
     {
         UE_DEFINE_GAMEPLAY_TAG_COMMENT(Root,

@@ -89,7 +89,16 @@ void AAuraProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, 
         // 服务器逻辑
         if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
         {
-            TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data);
+            // 继续补充相关信息
+            DamageEffectParams.TargetASC = TargetASC;
+            DamageEffectParams.DeathImpulse = GetActorForwardVector() * DamageEffectParams.DeathImpulseMagnitude;
+            if (FMath::RandRange(1.f, 100.f) <= DamageEffectParams.KnockbackForceChance)
+            {
+                FVector KnockbackDirection = GetActorForwardVector(); /* .RotateAngleAxis(45.f, GetActorRightVector()); */
+                DamageEffectParams.KnockbackForce = KnockbackDirection * DamageEffectParams.KnockbackForceMagnitude;
+                DamageEffectParams.KnockbackForce.Z = 0.f;
+            }
+            UAuraAbilitySystemLibrary::ApplyAuraDamageGE(DamageEffectParams);
         }
 
         Destroy();

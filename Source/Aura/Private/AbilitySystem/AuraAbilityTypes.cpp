@@ -3,6 +3,9 @@
 
 #include "AbilitySystem/AuraAbilityTypes.h"
 
+#include "Aura/Aura.h"
+#include "Game/AuraGameplayTags.h"
+
 void FAuraGameplayEffectContext::SetIsBlockedHit(bool bInIsBlockedHit)
 {
     bIsBlockedHit = bInIsBlockedHit;
@@ -21,6 +24,78 @@ void FAuraGameplayEffectContext::SetIsCriticalHit(bool bInIsCriticalHit)
 bool FAuraGameplayEffectContext::GetIsCriticalHit() const
 {
     return bIsCriticalHit;
+}
+
+void FAuraGameplayEffectContext::SetIsDoTDamage(bool bInIsDoTDamage)
+{
+    bIsDoTDamage = bInIsDoTDamage;
+}
+
+bool FAuraGameplayEffectContext::GetIsDoTDamage() const
+{
+    return bIsDoTDamage;
+}
+
+void FAuraGameplayEffectContext::ResetDebuffs(int32 NewSize)
+{
+    Debuffs.Reset(NewSize);
+}
+
+void FAuraGameplayEffectContext::AddDebuff(const FAuraDebuffParams& DebuffParams)
+{
+    Debuffs.Add(DebuffParams);
+}
+
+void FAuraGameplayEffectContext::SetDebuffSuccessful(const FGameplayTag& DebuffTag, bool bSuccessful)
+{
+    for (auto& DebuffParams : Debuffs)
+    {
+        if (DebuffParams.DebuffTag.MatchesTagExact(DebuffTag))
+        {
+            DebuffParams.bIsSucceeded = bSuccessful;
+            return;
+        }
+    }
+
+    UE_LOG(LogAuraGame, Error, TEXT("[%hs]: Can't find debuff: %s"), __FUNCTION__, *DebuffTag.ToString());
+}
+
+TArray<FAuraDebuffParams> FAuraGameplayEffectContext::GetDebuffs() const
+{
+    return Debuffs;
+}
+
+bool FAuraGameplayEffectContext::TryGetDebuffParams(const FGameplayTag& DebuffTag, FAuraDebuffParams& OutDebuffParams) const
+{
+    for (auto& DebuffParams : Debuffs)
+    {
+        if (DebuffParams.DebuffTag.MatchesTagExact(DebuffTag))
+        {
+            OutDebuffParams = DebuffParams;
+            return true;
+        }
+    }
+    return false;
+}
+
+void FAuraGameplayEffectContext::SetDeathImpulse(const FVector& InDeathImpulse)
+{
+    DeathImpulse = InDeathImpulse;
+}
+
+FVector FAuraGameplayEffectContext::GetDeathImpulse() const
+{
+    return DeathImpulse;
+}
+
+void FAuraGameplayEffectContext::SetKnockbackForce(const FVector& InKnockbackForce)
+{
+    KnockbackForce = InKnockbackForce;
+}
+
+FVector FAuraGameplayEffectContext::GetKnockbackForce() const
+{
+    return KnockbackForce;
 }
 
 UScriptStruct* FAuraGameplayEffectContext::GetScriptStruct() const
@@ -73,9 +148,25 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, class UPackageMap* M
         {
             RepBits |= 1 << 8;
         }
+        if (bIsDoTDamage)
+        {
+            RepBits |= 1 << 9;
+        }
+        if (Debuffs.Num() > 0)
+        {
+            RepBits |= 1 << 10;
+        }
+        if (!DeathImpulse.IsZero())
+        {
+            RepBits |= 1 << 11;
+        }
+        if (!KnockbackForce.IsZero())
+        {
+            RepBits |= 1 << 12;
+        }
     }
     // 让Archive知道要存储多少数据
-    Ar.SerializeBits(&RepBits, 9);
+    Ar.SerializeBits(&RepBits, 13);
 
     // 序列化/反序列化阶段: 通过按位与的结果存储/读取相应数据
 #pragma region FGameplayEffectContext
@@ -131,6 +222,27 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, class UPackageMap* M
     {
         Ar << bIsCriticalHit;
     }
+    if (RepBits & (1 << 9))
+    {
+        Ar << bIsDoTDamage;
+    }
+    if (RepBits & (1 << 10))
+    {
+        SafeNetSerializeTArray_WithNetSerialize<AuraGameplayTags::Debuff::MaxDebuffNum>(Ar, Debuffs, Map);
+    }
+    else if (Ar.IsLoading())
+    {
+        Debuffs.Reset();
+    }
+    if (RepBits & (1 << 11))
+    {
+        DeathImpulse.NetSerialize(Ar, Map, bOutSuccess);
+    }
+    if (RepBits & (1 << 12))
+    {
+        KnockbackForce.NetSerialize(Ar, Map, bOutSuccess);
+    }
+
 
 #pragma region FGameplayEffectContext
     if (Ar.IsLoading())
@@ -139,6 +251,7 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, class UPackageMap* M
     }
 #pragma endregion
 
+    // return true 表示自定义序列化函数已处理该类型; 实际序列化是否成功通过 bOutSuccess 返回
     bOutSuccess = true;
     return true;
 }
@@ -153,4 +266,66 @@ FAuraGameplayEffectContext* FAuraGameplayEffectContext::Duplicate() const
         NewContext->AddHitResult(*GetHitResult(), true);
     }
     return NewContext;
+}
+
+bool FAuraDebuffParams::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+{
+    uint8 RepBits = 0;
+    bool bLocalSuccess = true;
+
+    if (Ar.IsSaving())
+    {
+        // FGameplayTag DebuffTag
+        if (DebuffTag.IsValid())
+        {
+            RepBits |= 1 << 0;
+        }
+
+        RepBits |= 1 << 1; // float Chance
+        RepBits |= 1 << 2; // float PerDamage
+        RepBits |= 1 << 3; // float Frequency
+        RepBits |= 1 << 4; // float Duration
+
+        // bool bIsSucceeded
+        if (bIsSucceeded)
+        {
+            RepBits |= 1 << 5;
+        }
+    }
+    Ar.SerializeBits(&RepBits, 6);
+
+    if (RepBits & (1 << 0))
+    {
+        bool bDebuffTagLocalSuccess = true;
+        bool bDebuffTagSerialized = DebuffTag.NetSerialize(Ar, Map, bDebuffTagLocalSuccess);
+        bLocalSuccess &= bDebuffTagLocalSuccess && bDebuffTagSerialized;
+    }
+    else if (Ar.IsLoading())
+    {
+        // 避免接收端保留旧值
+        DebuffTag = FGameplayTag();
+    }
+    if (RepBits & (1 << 1))
+    {
+        Ar << Chance;
+    }
+    if (RepBits & (1 << 2))
+    {
+        Ar << PerDamage;
+    }
+    if (RepBits & (1 << 3))
+    {
+        Ar << Frequency;
+    }
+    if (RepBits & (1 << 4))
+    {
+        Ar << Duration;
+    }
+    if (RepBits & (1 << 5))
+    {
+        Ar << bIsSucceeded;
+    }
+
+    bOutSuccess = bLocalSuccess;
+    return true;
 }

@@ -9,6 +9,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Game/AuraGameplayTags.h"
 #include "Kismet/GameplayStatics.h"
+#include "VFX/Buff/DeBuffNiagaraComponent.h"
 
 
 AAuraCharacterBase::AAuraCharacterBase()
@@ -29,6 +30,11 @@ AAuraCharacterBase::AAuraCharacterBase()
     /// Begin: Animation
     MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>("Motion Warping");
     /// End: Animation 
+
+    /// Begin: VFX
+    DebuffNiagaraComponent = CreateDefaultSubobject<UDeBuffNiagaraComponent>("Debuff Niagara Component");
+    DebuffNiagaraComponent->SetupAttachment(GetMesh());
+    /// End: VFX
 }
 
 UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
@@ -36,35 +42,48 @@ UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
     return AuraAbilitySystemComponent;
 }
 
-void AAuraCharacterBase::MulticastOnCharacterDeath_Implementation()
+void AAuraCharacterBase::MulticastOnCharacterDeath_Implementation(const FVector& DeathImpulse)
 {
     bIsDead = true;
+    OnCharacterDied.Broadcast(this);
 
     // 播放死亡音效
     UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
 
-    // 设定武器掉落相关参数
+    // 设定武器Ragdoll效果和致命一击施加的力
     Weapon->SetSimulatePhysics(true);
     Weapon->SetEnableGravity(true);
     Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+    Weapon->AddImpulse(DeathImpulse * 0.1f, NAME_None, true);
 
-    // 设定角色网格体Ragdoll效果
+    // 设定角色网格体Ragdoll效果和致命一击施加的力
     GetMesh()->SetSimulatePhysics(true);
     GetMesh()->SetEnableGravity(true);
     GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
     GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+    GetMesh()->AddImpulse(DeathImpulse, NAME_None, true);
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
     // 角色和武器溶解
     Dissolve();
 }
 
-void AAuraCharacterBase::Die()
+void AAuraCharacterBase::Die(const FVector& DeathImpulse)
 {
     // 角色死亡时武器会掉落
     Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 
-    MulticastOnCharacterDeath();
+    MulticastOnCharacterDeath(DeathImpulse);
+}
+
+FOnASCInitialized AAuraCharacterBase::GetOnASCInitializedDelegate()
+{
+    return OnAscInitialized;
+}
+
+FOnCharacterDied AAuraCharacterBase::GetOnCharacterDiedDelegate()
+{
+    return OnCharacterDied;
 }
 
 FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& SocketTag)
@@ -169,6 +188,11 @@ bool AAuraCharacterBase::CheckMotionWarpTargetExists(const FName& WarpTargetName
 UNiagaraSystem* AAuraCharacterBase::GetImpactBloodEffect_Implementation()
 {
     return BloodImpactEffect;
+}
+
+TObjectPtr<UDeBuffNiagaraComponent> AAuraCharacterBase::GetDebuffNiagaraComponent()
+{
+    return DebuffNiagaraComponent;
 }
 
 void AAuraCharacterBase::Dissolve()

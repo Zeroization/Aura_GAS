@@ -7,6 +7,9 @@
 #include "UI/Widget/DamageFloatingTextComponent.h"
 #include "AuraAbilitySystemLibrary.generated.h"
 
+struct FGameplayTag;
+struct FAuraDebuffParams;
+struct FAuraDamageEffectParams;
 class UAuraAbilityInfo;
 class UGameplayEffect;
 struct FGameplayEffectContextHandle;
@@ -52,11 +55,32 @@ public:
     UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|GameplayEffects")
     static bool GetIsCriticalHit(const FGameplayEffectContextHandle& GEContextHandle);
 
+    UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static bool GetIsDoTDamage(const FGameplayEffectContextHandle& GEContextHandle);
+
     UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
     static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& GEContextHandle, bool InIsBlockedHit);
 
     UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
     static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& GEContextHandle, bool InIsCriticalHit);
+
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static void SetIsDoTDamage(UPARAM(ref) FGameplayEffectContextHandle& GEContextHandle, bool InIsDoTDamage);
+
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static FGameplayEffectContextHandle ApplyAuraDamageGE(const FAuraDamageEffectParams& Params);
+
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static bool TryGetDebuffByTag(const FGameplayEffectContextHandle& GEContextHandle, FAuraDebuffParams& OutDebuffParams,
+                                  const FGameplayTag& DebuffTag);
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static bool GetDebuffs(const FGameplayEffectContextHandle& GEContextHandle, TArray<FAuraDebuffParams>& OutDebuffs);
+
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static bool GetDeathImpulse(const FGameplayEffectContextHandle& GEContextHandle, FVector& OutDeathImpulse);
+
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static bool GetKnockbackForce(const FGameplayEffectContextHandle& GEContextHandle, FVector& OutKnockbackForce);
 #pragma endregion
 
 #pragma region Damage
