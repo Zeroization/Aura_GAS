@@ -394,6 +394,7 @@ void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props, flo
         if (bIsDead)
         {
             // 致命一击相关逻辑:
+            // 角色受到致命一击力的冲击
             AActor* TargetAvatarActor = Props.TargetAvatarActor;
             if (TargetAvatarActor->Implements<UCombatInterface>())
             {
@@ -411,6 +412,7 @@ void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props, flo
         else
         {
             // 非致命一击相关逻辑:
+            // 角色受击动画
             if (bool bIsDoTDamage = UAuraAbilitySystemLibrary::GetIsDoTDamage(Props.EffectContextHandle);
                 !bIsDoTDamage)
             {
@@ -418,6 +420,17 @@ void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props, flo
                 FGameplayTagContainer TagContainer;
                 TagContainer.AddTag(AuraGameplayTags::GE::HitReact.GetTag());
                 Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+            }
+
+            // 角色击退
+            FVector KnockbackForce = FVector::ZeroVector;
+            if (!UAuraAbilitySystemLibrary::GetKnockbackForce(Props.EffectContextHandle, KnockbackForce))
+            {
+                UE_LOG(LogAuraGame, Warning, TEXT("[%hs]: Can't get knockback force!"), __FUNCTION__);
+            }
+            else if (!KnockbackForce.IsNearlyZero(1.f))
+            {
+                Props.TargetCharacter->LaunchCharacter(KnockbackForce, true, true);
             }
         }
 

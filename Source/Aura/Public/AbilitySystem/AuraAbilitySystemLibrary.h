@@ -78,6 +78,9 @@ public:
 
     UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
     static bool GetDeathImpulse(const FGameplayEffectContextHandle& GEContextHandle, FVector& OutDeathImpulse);
+
+    UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|GameplayEffects")
+    static bool GetKnockbackForce(const FGameplayEffectContextHandle& GEContextHandle, FVector& OutKnockbackForce);
 #pragma endregion
 
 #pragma region Damage

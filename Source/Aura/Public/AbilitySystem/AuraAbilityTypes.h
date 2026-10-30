@@ -64,6 +64,8 @@ struct FAuraGameplayEffectContext : public FGameplayEffectContext
 
     void SetDeathImpulse(const FVector& InDeathImpulse);
     FVector GetDeathImpulse() const;
+    void SetKnockbackForce(const FVector& InKnockbackForce);
+    FVector GetKnockbackForce() const;
 
     // 必须重写此方法, 用于为反射系统提供数据
     virtual UScriptStruct* GetScriptStruct() const override;
@@ -87,6 +89,9 @@ protected:
 
     UPROPERTY()
     FVector DeathImpulse = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector KnockbackForce = FVector::ZeroVector;
 };
 
 // 必须定义的结构体: 用于告诉引擎该结构体支持哪些底层行为(例如网络序列化, 拷贝等), 进而让引擎调用相关逻辑 
@@ -133,4 +138,13 @@ struct FAuraDamageEffectParams
 
     UPROPERTY()
     FVector DeathImpulse = FVector::ZeroVector;
+
+    UPROPERTY()
+    float KnockbackForceChance = 0.f;
+
+    UPROPERTY()
+    float KnockbackForceMagnitude = 0.f;
+
+    UPROPERTY()
+    FVector KnockbackForce = FVector::ZeroVector;
 };

@@ -171,6 +171,9 @@ FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyAuraDamageGE(const 
 
         // DeathImpulse
         GEContext->SetDeathImpulse(Params.DeathImpulse);
+
+        // KnockbackForce
+        GEContext->SetKnockbackForce(Params.KnockbackForce);
     }
     else
     {
@@ -219,6 +222,18 @@ bool UAuraAbilitySystemLibrary::GetDeathImpulse(const FGameplayEffectContextHand
     }
 
     OutDeathImpulse = FVector::ZeroVector;
+    return false;
+}
+
+bool UAuraAbilitySystemLibrary::GetKnockbackForce(const FGameplayEffectContextHandle& GEContextHandle, FVector& OutKnockbackForce)
+{
+    if (const FAuraGameplayEffectContext* GEContext = static_cast<const FAuraGameplayEffectContext*>(GEContextHandle.Get()))
+    {
+        OutKnockbackForce = GEContext->GetKnockbackForce();
+        return true;
+    }
+
+    OutKnockbackForce = FVector::ZeroVector;
     return false;
 }
 

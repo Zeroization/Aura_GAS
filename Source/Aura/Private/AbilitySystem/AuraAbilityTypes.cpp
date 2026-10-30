@@ -88,6 +88,16 @@ FVector FAuraGameplayEffectContext::GetDeathImpulse() const
     return DeathImpulse;
 }
 
+void FAuraGameplayEffectContext::SetKnockbackForce(const FVector& InKnockbackForce)
+{
+    KnockbackForce = InKnockbackForce;
+}
+
+FVector FAuraGameplayEffectContext::GetKnockbackForce() const
+{
+    return KnockbackForce;
+}
+
 UScriptStruct* FAuraGameplayEffectContext::GetScriptStruct() const
 {
     return StaticStruct();
@@ -150,9 +160,13 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, class UPackageMap* M
         {
             RepBits |= 1 << 11;
         }
+        if (!KnockbackForce.IsZero())
+        {
+            RepBits |= 1 << 12;
+        }
     }
     // 让Archive知道要存储多少数据
-    Ar.SerializeBits(&RepBits, 12);
+    Ar.SerializeBits(&RepBits, 13);
 
     // 序列化/反序列化阶段: 通过按位与的结果存储/读取相应数据
 #pragma region FGameplayEffectContext
@@ -223,6 +237,10 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, class UPackageMap* M
     if (RepBits & (1 << 11))
     {
         DeathImpulse.NetSerialize(Ar, Map, bOutSuccess);
+    }
+    if (RepBits & (1 << 12))
+    {
+        KnockbackForce.NetSerialize(Ar, Map, bOutSuccess);
     }
 
 

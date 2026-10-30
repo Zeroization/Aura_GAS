@@ -39,6 +39,20 @@ FAuraDamageEffectParams UAuraDamageGA::MakeDamageEffectParamsFromClassDefaults(A
     }
     Params.AbilityLevel = GetAbilityLevel();
     Params.DeathImpulseMagnitude = DeathImpulseMagnitude;
+    Params.KnockbackForceChance = KnockbackForceChance;
+    Params.KnockbackForceMagnitude = KnockbackForceMagnitude;
+
+    if (IsValid(TargetActor))
+    {
+        FVector TargetDir = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation())
+            .GetSafeNormal();
+        TargetDir.Z = 0.f;
+        Params.DeathImpulse = TargetDir * DeathImpulseMagnitude;
+        if (FMath::RandRange(1.f, 100.f) <= KnockbackForceChance)
+        {
+            Params.KnockbackForce = TargetDir * KnockbackForceMagnitude;
+        }
+    }
 
     return Params;
 }
